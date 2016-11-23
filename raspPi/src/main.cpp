@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 	float freq;
 	freq = servoCtrl.setUpdateFrequency(60.0f);
 	printf("PWM Frequency set to %.2f \n", freq);
-	//servoCtrl.printAllRegisters();
+	servoCtrl.printAllRegisters();
 	//mr996R_test(servoCtrl);
 	//ArmTest(servoCtrl);
 	//ArmTest2(servoCtrl);
