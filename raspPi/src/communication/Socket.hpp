@@ -1,4 +1,6 @@
 //http://stackoverflow.com/questions/28027937/cross-platform-sockets
+#pragma once
+
 #include <cstdint>
 #include <sys/types.h> 
 #include <sys/socket.h>
@@ -8,17 +10,16 @@ typedef int SOCKET;
 typedef struct sockaddr_in SOCKADDR_IN;
 typedef struct sockaddr SOCKADDR;
 
-enum ESocketType {UDP, TCP};
-typedef enum ESocketType SocketType;
+enum class SocketType {UDP, TCP};
 
 class Socket
 {
 public:
-    Socket(SocketType type);
+    Socket();
     virtual ~Socket();
 
     int Listen();
-    int Bind(uint16_t portNo);
+    int Bind(uint16_t portNo, SocketType type);
     int Connect(const SOCKADDR_IN& sockAddr);
     int Accept(const Socket &listningSocket);
     int Shutdown();

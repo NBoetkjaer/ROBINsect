@@ -9,14 +9,12 @@
 // #define IPPROTO_UDP 0
 
 
-Socket::Socket(SocketType type)
+Socket::Socket()
     :socketID(0),
      bytesSent(0),
      bytesRecieved(0),
-     socketType(type),
      isBlocking(true), bound(false), connected(false)
 {
-
 }
 
 Socket::~Socket()
@@ -40,32 +38,38 @@ int Socket::SetBlocking(bool blocking)
 }
 
 int Socket::Listen()
-{
+{    
 	if(listen(socketID, SOMAXCONN) < 0)
 		return SocketError();
 	return 0;    
 }
 
-int Socket::Bind(uint16_t portNo)
+int Socket::Bind(uint16_t portNo, SocketType type)
 {
+    socketType = type;
 	SOCKADDR_IN socketAddr;
 	char optval = 1;
 	if(bound)
     {
         Close();
     }
+    
     switch(socketType)
     {
-        case TCP: //TCP Socket
+        case SocketType::TCP: //TCP Socket        
             socketID = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
             break;
-        case UDP: //UDP Socket
+        case SocketType::UDP: //UDP Socket
             socketID = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
             break;
     }
 	
     if (!socketID) // Error socket not created
         return SocketError();
+
+    // SO_REUSEADDR allows app to connect to server
+    // port quickly after last shutdown:
+    setsockopt(socketID, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
 
     memset(&socketAddr, 0, sizeof(socketAddr));
     socketAddr.sin_family = AF_INET;
@@ -76,7 +80,7 @@ int Socket::Bind(uint16_t portNo)
     if (bind (socketID, (SOCKADDR *)&socketAddr, sizeof(SOCKADDR_IN)) < 0 ) // There was an error binding this socket
 		return SocketError();
     bound = true;
-    if(socketType == UDP)
+    if(socketType == SocketType::UDP)
     {
         // Allow broadcast
 	    if (setsockopt(socketID, SOL_SOCKET, SO_BROADCAST, &optval, sizeof(optval)) < 0 )
@@ -101,7 +105,7 @@ int Socket::Accept(const Socket &listningSocket)
 	SOCKET newSockID; 
 	
 	socklen_t addrlen = sizeof(SOCKADDR);	
-	newSockID= accept(listningSocket.socketID, &addr, &addrlen);
+	newSockID = accept(listningSocket.socketID, &addr, &addrlen);
 	if(newSockID < 0)
 	{
 		return SocketError();
@@ -110,6 +114,7 @@ int Socket::Accept(const Socket &listningSocket)
 	{		
 		socketID = newSockID;
         connected = true;
+        socketType = SocketType::TCP;
 	}
 	return 0;
 }
@@ -124,7 +129,7 @@ int Socket::Recieve(char *pData, size_t *pDataLen)
 	}
     if(iBytesRecieved == 0)
     {
-        //if(socketType == TCP) shutdown();
+        //if(socketType == SocketType::TCP) shutdown();
         // Remote end is shutdown - only TCP.
         // Return ???
     }

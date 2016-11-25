@@ -11,11 +11,15 @@
 #include <string>
 #include <iostream>
 #include <iomanip>
+#include <vector>
+#include <memory>
 
 #include "pca9685.h"
 #include "servo.h"
 #include "LegKinematic.h"
 #include "cmd.h"
+
+#include "modules/NetworkModule.hpp"
 
 using namespace std;
 
@@ -30,6 +34,19 @@ void menu_test(pca9685 &servoCtrl);
 
 int main(int argc, char **argv)
 {
+	vector<unique_ptr<Module>> modules;
+	//unique_ptr<Module> netModule(new NetworkModule());
+	modules.push_back(make_unique<NetworkModule>());
+
+	while(true)
+	{
+		for(auto &pModul : modules)
+		{
+			pModul->Execute();
+		}
+	}
+
+	
 	std::cout.setf(std::ios::fixed, std::ios::floatfield); // set fixed floating format
 	std::cout.precision(3);
 	

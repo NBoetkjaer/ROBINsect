@@ -10,15 +10,16 @@ include_directories(include  /usr/include/eigen3/)
 #set(SOURCES src/mainapp.cpp src/Student.cpp)
  
 #However, the file(GLOB...) allows for wildcard additions:
-file(GLOB SOURCES "src/*.cpp")
-file(GLOB SOURCES_Comm "src/communication/*.cpp")
+file(GLOB SOURCES_top "src/*.cpp")
+file(GLOB SOURCES_comm "src/communication/*.cpp")
+file(GLOB SOURCES_modules "src/modules/*.cpp")
+set(SOURCES ${SOURCES_top} ${SOURCES_comm} ${SOURCES_modules}) 
  
-add_executable(servo_test ${SOURCES} ${SOURCES_Comm})
+add_executable(ROBINsect ${SOURCES} )
 
 ADD_DEFINITIONS(
-    #-std=c++11 # Or 
-    -std=c++0x
+    -std=c++14 # Or -std=c++0x
     # Other flags
 )
 
-#install(TARGETS servo_test DESTINATION bin)
+#install(TARGETS ROBINsect DESTINATION bin)
