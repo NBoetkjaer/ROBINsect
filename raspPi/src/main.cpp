@@ -20,6 +20,7 @@
 #include "cmd.h"
 
 #include "modules/NetworkModule.hpp"
+#include "nodes/BaseNode.hpp"
 
 using namespace std;
 
@@ -37,7 +38,7 @@ int main(int argc, char **argv)
 	vector<unique_ptr<Module>> modules;
 	//unique_ptr<Module> netModule(new NetworkModule());
 	modules.push_back(make_unique<NetworkModule>());
-
+	BaseNode test("root");
 	while(true)
 	{
 		for(auto &pModul : modules)

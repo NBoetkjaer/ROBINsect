@@ -48,7 +48,7 @@ int Socket::Bind(uint16_t portNo, SocketType type)
 {
     socketType = type;
 	SOCKADDR_IN socketAddr;
-	char optval = 1;
+	int optval = 1;
 	if(bound)
     {
         Close();

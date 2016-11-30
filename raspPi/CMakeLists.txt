@@ -13,7 +13,13 @@ include_directories(include  /usr/include/eigen3/)
 file(GLOB SOURCES_top "src/*.cpp")
 file(GLOB SOURCES_comm "src/communication/*.cpp")
 file(GLOB SOURCES_modules "src/modules/*.cpp")
-set(SOURCES ${SOURCES_top} ${SOURCES_comm} ${SOURCES_modules}) 
+file(GLOB SOURCES_nodes "src/nodes/*.cpp")
+set(SOURCES 
+    ${SOURCES_top}
+    ${SOURCES_comm}
+    ${SOURCES_modules}
+    ${SOURCES_nodes}
+) 
  
 add_executable(ROBINsect ${SOURCES} )
 
