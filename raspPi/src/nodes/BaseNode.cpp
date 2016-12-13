@@ -4,8 +4,16 @@
 using namespace std;
 
 
-BaseNode::BaseNode(const std::string &nodeName, BaseNode* pParentNode, NodeType type)
-    :name(nodeName), nodeType(type), pParent(pParentNode)
+// Register attributes.
+static Attribute flags("flags");
+static Attribute info("info");
+
+
+BaseNode::BaseNode(const std::string &nodeName, BaseNode* pParentNode, NodeType type):
+    isChanged(true),
+    name(nodeName),
+    nodeType(type),
+    pParent(pParentNode)
 {
 }
 
@@ -33,6 +41,49 @@ void BaseNode::Notify()
     for(auto pObserver : subscribers)
     {
         pObserver->Notify();
+    }
+}
+
+
+bool BaseNode::SetAttribute(attribID_t attribID, const char* pAttributeValue)
+{
+
+    if(flags.GetID() == attribID)
+    {
+        return true;
+    }
+    else if(info.GetID() == attribID){
+
+    }
+    //else if(info.GetID() == attribID){
+
+    return false;
+    // Find attribute index.
+    // If found
+    //  Set the attribute
+    // else
+    //  CreateAttribute
+    // Indicate attribute changed-
+}
+
+void BaseNode::SetValueChanged()
+{
+    if(!isChanged)
+    {
+        isChanged = true;
+        if(pParent!= nullptr)
+        {
+            pParent->SetValueChanged();
+        }
+    }
+}
+
+void BaseNode::Print() const
+{
+    std::cout << name <<"  " << typeid(*this).name() << std::endl;
+    for(const auto &child : children)
+    {
+        child->Print();
     }
 }
 

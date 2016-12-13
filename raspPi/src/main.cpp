@@ -42,6 +42,7 @@ int main(int argc, char **argv)
 	root.AddChild<BoolNode>("Bool", true);
 	root.AddChild<Int32Node>("Int32", 0);
 	root.AddChild<FloatNode>("Float", 0.0f);
+	root.AddChild<StringNode>("String", "Test string.");
 	root.Print();
 
 	while(true) 
