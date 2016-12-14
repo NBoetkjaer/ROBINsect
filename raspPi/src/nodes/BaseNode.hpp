@@ -3,6 +3,7 @@
 #include <vector>
 #include <list>
 #include <limits>
+#include <algorithm>
 #include <memory>
 #include <iostream>
 #include <typeinfo>
@@ -55,11 +56,11 @@ public:
         std::unique_ptr<BaseNode> newNode(new TNode(std::forward<Args>(params)...));
         newNode->pParent = this;
         children.push_back(std::move(newNode));
-        return children.end()->get();
+        return children.back().get();
     }
 
     void SetValueChanged();
-    void Print() const; 
+    void Print(int indentLevel = 0) const; 
 };
 
 template <typename T>

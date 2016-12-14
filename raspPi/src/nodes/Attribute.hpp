@@ -3,7 +3,7 @@
 #include <vector>
 
 typedef char attribID_t;
-#define INVALID_ATTRIBUTE_ID (0xFF)
+#define INVALID_ATTRIBUTE_ID (-1)
 
 class Attribute
 {
