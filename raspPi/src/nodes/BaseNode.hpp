@@ -30,6 +30,7 @@ private:
     size_t changes; // Variable to hold the applied changes to this node. Each attribID has a bit in changes.
     //std::map<size_t, string> attributes; key<attribID,string>
     std::vector<NodeObserver*> subscribers;
+    
 protected:
     std::string name;
     NodeType nodeType;
@@ -40,15 +41,20 @@ public:
     BaseNode(const std::string &nodeName, BaseNode* pParentNode = nullptr, NodeType type = NodeType::nodeNode);
     virtual ~BaseNode();
 
+    const std::string&  GetName() const { return name; }
+    BaseNode* GetParent() const { return pParent; }
     // Sets the given attribute, based on the string argument.
     // Inherited nodes should call and return a base implementation if it does not handle the attributeID.
     // Returns true is the attribute is handeled/altered. 
     virtual bool SetAttribute(attribID_t attribID, const char* pAttributeValue);
+    bool SetFlags(const char* pValues);
 
     void Subscribe(NodeObserver* pObserver);
     void UnSubscribe(NodeObserver* pObserver);
 
-    BaseNode* FindNode(std::string nodePath);
+private: BaseNode* FindNodeInternal(const std::string& nodePath, size_t pos);
+public: BaseNode* FindNode(const std::string& nodePath);
+public:
 
     template<typename TNode, typename ...Args>
     BaseNode* AddChild(Args&&... params)
