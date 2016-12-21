@@ -1,0 +1,16 @@
+# directories
+libraries/
+
+build/
+debug/
+release/
+bin/
+obj/
+
+# files
+*.suo
+*.sdf
+*.opensdf
+*.user
+*.ncb
+*.meta

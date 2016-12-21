@@ -13,8 +13,8 @@ private:
     attribID_t id;
 public:
     Attribute(const char* name);
-    attribID_t GetID() const {return id;}
-    const std::string& GetName() const {return name;}
+    inline attribID_t GetID() const {return id;}
+    inline const std::string& GetName() const {return name;}
     static const std::string& GetAttributeName(attribID_t id);
 
     // Function used to lookup an attributes given its name.

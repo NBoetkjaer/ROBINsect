@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include <string>
 #include <vector>
 #include <list>
@@ -9,9 +10,12 @@
 #include <typeinfo>
 #include "Attribute.hpp"
 
+#include "../util/BitmaskEnumClass.h"
+
 enum class NodeType { nodeNode, boolNode, intNode, floatNode, doubleNode, stringNode, enumNode };
 
-//flags ?? logging|hidden|readonly|persistent|query ...
+enum class FlagType :uint32_t { hide, readonly, logging, persist, query, numflags, invalidFlag = numflags};
+ENABLE_BITMASK_OPERATORS(FlagType) // Supply overloaded bitwise operators for FlagType.
 
 // Attributes: Value, Type, Range, flags, Enums, DisplayName, DisplayFormat, unit, prefix, info, ... 
 
@@ -26,10 +30,13 @@ class BaseNode
 private:
     // Common attributes.
     //static Attributes displayName("displayName");
+    static std::array< std::tuple<const std::string, FlagType>, (size_t)FlagType::numflags> flagNames;
     bool isChanged;
     size_t changes; // Variable to hold the applied changes to this node. Each attribID has a bit in changes.
     //std::map<size_t, string> attributes; key<attribID,string>
     std::vector<NodeObserver*> subscribers;
+
+    FlagType nodeFlag;
     
 protected:
     std::string name;
@@ -43,18 +50,28 @@ public:
 
     const std::string&  GetName() const { return name; }
     BaseNode* GetParent() const { return pParent; }
+
     // Sets the given attribute, based on the string argument.
     // Inherited nodes should call and return a base implementation if it does not handle the attributeID.
-    // Returns true is the attribute is handeled/altered. 
+    // Returns true is the attribute is handeled. 
     virtual bool SetAttribute(attribID_t attribID, const char* pAttributeValue);
-    bool SetFlags(const char* pValues);
+    // Mark a given attribute as changed.
+    inline void SetAttributeChanged(attribID_t attribID){ changes |= 1 << attribID; }
 
+    // Flag attribute methods.
+    bool SetFlags(const char* pValues);
+    void SetFlag(FlagType flag, bool value);
+    bool GetFlag(FlagType flag);
+
+    // Add/remove observers to this node.
     void Subscribe(NodeObserver* pObserver);
     void UnSubscribe(NodeObserver* pObserver);
 
-private: BaseNode* FindNodeInternal(const std::string& nodePath, size_t pos);
-public: BaseNode* FindNode(const std::string& nodePath);
+private:
+    BaseNode* FindNodeInternal(const char * pNodePath);
 public:
+    BaseNode* FindNode(const std::string& nodePath);
+    BaseNode* FindNode(const char * pNodePath);
 
     template<typename TNode, typename ...Args>
     BaseNode* AddChild(Args&&... params)

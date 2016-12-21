@@ -1,12 +1,23 @@
 #include "BaseNode.hpp"
 
 #include <algorithm>
-using namespace std;
 
+using namespace std;
+using namespace Util;
 
 // Register attributes.
-static Attribute flags("flags");
-static Attribute info("info");
+static Attribute flagsAttrib("flags");
+static Attribute infoAttrib("info");
+
+// Define flag names 
+std::array< std::tuple<const string, FlagType>, (size_t)FlagType::numflags > BaseNode::flagNames =
+{
+    make_tuple("hide"       , FlagType::hide),
+    make_tuple("readonly"   , FlagType::readonly),
+    make_tuple("log"        , FlagType::logging),
+    make_tuple("persist"    , FlagType::persist),
+    make_tuple("query"      , FlagType::query),
+};
 
 
 BaseNode::BaseNode(const std::string &nodeName, BaseNode* pParentNode, NodeType type):
@@ -47,19 +58,95 @@ void BaseNode::Notify()
 bool BaseNode::SetFlags(const char* pValues)
 {
     // Syntax: "[+/-]flag1|[+/-]flag2" eg. "+flag1|+flag2|-flag3" set 
-    // Parse string and set flags accordingly.   
+    // Parse string and set flags accordingly.
+    static const char flagDelimiter = '|';
+    bool moreflags = true;
+    FlagType newFlags = (FlagType) 0;
+
+
+    if (pValues == nullptr) return false;
+    while (moreflags)
+    {
+        FlagType flag = FlagType::invalidFlag;
+        // End of string stop parsing.
+        if (*pValues == 0) break;
+
+        bool removeFlag = false;
+        if (pValues[0] == '-')
+        {
+            removeFlag = true;
+            pValues++;
+        }
+        else if (pValues[0] == '+')
+        {
+            pValues++;
+        }
+
+        // Iterate over all flags to find a string match.    
+        for (const auto &flagTuple : flagNames)
+        {
+            const char* pFlagName = get<0>(flagTuple).c_str();
+            const char* pValue = pValues;
+
+            while (*pValue == *pFlagName  && *pFlagName != 0 && *pValue != 0 && *pValue != flagDelimiter)
+            {
+                pValue++;
+                pFlagName++;
+            }
+
+            // did we match to the end of child name?
+            if (*pFlagName == 0)
+            {
+                if (*pValue == flagDelimiter || *pValue == 0)
+                {                    
+                    if (*pValue == flagDelimiter) pValues = pValue + 1;
+					else moreflags = false;
+					flag = get<1>(flagTuple);
+                    break;
+                }
+            }
+        }
+        if (flag != FlagType::invalidFlag)
+        {
+            SetFlag(flag, !removeFlag);
+        }
+    } // End of while loop.
     return true;
+}
+
+void BaseNode::SetFlag(FlagType flag, bool value)
+{
+    FlagType oldFlags = nodeFlag;
+    if (value)
+    {
+        // Add flag.
+        nodeFlag |= (FlagType)(1 << (uint32_t)flag);
+    }
+    else
+    {
+        // Remove flag
+        nodeFlag &= (FlagType)(~(1 << (uint32_t)flag));
+    }
+    if (oldFlags != nodeFlag)
+    {
+        SetAttributeChanged(flagsAttrib.GetID()); // Mark the change.;
+    }
+}
+
+bool BaseNode::GetFlag(FlagType flag)
+{
+    return (flag & nodeFlag) != (FlagType)0;
 }
 
 bool BaseNode::SetAttribute(attribID_t attribID, const char* pAttributeValue)
 {
 
     bool retVal = false;
-    if(flags.GetID() == attribID)
+    if(flagsAttrib.GetID() == attribID)
     {
-        return SetFlags(pAttributeValue);
+        retVal = SetFlags(pAttributeValue);
     }
-    else if(info.GetID() == attribID){
+    else if(infoAttrib.GetID() == attribID){
 
     }
     //else if(info.GetID() == attribID){
@@ -105,60 +192,56 @@ void BaseNode::Print(int indentLevel) const
 // Return value: If the node is found a pointer to the requested node is returned, otherwise a nullptr is returned.
 BaseNode* BaseNode::FindNode(const std::string& nodePath)
 {
-
-    return FindNodeInternal(nodePath, 0);
+    return FindNodeInternal(nodePath.c_str());
 }
 
-BaseNode* BaseNode::FindNodeInternal(const std::string& nodePath, size_t pos)
+BaseNode* BaseNode::FindNode(const char * pNodePath)
 {
-    static const char pathDelimiter = '/';    
+    return FindNodeInternal(pNodePath);
+}
 
-    // Special case for an empty string - just return this, also terminates the recursion.
-    if (pos >= nodePath.size()) return this;
-
-    // 
-    if (pos == 0)
+BaseNode* BaseNode::FindNodeInternal(const char * pNodePath)
+{
+    static const char pathDelimiter = '/';
+    if (pNodePath == nullptr) return nullptr;
+    // Special case for an empty string - just return this.
+    if (pNodePath[0] == 0) return this;
+    // Special case if first character is a pathDelimiter we should start the search from the root node.
+    if (pNodePath[0] == pathDelimiter)
     {
-        // Special case if first character is a pathDelimiter we should start the search from the root node.
-        if (nodePath.front() == pathDelimiter)
+        BaseNode* pNode = this;
+        // Traverse to root.
+        while (pNode->pParent)
         {
-            BaseNode* pNode = this;
-            // Traverse to root.
-            while (pNode->pParent)
-            {
-                pNode = pNode->pParent;
-            }
-            return pNode->FindNodeInternal(nodePath, pos + 1);
+            pNode = pNode->pParent;
         }
-        // Special case if first two characters are ".." - then return the parent if not null.
-        if (nodePath.size() == 2 && nodePath == ".." && pParent)
-        {
-            return pParent;
-        }
+        return pNode->FindNodeInternal(pNodePath + 1);
+    }
+    // Special case if first two characters are ".." - then return the parent if not null.
+    if (pNodePath[0] == '.' && pNodePath[1] != 0 && pNodePath[1] == '.' && pParent)
+    {
+        if (pNodePath[2] == pathDelimiter) return pParent->FindNodeInternal(pNodePath + 3);
+        if (pNodePath[2] == 0) return pParent;
     }
 
     // Otherwise look up (next) node name in nodePath.
-    size_t tmpPos = nodePath.find(pathDelimiter, pos);
-    size_t len = tmpPos == std::string::npos ? nodePath.size() - pos : tmpPos - pos;
-    std::string nodeName = nodePath.substr(pos, len);
-
-    // Special case "../" characters means select parent.  
-    // ??? what about "./" ?? should we handle this ???
-    if (nodeName == ".." && pParent != nullptr)
-    {
-        return pParent->FindNodeInternal(nodePath, pos + len + 1);
-    }
-
-    // Find the node name amongst children.
+    // Otherwise search children for at string match with next node.
     for (const auto &child : children)
     {
-        if (nodeName == child->name)
+        const char* pChildName = child->name.c_str();
+        const char* pNodeName = pNodePath;
+
+        while (*pNodeName == *pChildName && *pChildName != 0 && *pNodeName != 0 && *pNodeName != pathDelimiter)
         {
-            BaseNode* pNode = child.get();
-            return pNode->FindNodeInternal(nodePath, pos + len + 1);;
+            pNodeName++;
+            pChildName++;
+        }
+        // did we match to the end of child name?
+        if (*pChildName == 0)
+        {
+            if (*pNodeName == pathDelimiter) return child->FindNodeInternal(pNodeName + 1);
+            if (*pNodeName == 0) return child.get();
         }
     }
-
-    // No match return nullptr;
     return nullptr;
 }
