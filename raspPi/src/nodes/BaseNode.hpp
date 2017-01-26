@@ -12,12 +12,15 @@
 
 #include "../util/BitmaskEnumClass.h"
 
-enum class NodeType { nodeNode, boolNode, intNode, floatNode, doubleNode, stringNode, enumNode };
+//enum class NodeType { nodeNode, boolNode, intNode, floatNode, doubleNode, stringNode, enumNode };
 
-enum class FlagType :uint32_t { hide, readonly, logging, persist, query, numflags, invalidFlag = numflags};
+extern Attribute valueAttrib("value");
+
+enum class FlagType :uint32_t {hide, readonly, logging, persist, query, numflags, invalidFlag = numflags};
 ENABLE_BITMASK_OPERATORS(FlagType) // Supply overloaded bitwise operators for FlagType.
 
 // Attributes: Value, Type, Range, flags, Enums, DisplayName, DisplayFormat, unit, prefix, info, ... 
+
 
 class NodeObserver
 {
@@ -36,16 +39,15 @@ private:
     //std::map<size_t, string> attributes; key<attribID,string>
     std::vector<NodeObserver*> subscribers;
 
-    FlagType nodeFlag;
+
     
 protected:
     std::string name;
-    NodeType nodeType;
     BaseNode* pParent;
     std::vector<std::unique_ptr<BaseNode>> children;
     void Notify();
 public:
-    BaseNode(const std::string &nodeName, BaseNode* pParentNode = nullptr, NodeType type = NodeType::nodeNode);
+    BaseNode(const std::string &nodeName, BaseNode* pParentNode = nullptr);
     virtual ~BaseNode();
 
     const std::string&  GetName() const { return name; }
@@ -57,11 +59,20 @@ public:
     virtual bool SetAttribute(attribID_t attribID, const char* pAttributeValue);
     // Mark a given attribute as changed.
     inline void SetAttributeChanged(attribID_t attribID){ changes |= 1 << attribID; }
+	inline bool IsAttributeChanged(attribID_t attribID) { return (changes &= 1 << attribID)!=0;}
 
+	// -------- Atributes --------
+private:
+	FlagType nodeFlag;
+	std::string info;
+public:
     // Flag attribute methods.
-    bool SetFlags(const char* pValues);
+    void SetFlags(const char* pValues);
     void SetFlag(FlagType flag, bool value);
     bool GetFlag(FlagType flag);
+	// Info attributes methods.
+	const std::string &GetInfo() {return info;}
+	void SetInfo(const char* pValue);
 
     // Add/remove observers to this node.
     void Subscribe(NodeObserver* pObserver);
@@ -104,30 +115,7 @@ private:
     T value;
 };
 
-template <typename T>
-class NumericNode : public GenericNode<T>
-{
-public:
-    NumericNode(const std::string &nodeName, T val) : GenericNode<T> (nodeName, val){ }
-    virtual ~NumericNode(){}
 
-    void SetRange(T min, T max)
-    {
-        // ToDo check min <= max
-        minValue = min;
-        maxValue = max;
-    }
-    virtual void Set(const T &newValue)
-    {
-        T val = std::min(maxValue, std::max(newValue, minValue));
-        GenericNode<T>::Set(val);
-    }
-private:
-    T minValue; // = std::numeric_limits<T>::lowest()
-    T maxValue; // = std::numeric_limits<T>::max()
-};
 
 typedef GenericNode<bool> BoolNode;
 typedef GenericNode<std::string> StringNode;
-typedef NumericNode<int32_t> Int32Node;
-typedef NumericNode<float> FloatNode;

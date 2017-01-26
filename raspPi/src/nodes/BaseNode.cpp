@@ -7,23 +7,26 @@ using namespace Util;
 
 // Register attributes.
 static Attribute flagsAttrib("flags");
+static Attribute typeAttrib("type");
 static Attribute infoAttrib("info");
 
+Attribute valueAttrib("value");
+Attribute rangeAttrib("range");
 // Define flag names 
 std::array< std::tuple<const string, FlagType>, (size_t)FlagType::numflags > BaseNode::flagNames =
 {
     make_tuple("hide"       , FlagType::hide),
     make_tuple("readonly"   , FlagType::readonly),
-    make_tuple("log"        , FlagType::logging),
+    make_tuple("logging"    , FlagType::logging),
     make_tuple("persist"    , FlagType::persist),
     make_tuple("query"      , FlagType::query),
 };
 
 
-BaseNode::BaseNode(const std::string &nodeName, BaseNode* pParentNode, NodeType type):
+BaseNode::BaseNode(const std::string &nodeName, BaseNode* pParentNode):
     isChanged(true),
+	changes(0),
     name(nodeName),
-    nodeType(type),
     pParent(pParentNode)
 {
 }
@@ -42,6 +45,7 @@ void BaseNode::Subscribe(NodeObserver* pObserver)
     subscribers.push_back(pObserver);
 
 }
+
 void BaseNode::UnSubscribe(NodeObserver* pObserver)
 {
     subscribers.erase(std::remove_if(subscribers.begin(), subscribers.end(),
@@ -55,7 +59,8 @@ void BaseNode::Notify()
         pObserver->Notify();
     }
 }
-bool BaseNode::SetFlags(const char* pValues)
+// Flag attribute
+void  BaseNode::SetFlags(const char* pValues)
 {
     // Syntax: "[+/-]flag1|[+/-]flag2" eg. "+flag1|+flag2|-flag3" set 
     // Parse string and set flags accordingly.
@@ -64,7 +69,7 @@ bool BaseNode::SetFlags(const char* pValues)
     FlagType newFlags = (FlagType) 0;
 
 
-    if (pValues == nullptr) return false;
+    if (pValues == nullptr) return;
     while (moreflags)
     {
         FlagType flag = FlagType::invalidFlag;
@@ -94,7 +99,7 @@ bool BaseNode::SetFlags(const char* pValues)
                 pFlagName++;
             }
 
-            // did we match to the end of child name?
+            // did we match to the end of flag name?
             if (*pFlagName == 0)
             {
                 if (*pValue == flagDelimiter || *pValue == 0)
@@ -111,7 +116,6 @@ bool BaseNode::SetFlags(const char* pValues)
             SetFlag(flag, !removeFlag);
         }
     } // End of while loop.
-    return true;
 }
 
 void BaseNode::SetFlag(FlagType flag, bool value)
@@ -135,28 +139,33 @@ void BaseNode::SetFlag(FlagType flag, bool value)
 
 bool BaseNode::GetFlag(FlagType flag)
 {
-    return (flag & nodeFlag) != (FlagType)0;
+    return ((1<<(uint32_t)flag) & (uint32_t)nodeFlag) != 0;
+}
+// Info attribute
+void BaseNode::SetInfo(const char* pValue)
+{
+	info = pValue;
+	SetAttributeChanged(flagsAttrib.GetID()); // Mark the change.
 }
 
+// SetAttribute
+// Must return true if a given attribute is handled.
 bool BaseNode::SetAttribute(attribID_t attribID, const char* pAttributeValue)
 {
-
-    bool retVal = false;
     if(flagsAttrib.GetID() == attribID)
     {
-        retVal = SetFlags(pAttributeValue);
+        SetFlags(pAttributeValue);
     }
-    else if(infoAttrib.GetID() == attribID){
-
+    else if(infoAttrib.GetID() == attribID)
+	{
+		SetInfo(pAttributeValue);
     }
-    //else if(info.GetID() == attribID){
+	else 
+	{
+		return false; // Unknown attribute return false.
+	}
 
-
-    if (retVal)
-    {
-        changes |= 1 << attribID; // If change is handled, we mark the change.
-    }
-    return retVal;
+    return true;
     // Find attribute index.
     // If found
     //  Set the attribute

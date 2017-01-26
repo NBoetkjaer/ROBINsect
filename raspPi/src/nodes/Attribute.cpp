@@ -12,15 +12,18 @@ Attribute::Attribute(const char* pName):
     id = GetAttributeID(pName);
     if(id == INVALID_ATTRIBUTE_ID)
     {
-        registredAttributes.push_back(pName);
-        id = registredAttributes.size();
+        id = (attribID_t)(registredAttributes.size());
+		if (id >= sizeof(size_t) * 8)
+		{
+			throw std::exception("Too many attributes registred.");
+		}
+		registredAttributes.push_back(pName);
     }
 }
 
 const string& Attribute::GetAttributeName(attribID_t id)
 {
     //if(id < 0 && id >= registredAttributes.size())
-
     return registredAttributes.at(id);
 }
 

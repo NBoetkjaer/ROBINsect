@@ -3,7 +3,9 @@
 
 #include <assert.h>
 #include <array>
+
 #include "../nodes/BaseNode.hpp"
+#include "../nodes/NumericNode.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -14,7 +16,23 @@ int main(int argc, char* argv[])
     BaseNode* pFloatNode = pInt32Node->AddChild<FloatNode>("Float", 0.0f);
     BaseNode* pStringNode = pFloatNode->AddChild<StringNode>("String", "Test string.");
     
-    root.SetFlags("+hide|+readonly|+log|+persist|-query");
+
+	root.SetAttribute(Attribute::GetAttributeID("info"), "Dette er en test");
+	assert(root.GetInfo()=="Dette er en test");
+
+    //root.SetFlags("+hide|+readonly|+logging|persist|query");
+	root.SetAttribute(Attribute::GetAttributeID("flags"),"+hide|+readonly|+logging|persist|query");
+	assert(root.GetFlag(FlagType::hide));
+	assert(root.GetFlag(FlagType::readonly));
+	assert(root.GetFlag(FlagType::logging));
+	assert(root.GetFlag(FlagType::persist));
+	assert(root.GetFlag(FlagType::query));
+	root.SetFlags("-hide|-logging|-query");
+	assert(!root.GetFlag(FlagType::hide));
+	assert(root.GetFlag(FlagType::readonly));
+	assert(!root.GetFlag(FlagType::logging));
+	assert(root.GetFlag(FlagType::persist));
+	assert(!root.GetFlag(FlagType::query));
 
     BaseNode* pTmpNode;
     pTmpNode = pStringNode->FindNode("/Base/Int32/");
@@ -40,6 +58,8 @@ int main(int argc, char* argv[])
 
     pTmpNode = pStringNode->FindNode(".././../Int32");
     assert(pTmpNode == nullptr);
+
+	pInt32Node->SetAttribute(Attribute::GetAttributeID("value"), "[12,24]");
     root.Print(); 
 
 	return 0;
