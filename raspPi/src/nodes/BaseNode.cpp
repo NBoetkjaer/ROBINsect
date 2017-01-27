@@ -25,7 +25,7 @@ std::array< std::tuple<const string, FlagType>, (size_t)FlagType::numflags > Bas
 
 BaseNode::BaseNode(const std::string &nodeName, BaseNode* pParentNode):
     isChanged(true),
-	changes(0),
+    changes(0),
     name(nodeName),
     pParent(pParentNode)
 {
@@ -105,8 +105,8 @@ void  BaseNode::SetFlags(const char* pValues)
                 if (*pValue == flagDelimiter || *pValue == 0)
                 {                    
                     if (*pValue == flagDelimiter) pValues = pValue + 1;
-					else moreflags = false;
-					flag = get<1>(flagTuple);
+                    else moreflags = false;
+                    flag = get<1>(flagTuple);
                     break;
                 }
             }
@@ -137,15 +137,16 @@ void BaseNode::SetFlag(FlagType flag, bool value)
     }
 }
 
-bool BaseNode::GetFlag(FlagType flag)
+bool BaseNode::GetFlag(FlagType flag) const
 {
     return ((1<<(uint32_t)flag) & (uint32_t)nodeFlag) != 0;
 }
+
 // Info attribute
 void BaseNode::SetInfo(const char* pValue)
 {
-	info = pValue;
-	SetAttributeChanged(flagsAttrib.GetID()); // Mark the change.
+    info = pValue;
+    SetAttributeChanged(flagsAttrib.GetID()); // Mark the change.
 }
 
 // SetAttribute
@@ -157,13 +158,13 @@ bool BaseNode::SetAttribute(attribID_t attribID, const char* pAttributeValue)
         SetFlags(pAttributeValue);
     }
     else if(infoAttrib.GetID() == attribID)
-	{
-		SetInfo(pAttributeValue);
+    {
+        SetInfo(pAttributeValue);
     }
-	else 
-	{
-		return false; // Unknown attribute return false.
-	}
+    else 
+    {
+        return false; // Unknown attribute return false.
+    }
 
     return true;
     // Find attribute index.
@@ -199,17 +200,17 @@ void BaseNode::Print(int indentLevel) const
 // An absolute path is specified with a leading "/" eg. "/node1/node2/nodeToFind", in which case the function will begin the search from the root node.
 // The syntax of a relative path is "node2/nodeToFind" or "../node1/node2/nodeToFind" and the search is started from this node.
 // Return value: If the node is found a pointer to the requested node is returned, otherwise a nullptr is returned.
-BaseNode* BaseNode::FindNode(const std::string& nodePath)
+BaseNode* BaseNode::FindNode(const std::string& nodePath) 
 {
     return FindNodeInternal(nodePath.c_str());
 }
 
-BaseNode* BaseNode::FindNode(const char * pNodePath)
+BaseNode* BaseNode::FindNode(const char * pNodePath) 
 {
     return FindNodeInternal(pNodePath);
 }
 
-BaseNode* BaseNode::FindNodeInternal(const char * pNodePath)
+BaseNode* BaseNode::FindNodeInternal(const char * pNodePath) 
 {
     static const char pathDelimiter = '/';
     if (pNodePath == nullptr) return nullptr;
