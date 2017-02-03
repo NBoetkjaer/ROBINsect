@@ -22,7 +22,13 @@ file(GLOB SOURCES_test "src/test/*.cpp")
 		${SOURCES_comm}
 		${SOURCES_modules}
 		${SOURCES_nodes}
-	) 
+	)
+
+    ADD_DEFINITIONS(
+        -std=c++14 # Or -std=c++0x
+        # Other flags
+    )
+
 ELSE (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	set(SOURCES 
 		#${SOURCES_top}
@@ -30,14 +36,9 @@ ELSE (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 		#${SOURCES_modules}
 		${SOURCES_nodes}
 		${SOURCES_test}
-	) 
+	)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 add_executable(ROBINsect ${SOURCES} )
-
-ADD_DEFINITIONS(
-    -std=c++14 # Or -std=c++0x
-    # Other flags
-)
 
 #install(TARGETS ROBINsect DESTINATION bin)

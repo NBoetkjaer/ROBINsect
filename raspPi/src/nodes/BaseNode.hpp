@@ -14,8 +14,6 @@
 
 //enum class NodeType { nodeNode, boolNode, intNode, floatNode, doubleNode, stringNode, enumNode };
 
-extern Attribute valueAttrib;
-
 enum class FlagType :uint32_t {hide, readonly, logging, persist, query, numflags, invalidFlag = numflags};
 ENABLE_BITMASK_OPERATORS(FlagType) // Supply overloaded bitwise operators for FlagType.
 
@@ -36,6 +34,7 @@ private:
     static std::array< std::tuple<const std::string, FlagType>, (size_t)FlagType::numflags> flagNames;
     bool isChanged;
     size_t changes; // Variable to hold the applied changes to this node. Each attribID has a bit in changes.
+    size_t touchedAttributes; // Variable used to collect all used (active) attributes.
     //std::map<size_t, string> attributes; key<attribID,string>
     std::vector<NodeObserver*> subscribers;
 
@@ -51,15 +50,27 @@ public:
     const std::string&  GetName() const { return name; }
     BaseNode* GetParent() const { return pParent; }
 
+    // -------- Atributes --------
     // Sets the given attribute, based on the string argument.
     // Inherited nodes should call and return a base implementation if it does not handle the attributeID.
-    // Returns true is the attribute is handeled. 
+    // Returns true is the attribute is handled. 
     virtual bool SetAttribute(attribID_t attribID, const char* pAttributeValue);
+
+    // ToDo ??? GetAttribute
+
     // Mark a given attribute as changed.
-    inline void SetAttributeChanged(attribID_t attribID){ changes |= 1 << attribID; }
+    inline void SetAttributeChanged(attribID_t attribID)
+    { 
+        if (changes == 0)
+        {   // Notify the node tree that a change has been applied.
+            SetValueChanged();
+        }
+        changes |= 1 << attribID;
+        touchedAttributes |= changes;
+    }
+
     inline bool IsAttributeChanged(attribID_t attribID) const { return (changes & (1 << attribID))!=0;}
 
-    // -------- Atributes --------
 private:
     FlagType nodeFlag;
     std::string info;
@@ -95,47 +106,3 @@ public:
     void Print(int indentLevel = 0) const; 
 };
 
-template <typename T>
-class GenericValueNode : public BaseNode
-{
-public:
-    GenericValueNode(const std::string &nodeName, T val) : BaseNode(nodeName), value(val) { }
-    virtual ~GenericValueNode(){}
-
-    virtual bool SetAttribute(attribID_t attribID, const char* pAttributeValue)
-    {
-        if (valueAttrib.GetID() == attribID)
-        {
-            SetValue(pAttributeValue);
-        }
-        else
-        {
-            return BaseNode::SetAttribute(attribID, pAttributeValue);
-        }
-        return true;
-    }
-
-    virtual void SetValue(const char* pValues) = 0;
-
-    virtual void Set(const T &newValue)
-    { 
-        if(newValue == value) return;
-        value = newValue;
-        SetAttributeChanged(valueAttrib.GetID());
-    }
-    T Get() const { return value;}    
-protected:
-    T value;
-};
-
-class StringNode : public GenericValueNode<std::string>
-{
-public:
-    StringNode(const std::string &nodeName, std::string val) : GenericValueNode<std::string>(nodeName, val){}
-    virtual ~StringNode(){}
-    virtual void SetValue(const char* pValues)
-    {
-        value = pValues;
-        SetAttributeChanged(valueAttrib.GetID());
-    }
-};

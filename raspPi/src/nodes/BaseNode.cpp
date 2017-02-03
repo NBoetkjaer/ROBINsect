@@ -10,8 +10,6 @@ static Attribute flagsAttrib("flags");
 static Attribute typeAttrib("type");
 static Attribute infoAttrib("info");
 
-Attribute valueAttrib("value");
-Attribute rangeAttrib("range");
 // Define flag names 
 std::array< std::tuple<const string, FlagType>, (size_t)FlagType::numflags > BaseNode::flagNames =
 {

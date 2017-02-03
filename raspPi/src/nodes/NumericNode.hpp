@@ -1,18 +1,20 @@
 #pragma once
 
-#include "BaseNode.hpp" 
+#include "AbstractValueNode.hpp"
 #include <sstream>
 extern Attribute rangeAttrib;
+extern Attribute unitAttrib;
+extern Attribute prefixAttrib;
 
 template <typename T>
-class NumericNode : public GenericValueNode<T>
+class NumericNode : public AbstractValueNode<T>
 {   
     static const char* pFmt;
     static const char* pRangeFmt;
 public:
     // Constructor
     NumericNode(const std::string &nodeName, T val) :
-        GenericValueNode<T>(nodeName, val),
+        AbstractValueNode<T>(nodeName, val),
         minValue(std::numeric_limits<T>::lowest()),
         maxValue(std::numeric_limits<T>::max()) 
     {}
@@ -24,12 +26,21 @@ public:
         if (rangeAttrib.GetID() == attribID)
         {
             SetRange(pAttributeValue);
+            return true;
+        }
+        else if (unitAttrib.GetID() == attribID)
+        {
+            return false; // ToDo
+        }
+        else if (prefixAttrib.GetID() == attribID)
+        {
+            return false; // ToDo 
         }
         else
         {
-            return GenericValueNode<T>::SetAttribute(attribID, pAttributeValue);
+            return AbstractValueNode<T>::SetAttribute(attribID, pAttributeValue);
         }
-        return true;
+        return false; // Attribute is unhandled.
     }
 
     void SetRange(const char* pValues)
@@ -85,33 +96,14 @@ public:
     {
         // ToDo: Report error if outside range?
         T val = std::min(maxValue, std::max(newValue, minValue));
-        GenericValueNode<T>::Set(val);
+        AbstractValueNode<T>::Set(val);
     }
 private:
     T minValue;
     T maxValue;
 };
 
-class BoolNode : public GenericValueNode<bool>
-{
-public:
-    BoolNode(const std::string &nodeName, bool val) : GenericValueNode<bool>(nodeName, val){}
-    virtual ~BoolNode(){}
-    virtual void SetValue(const char* pValues)
-    {
-        bool _value;
-        bool bSuccess = false;
-        // ToDo: Parse string 
-        if (bSuccess)
-        {
-            Set(_value);
-        }
-        else
-        {
-            // ToDo: Report error (parsing string).
-        }
-    }
-};
-
 typedef NumericNode<int32_t> Int32Node;
+typedef NumericNode<int64_t> Int64Node;
 typedef NumericNode<float> FloatNode;
+typedef NumericNode<double> DoubleNode;

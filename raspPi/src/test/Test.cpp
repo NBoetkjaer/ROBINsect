@@ -7,6 +7,8 @@
 
 #include "../nodes/BaseNode.hpp"
 #include "../nodes/NumericNode.hpp"
+#include "../nodes/BoolNode.hpp"
+#include "../nodes/StringNode.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -14,7 +16,9 @@ int main(int argc, char* argv[])
     BaseNode* pNode = root.AddChild<BaseNode>("Base");
     BaseNode* pBoolNode = root.AddChild<BoolNode>("Bool", true);
     BaseNode* pInt32Node = pNode->AddChild<Int32Node>("Int32", 0);
+    BaseNode* pInt64Node = pNode->AddChild<Int64Node>("Int64", 0L);
     BaseNode* pFloatNode = pInt32Node->AddChild<FloatNode>("Float", 0.0f);
+    BaseNode* pDoubleNode = pInt64Node->AddChild<DoubleNode>("Double", 0.0);
     BaseNode* pStringNode = pFloatNode->AddChild<StringNode>("String", "Test string.");
     
 
@@ -61,7 +65,12 @@ int main(int argc, char* argv[])
     assert(pTmpNode == nullptr);
 
     pFloatNode->SetAttribute(Attribute::GetAttributeID("range"), "[12e-3,24.34e4]");
+    pDoubleNode->SetAttribute(Attribute::GetAttributeID("range"), "[12e-3,24.34e4]");
+
     pInt32Node->SetAttribute(Attribute::GetAttributeID("range"), "[12,24]");
+    pInt64Node->SetAttribute(Attribute::GetAttributeID("range"), "[12,24]");
+
+    pBoolNode->SetAttribute(Attribute::GetAttributeID("value"), "true");
     pInt32Node->SetAttribute(Attribute::GetAttributeID("value"), "25");
 
     pStringNode->SetAttribute(Attribute::GetAttributeID("value"), "Test string");
