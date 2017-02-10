@@ -21,7 +21,7 @@ public:
     // Returns the unique ID for the given attribute name. 
     // If attribute is not found it returns INVALID_ATTRIBUTE_ID. 
     static attribID_t GetAttributeID(const char* attribName);
-
+    inline static size_t GetNumAttributes(){ return registredAttributes.size(); };
 };
 
 

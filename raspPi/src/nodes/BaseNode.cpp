@@ -1,14 +1,15 @@
 #include "BaseNode.hpp"
-
+#include <sstream>
 #include <algorithm>
 
 using namespace std;
 using namespace Util;
 
 // Register attributes.
-static Attribute flagsAttrib("flags");
-static Attribute typeAttrib("type");
-static Attribute infoAttrib("info");
+Attribute flagsAttrib("flags");
+Attribute typeAttrib("type");
+Attribute infoAttrib("info");
+Attribute optionsAttrib("options");
 
 // Define flag names 
 std::array< std::tuple<const string, FlagType>, (size_t)FlagType::numflags > BaseNode::flagNames =
@@ -252,4 +253,31 @@ BaseNode* BaseNode::FindNodeInternal(const char * pNodePath)
         }
     }
     return nullptr;
+}
+
+
+void BaseNode::SetOptions(const char* pValues, std::vector<std::string> & options, const char delimiter)
+{
+    options.clear();
+    istringstream streamValues(pValues);
+    string opt;
+    while (getline(streamValues, opt, delimiter))
+    {
+        options.push_back(opt);
+    }
+}
+
+void BaseNode::SetOptionValue(const char* pValue, const std::vector<std::string> & options, int &value)
+{
+    int i = 0;
+    for (auto opt : options)
+    {
+        if (strcasecmp(pValue, opt.c_str()) == 0)
+        {
+            value = i;
+            return;
+        }
+        i++;
+    }
+    value = -1;
 }

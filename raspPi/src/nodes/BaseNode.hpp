@@ -12,13 +12,20 @@
 
 #include "../util/BitmaskEnumClass.h"
 
+#if _MSC_VER
+#define strcasecmp _stricmp
+#endif
 //enum class NodeType { nodeNode, boolNode, intNode, floatNode, doubleNode, stringNode, enumNode };
 
 enum class FlagType :uint32_t {hide, readonly, logging, persist, query, numflags, invalidFlag = numflags};
 ENABLE_BITMASK_OPERATORS(FlagType) // Supply overloaded bitwise operators for FlagType.
 
 // Attributes: Value, Type, Range, flags, Enums, DisplayName, DisplayFormat, unit, prefix, info, ... 
-
+// Common attributes.
+extern Attribute flagsAttrib;
+extern Attribute typeAttrib;
+extern Attribute infoAttrib;
+extern Attribute optionsAttrib;
 
 class NodeObserver
 {
@@ -103,6 +110,9 @@ public:
     }
 
     void SetValueChanged();
-    void Print(int indentLevel = 0) const; 
+    void Print(int indentLevel = 0) const;
+
+    static void SetOptions(const char* pValues, std::vector<std::string> & options, const char delimiter = ',');
+    static void SetOptionValue(const char* pValue, const std::vector<std::string> & options, int &value);
 };
 

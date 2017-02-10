@@ -12,6 +12,11 @@
 
 int main(int argc, char* argv[])
 {
+    std::cout << "Size of BaseNode: " << sizeof(BaseNode) << std::endl;
+    std::cout << "Size of BoolNode: " << sizeof(BoolNode) << std::endl;
+    std::cout << "Size of FloatNode: " << sizeof(FloatNode) << std::endl;
+    std::cout << "Size of DoubleNode: " << sizeof(DoubleNode) << std::endl;
+
     BaseNode root("root");
     BaseNode* pNode = root.AddChild<BaseNode>("Base");
     BaseNode* pBoolNode = root.AddChild<BoolNode>("Bool", true);
@@ -71,6 +76,9 @@ int main(int argc, char* argv[])
     pInt64Node->SetAttribute(Attribute::GetAttributeID("range"), "[12,24]");
 
     pBoolNode->SetAttribute(Attribute::GetAttributeID("value"), "true");
+    pBoolNode->SetAttribute(Attribute::GetAttributeID("options"), "no,yes");
+    pBoolNode->SetAttribute(Attribute::GetAttributeID("value"), "no");
+
     pInt32Node->SetAttribute(Attribute::GetAttributeID("value"), "25");
 
     pStringNode->SetAttribute(Attribute::GetAttributeID("value"), "Test string");
