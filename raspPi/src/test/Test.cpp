@@ -84,6 +84,16 @@ int main(int argc, char* argv[])
     pStringNode->SetAttribute(Attribute::GetAttributeID("value"), "Test string");
     root.Print(); 
 
+
+    std::string tmpStr;
+    root.GetAttribute(Attribute::GetAttributeID("flags"), tmpStr);
+    std::cout << tmpStr << std::endl;
+    pBoolNode->GetAttribute(Attribute::GetAttributeID("value"), tmpStr);
+    std::cout << tmpStr << std::endl;
+    pFloatNode->GetAttribute(Attribute::GetAttributeID("value"), tmpStr);
+    std::cout << tmpStr << std::endl;
+    pStringNode->GetAttribute(Attribute::GetAttributeID("value"), tmpStr);
+    std::cout << tmpStr << std::endl;
     return 0;
 }
 

@@ -78,7 +78,18 @@ public:
 
     void GetRange(T& min, T& max) const { min = minValue; max = maxValue;}
 
-    virtual void SetValue(const char* pValues)
+    virtual void GetValue(std::string &strValue)
+    {
+        //ToDo ... check.
+        static const int maxLength = 30;
+        strValue.resize(maxLength+1);
+        int len = snprintf(&strValue[0], maxLength, pFmt, value);
+        if (len < 0) strValue.clear();
+        if (len > maxLength) len = maxLength;
+        strValue.resize(len);
+    }
+
+    virtual void SetValue(const char* pValues) override
     {
         T _value;
         int numSuccess = sscanf(pValues, pFmt, &_value);
@@ -92,7 +103,7 @@ public:
         }
     }
 
-    virtual void Set(const T &newValue)
+    virtual void Set(const T &newValue) override
     {
         // ToDo: Report error if outside range?
         T val = std::min(maxValue, std::max(newValue, minValue));

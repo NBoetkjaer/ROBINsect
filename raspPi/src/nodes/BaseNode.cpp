@@ -117,6 +117,22 @@ void  BaseNode::SetFlags(const char* pValues)
     } // End of while loop.
 }
 
+void BaseNode::GetFlags(string &strFlags)
+{
+    strFlags.clear();
+    for (const auto & flagTup : flagNames)
+    {
+        if (((1 << (uint32_t)get<1>(flagTup)) & (uint32_t)nodeFlag))
+        {
+            if (!strFlags.empty())
+            {
+                strFlags.push_back('|');
+            }
+            strFlags.append(get<0>(flagTup));
+        }
+    }
+}
+
 void BaseNode::SetFlag(FlagType flag, bool value)
 {
     FlagType oldFlags = nodeFlag;
@@ -174,14 +190,34 @@ bool BaseNode::SetAttribute(attribID_t attribID, const char* pAttributeValue)
     // Indicate attribute changed-
 }
 
-void BaseNode::SetValueChanged()
+// GetAttribute
+// Must return true if a given attribute is handled.
+bool BaseNode::GetAttribute(attribID_t attribID, string &strAttributeValue)
+{
+    //if (attribID & touchedAttributes) return false;
+    if (flagsAttrib.GetID() == attribID)
+    {
+        GetFlags(strAttributeValue);
+    }
+    else if (infoAttrib.GetID() == attribID)
+    {
+        strAttributeValue = info;
+    }
+    else
+    {
+        return false; // Unknown attribute return false.
+    }
+    return true;
+}
+
+void BaseNode::SetNodeChanged()
 {
     if(!isChanged)
     {
         isChanged = true;
         if(pParent!= nullptr)
         {
-            pParent->SetValueChanged();
+            pParent->SetNodeChanged();
         }
     }
 }

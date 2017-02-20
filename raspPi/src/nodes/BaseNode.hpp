@@ -58,33 +58,38 @@ public:
     BaseNode* GetParent() const { return pParent; }
 
     // -------- Atributes --------
+    // Get the string representation of a given attribute.
+    virtual bool GetAttribute(attribID_t attribID, std::string &strAttributeValue);
     // Sets the given attribute, based on the string argument.
     // Inherited nodes should call and return a base implementation if it does not handle the attributeID.
     // Returns true is the attribute is handled. 
+    bool SetAttribute(attribID_t attribID, const std::string &strAttributeValue)
+    {
+        return SetAttribute(attribID, strAttributeValue.c_str());
+    }
     virtual bool SetAttribute(attribID_t attribID, const char* pAttributeValue);
-
-    // ToDo ??? GetAttribute
 
     // Mark a given attribute as changed.
     inline void SetAttributeChanged(attribID_t attribID)
     { 
         if (changes == 0)
         {   // Notify the node tree that a change has been applied.
-            SetValueChanged();
+            SetNodeChanged();
         }
-        changes |= 1 << attribID;
+        changes |= (size_t)1 << attribID;
         touchedAttributes |= changes;
     }
 
-    inline bool IsAttributeChanged(attribID_t attribID) const { return (changes & (1 << attribID))!=0;}
+    inline bool IsAttributeChanged(attribID_t attribID) const { return (changes & ((size_t)1 << attribID))!=0;}
 
 private:
     FlagType nodeFlag;
     std::string info;
-public:
+
     // Flag attribute methods.
-    void SetFlags(const char* pValues);
-    void SetFlag(FlagType flag, bool value);
+public: void SetFlags(const char* pValues);
+private: void GetFlags(std::string &strFlags);
+public: void SetFlag(FlagType flag, bool value);
     bool GetFlag(FlagType flag) const;
     // Info attributes methods.
     const std::string &GetInfo() const {return info;}
@@ -109,7 +114,7 @@ public:
         return children.back().get();
     }
 
-    void SetValueChanged();
+    void SetNodeChanged();
     void Print(int indentLevel = 0) const;
 
     static void SetOptions(const char* pValues, std::vector<std::string> & options, const char delimiter = ',');

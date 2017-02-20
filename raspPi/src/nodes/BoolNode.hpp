@@ -20,7 +20,19 @@ public:
         }
         return false; // Attribute is unhandled.
     }
+    virtual void GetValue(std::string &strValue)
+    {
+        if (options.size() == 2)
+        {
+            strValue = value ? options[1] : options[0];
+        }
+        else
+        {
+            strValue = value ? "true" : "false";
+        }
 
+
+    }
     virtual void SetValue(const char* pValue)
     {
         if (options.size() == 2)
