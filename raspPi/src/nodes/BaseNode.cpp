@@ -25,6 +25,7 @@ std::array< std::tuple<const string, FlagType>, (size_t)FlagType::numflags > Bas
 BaseNode::BaseNode(const std::string &nodeName, BaseNode* pParentNode):
     isChanged(true),
     changes(0),
+    touchedAttributes(0),
     name(nodeName),
     pParent(pParentNode)
 {
@@ -117,7 +118,7 @@ void  BaseNode::SetFlags(const char* pValues)
     } // End of while loop.
 }
 
-void BaseNode::GetFlags(string &strFlags)
+void BaseNode::GetFlags(string &strFlags) const
 {
     strFlags.clear();
     for (const auto & flagTup : flagNames)
@@ -192,7 +193,7 @@ bool BaseNode::SetAttribute(attribID_t attribID, const char* pAttributeValue)
 
 // GetAttribute
 // Must return true if a given attribute is handled.
-bool BaseNode::GetAttribute(attribID_t attribID, string &strAttributeValue)
+bool BaseNode::GetAttribute(attribID_t attribID, string &strAttributeValue) const
 {
     //if (attribID & touchedAttributes) return false;
     if (flagsAttrib.GetID() == attribID)
@@ -292,6 +293,20 @@ BaseNode* BaseNode::FindNodeInternal(const char * pNodePath)
 }
 
 
+void BaseNode::GetOptions(std::string& strOptions, const std::vector<std::string> & options, const char delimiter)
+{
+    strOptions.clear();
+    bool first = true;
+    for (auto opt : options)
+    {
+        if (!first)
+        {
+            strOptions.push_back(delimiter);
+        }
+        strOptions += opt;
+        first = false;
+    }
+}
 void BaseNode::SetOptions(const char* pValues, std::vector<std::string> & options, const char delimiter)
 {
     options.clear();

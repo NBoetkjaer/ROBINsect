@@ -10,7 +10,7 @@ class AbstractValueNode : public BaseNode
 public:
     AbstractValueNode(const std::string &nodeName, T val) : BaseNode(nodeName), value(val) { }
     virtual ~AbstractValueNode(){}
-    virtual bool GetAttribute(attribID_t attribID, std::string &strAttributeValue)
+    virtual bool GetAttribute(attribID_t attribID, std::string &strAttributeValue) const
     {
         if (valueAttrib.GetID() == attribID)
         {
@@ -38,7 +38,7 @@ public:
         return false; // Attribute is unhandled.
     }
 
-    virtual void GetValue(std::string &strValue) = 0;
+    virtual void GetValue(std::string &strValue) const = 0;
     virtual void SetValue(const char* pValues) = 0;
 
     virtual void Set(const T &newValue)

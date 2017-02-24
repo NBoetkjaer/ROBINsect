@@ -12,6 +12,7 @@ public:
         if (optionsAttrib.GetID() == attribID)
         {
             SetOptions(pAttributeValue, options);
+            SetAttributeChanged(attribID);
             return true;
         }
         else
@@ -20,7 +21,22 @@ public:
         }
         return false; // Attribute is unhandled.
     }
-    virtual void GetValue(std::string &strValue)
+
+    virtual bool GetAttribute(attribID_t attribID, std::string &strAttributeValue) const
+    {
+        if (optionsAttrib.GetID() == attribID)
+        {
+            GetOptions(strAttributeValue, options);
+            return true;
+        }
+        else
+        {
+            return AbstractValueNode::GetAttribute(attribID, strAttributeValue);
+        }
+        return false; // Attribute is unhandled.
+    }
+
+    virtual void GetValue(std::string &strValue) const
     {
         if (options.size() == 2)
         {

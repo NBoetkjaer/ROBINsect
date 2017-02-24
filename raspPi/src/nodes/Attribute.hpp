@@ -13,6 +13,7 @@ private:
     attribID_t id;
 public:
     Attribute(const char* name);
+    inline explicit operator attribID_t() const { return id; } // explicit conversion to attribID_t
     inline attribID_t GetID() const {return id;}
     inline const std::string& GetName() const {return name;}
     static const std::string& GetAttributeName(attribID_t id);

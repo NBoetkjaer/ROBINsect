@@ -59,7 +59,7 @@ public:
 
     // -------- Atributes --------
     // Get the string representation of a given attribute.
-    virtual bool GetAttribute(attribID_t attribID, std::string &strAttributeValue);
+    virtual bool GetAttribute(attribID_t attribID, std::string &strAttributeValue) const;
     // Sets the given attribute, based on the string argument.
     // Inherited nodes should call and return a base implementation if it does not handle the attributeID.
     // Returns true is the attribute is handled. 
@@ -81,6 +81,7 @@ public:
     }
 
     inline bool IsAttributeChanged(attribID_t attribID) const { return (changes & ((size_t)1 << attribID))!=0;}
+    inline bool IsAttributeUsed(attribID_t attribID) const { return (touchedAttributes  & ((size_t)1 << attribID)) != 0; }
 
 private:
     FlagType nodeFlag;
@@ -88,7 +89,7 @@ private:
 
     // Flag attribute methods.
 public: void SetFlags(const char* pValues);
-private: void GetFlags(std::string &strFlags);
+private: void GetFlags(std::string &strFlags) const;
 public: void SetFlag(FlagType flag, bool value);
     bool GetFlag(FlagType flag) const;
     // Info attributes methods.
@@ -117,6 +118,7 @@ public:
     void SetNodeChanged();
     void Print(int indentLevel = 0) const;
 
+    static void GetOptions(std::string& strOptions, const std::vector<std::string> & options, const char delimiter = ',');
     static void SetOptions(const char* pValues, std::vector<std::string> & options, const char delimiter = ',');
     static void SetOptionValue(const char* pValue, const std::vector<std::string> & options, int &value);
 };

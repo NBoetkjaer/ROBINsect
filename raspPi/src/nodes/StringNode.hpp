@@ -8,7 +8,7 @@ public:
     StringNode(const std::string &nodeName, std::string val) : AbstractValueNode<std::string>(nodeName, val){}
     virtual ~StringNode(){}
     
-    virtual void GetValue(std::string &strValue)
+    virtual void GetValue(std::string &strValue) const
     {
         strValue = value;
     }

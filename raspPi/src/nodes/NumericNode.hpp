@@ -1,5 +1,9 @@
 #pragma once
 
+#if _MSC_VER <= 1800
+    #define snprintf _snprintf
+#endif
+
 #include "AbstractValueNode.hpp"
 #include <sstream>
 extern Attribute rangeAttrib;
@@ -30,7 +34,9 @@ public:
         }
         else if (unitAttrib.GetID() == attribID)
         {
-            return false; // ToDo
+            unit = pAttributeValue;
+            SetAttributeChanged(attribID);
+            return true;
         }
         else if (prefixAttrib.GetID() == attribID)
         {
@@ -41,6 +47,39 @@ public:
             return AbstractValueNode<T>::SetAttribute(attribID, pAttributeValue);
         }
         return false; // Attribute is unhandled.
+    }
+
+    virtual bool GetAttribute(attribID_t attribID, std::string &strAttributeValue) const
+    {
+        if (rangeAttrib.GetID() == attribID)
+        {
+            GetRange(strAttributeValue);
+            return true;
+        }
+        else if (unitAttrib.GetID() == attribID)
+        {
+            strAttributeValue = unit;
+            return true;
+        }
+        else if (prefixAttrib.GetID() == attribID)
+        {
+            return false; // ToDo 
+        }
+        else
+        {
+            return AbstractValueNode<T>::GetAttribute(attribID, strAttributeValue);
+        }
+        return false; // Attribute is unhandled.
+    }
+
+    void GetRange(std::string &strRange) const 
+    {
+        static const int maxLength = 60;
+        strRange.resize(maxLength + 1);
+        int len = snprintf(&strRange[0], maxLength, pRangeFmt, minValue, maxValue);
+        if (len < 0) strRange.clear();
+        if (len > maxLength) len = maxLength;
+        strRange.resize(len);
     }
 
     void SetRange(const char* pValues)
@@ -78,7 +117,7 @@ public:
 
     void GetRange(T& min, T& max) const { min = minValue; max = maxValue;}
 
-    virtual void GetValue(std::string &strValue)
+    virtual void GetValue(std::string &strValue) const 
     {
         //ToDo ... check.
         static const int maxLength = 30;
@@ -112,6 +151,10 @@ public:
 private:
     T minValue;
     T maxValue;
+
+    std::string unit;
+    //std::string prefix;
+
 };
 
 typedef NumericNode<int32_t> Int32Node;

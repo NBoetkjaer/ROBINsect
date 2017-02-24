@@ -3,7 +3,10 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <assert.h>
+#include <memory>
 #include <array>
+#include <vector>
+#include <conio.h>
 
 #include "../nodes/BaseNode.hpp"
 #include "../nodes/NumericNode.hpp"
@@ -12,12 +15,25 @@
 
 int main(int argc, char* argv[])
 {
+    BaseNode root("root");
+
+    std::cout << "Size of std::vector<NodeObserver>: " << sizeof(std::vector<NodeObserver>) << std::endl;
+    std::vector<std::unique_ptr<BaseNode>> testVec;
+    std::cout << "Size of std::vector<std::unique_ptr<BaseNode>>: " << sizeof(testVec) << std::endl;
+    std::cout << "Initial capacity of a vector: " << testVec.capacity() << std::endl;
+    testVec.push_back(std::make_unique<BaseNode>("test"));
+    std::cout << "Capacity of a vector (one added): " << testVec.capacity() << std::endl;
+    std::cout << "Size of std::string: " << sizeof(std::string) << std::endl;
+    std::string str;
+    std::cout << "Initial capacity of a string: " << str.capacity() << std::endl;
     std::cout << "Size of BaseNode: " << sizeof(BaseNode) << std::endl;
     std::cout << "Size of BoolNode: " << sizeof(BoolNode) << std::endl;
+    std::cout << "Size of Int32Node: " << sizeof(Int32Node) << std::endl;
+    std::cout << "Size of Int64Node: " << sizeof(Int64Node) << std::endl;
     std::cout << "Size of FloatNode: " << sizeof(FloatNode) << std::endl;
     std::cout << "Size of DoubleNode: " << sizeof(DoubleNode) << std::endl;
 
-    BaseNode root("root");
+    
     BaseNode* pNode = root.AddChild<BaseNode>("Base");
     BaseNode* pBoolNode = root.AddChild<BoolNode>("Bool", true);
     BaseNode* pInt32Node = pNode->AddChild<Int32Node>("Int32", 0);
@@ -70,7 +86,9 @@ int main(int argc, char* argv[])
     assert(pTmpNode == nullptr);
 
     pFloatNode->SetAttribute(Attribute::GetAttributeID("range"), "[12e-3,24.34e4]");
-    pDoubleNode->SetAttribute(Attribute::GetAttributeID("range"), "[12e-3,24.34e4]");
+    pFloatNode->SetAttribute((attribID_t)unitAttrib, "m/s");
+    pDoubleNode->SetAttribute(Attribute::GetAttributeID("range"), "[-180,180]");
+    pDoubleNode->SetAttribute((attribID_t)unitAttrib, "deg");
 
     pInt32Node->SetAttribute(Attribute::GetAttributeID("range"), "[12,24]");
     pInt64Node->SetAttribute(Attribute::GetAttributeID("range"), "[12,24]");
@@ -81,19 +99,38 @@ int main(int argc, char* argv[])
 
     pInt32Node->SetAttribute(Attribute::GetAttributeID("value"), "25");
 
-    pStringNode->SetAttribute(Attribute::GetAttributeID("value"), "Test string");
+    pStringNode->SetAttribute(Attribute::GetAttributeID("value"), "Test string");    
     root.Print(); 
 
 
     std::string tmpStr;
-    root.GetAttribute(Attribute::GetAttributeID("flags"), tmpStr);
+    root.GetAttribute((attribID_t)flagsAttrib, tmpStr);
     std::cout << tmpStr << std::endl;
-    pBoolNode->GetAttribute(Attribute::GetAttributeID("value"), tmpStr);
+    pBoolNode->GetAttribute((attribID_t)valueAttrib, tmpStr);
     std::cout << tmpStr << std::endl;
-    pFloatNode->GetAttribute(Attribute::GetAttributeID("value"), tmpStr);
+    pFloatNode->GetAttribute((attribID_t)valueAttrib, tmpStr);
     std::cout << tmpStr << std::endl;
-    pStringNode->GetAttribute(Attribute::GetAttributeID("value"), tmpStr);
+    pStringNode->GetAttribute((attribID_t)valueAttrib, tmpStr);
     std::cout << tmpStr << std::endl;
+
+    
+    pTmpNode = pFloatNode;
+    for (size_t i = 0; i < Attribute::GetNumAttributes(); ++i)
+    {
+        if (pTmpNode->IsAttributeUsed(i))
+        {
+            if (pTmpNode->GetAttribute(i, tmpStr))
+            {
+                std::cout << Attribute::GetAttributeName(i) << "= " << tmpStr << std::endl;
+            }
+            else
+            {
+                assert(false);
+            }
+            
+        }
+    }
+    kbhit();
     return 0;
 }
 
