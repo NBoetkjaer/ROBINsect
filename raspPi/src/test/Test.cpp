@@ -13,6 +13,8 @@
 #include "../nodes/BoolNode.hpp"
 #include "../nodes/StringNode.hpp"
 
+#include "../modules/NetworkModule.hpp"
+
 int main(int argc, char* argv[])
 {
     BaseNode root("root");
@@ -130,7 +132,18 @@ int main(int argc, char* argv[])
             
         }
     }
-    kbhit();
+    Socket::InitLib(2, 2);
+    std::vector<std::unique_ptr<Module>> modules;
+    modules.push_back(std::make_unique<NetworkModule>());
+    std::cout << "Starting module loop";
+    while (true)
+    {
+        for (auto &pModul : modules)
+        {
+            pModul->Execute();
+        }
+    }
+    Socket::ExitLib();
     return 0;
 }
 

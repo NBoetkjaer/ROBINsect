@@ -2,19 +2,30 @@
 #pragma once
 
 #include <cstdint>
-#include <sys/types.h> 
-#include <sys/socket.h>
-#include <errno.h>
+#ifndef _WIN32
+    #include <sys/types.h> 
+    #include <sys/socket.h>
+    #include <errno.h>
 
-typedef int SOCKET;
-typedef struct sockaddr_in SOCKADDR_IN;
-typedef struct sockaddr SOCKADDR;
+    typedef int SOCKET;
+    typedef struct sockaddr_in SOCKADDR_IN;
+    typedef struct sockaddr SOCKADDR;
+#else
+    #include <winsock2.h>
+    #include <ws2tcpip.h>
+    #pragma comment(lib, "ws2_32.lib")
+#endif
 
 enum class SocketType {UDP, TCP};
 
 class Socket
 {
 public:
+#ifdef _WIN32
+    // Utillity functions used to initialize WinSock.
+    static int InitLib(byte majorVer, byte minorVer){ WSADATA wsaData; return WSAStartup(MAKEWORD(majorVer, minorVer),& wsaData); };
+    static int ExitLib(){ return WSACleanup(); };
+#endif
     Socket();
     virtual ~Socket();
 
@@ -34,11 +45,12 @@ public:
     int SetBlocking(bool blocking);
     int64_t GetBytesSent() const {return bytesSent;};
 	int64_t GetBytesRecieved() const {return bytesRecieved;};
-    bool IsBound(){return bound;};
-    bool IsConnected(){return connected;};
+    bool IsBound() const {return bound;};
+    bool IsConnected() const {return connected;};
 private:
     
-    int SocketError(){return errno;};
+    int SocketError() const;
+
     SOCKET  socketID;
     int64_t bytesSent, bytesRecieved;    
     SocketType socketType;

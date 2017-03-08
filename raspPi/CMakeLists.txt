@@ -32,8 +32,8 @@ file(GLOB SOURCES_test "src/test/*.cpp")
 ELSE (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	set(SOURCES 
 		#${SOURCES_top}
-		#${SOURCES_comm}
-		#${SOURCES_modules}
+		${SOURCES_comm}
+		${SOURCES_modules}
 		${SOURCES_nodes}
 		${SOURCES_test}
 	)
