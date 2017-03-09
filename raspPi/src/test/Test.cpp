@@ -8,10 +8,7 @@
 #include <vector>
 #include <conio.h>
 
-#include "../nodes/BaseNode.hpp"
-#include "../nodes/NumericNode.hpp"
-#include "../nodes/BoolNode.hpp"
-#include "../nodes/StringNode.hpp"
+#include "../nodes/Nodes.hpp"
 
 #include "../modules/NetworkModule.hpp"
 
@@ -135,13 +132,39 @@ int main(int argc, char* argv[])
     Socket::InitLib(2, 2);
     std::vector<std::unique_ptr<Module>> modules;
     modules.push_back(std::make_unique<NetworkModule>());
-    std::cout << "Starting module loop";
+    std::cout << std::endl << "************************" << std::endl;
+    std::cout << "Initialize all modules" << std::endl;
+    // Execute all modules.
+    for (auto &pModul : modules)
+    {
+        pModul->Init(root);
+    }
+    std::cout << "Starting module loop" << std::endl;
     while (true)
     {
+        // Execute all modules.
         for (auto &pModul : modules)
         {
             pModul->Execute();
         }
+
+        // Continue to notify all nodes until the tree is stabilized.
+        const int maxIterations = 8*sizeof(size_t) - 1;
+        int iterations = 0;
+        while (root.AnyRecentChanges() && iterations++ < maxIterations )
+        {
+            root.PushChangeHistory();
+            root.Notify(true);
+        }
+        if (iterations >= maxIterations)
+        {
+            // ToDo Error.
+        }
+
+        // ToDo - Publish any changes.
+
+        // Clear all changes.
+        root.ClearAllChanges();
     }
     Socket::ExitLib();
     return 0;

@@ -41,4 +41,8 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 add_executable(ROBINsect ${SOURCES} )
 
+source_group("Modules"	FILES ${SOURCES_modules})
+source_group("Nodes"    FILES ${SOURCES_nodes})
+source_group("Test"    	FILES ${SOURCES_test})
+
 #install(TARGETS ROBINsect DESTINATION bin)

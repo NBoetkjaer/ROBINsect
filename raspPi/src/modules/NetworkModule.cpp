@@ -14,6 +14,21 @@ NetworkModule::~NetworkModule()
 
 }
 
+void NetworkModule::Init(BaseNode& rootNode)
+{
+    BaseNode* pNode = rootNode.AddChild<BaseNode>("TelnetSocket");
+    pRcvNode = pNode->AddChild<Int64Node>("BytesRecived", 0);
+    pSentNode = pNode->AddChild<Int64Node>("BytesSent", 0);
+    pConnectedNode = pNode->AddChild<BoolNode>("Connected", false);
+
+    pNode->Subscribe(this);
+}
+
+void NetworkModule::Notify()
+{
+
+}
+
 void NetworkModule::Execute()
 {
     switch (state)
@@ -23,6 +38,7 @@ void NetworkModule::Execute()
         std::cout << "Listen Bind " << sockListen.Bind(1973, SocketType::TCP) << endl;
         std::cout << "Listen " << sockListen.Listen() << endl;
         state = State::Listning;
+        pConnectedNode->Set(false);
         return;
     case State::Listning:
         if(sockListen.IsReadPending(0))
@@ -31,6 +47,8 @@ void NetworkModule::Execute()
             std::cout << "Shutdown (listen) " << sockListen.Shutdown() << endl;
             std::cout << "Close (listen)" << sockListen.Close() << endl;
             state = State::Connected;
+            sockAccept.SetBlocking(false);
+            pConnectedNode->Set(true);
         }
         break;
     case State::Connected:
@@ -50,6 +68,7 @@ void NetworkModule::Execute()
             }
             buffer[dataLen] = 0; // Terminate the string.
             std::cout << buffer.data() << endl;
+            pRcvNode->Set(sockAccept.GetBytesRecieved());
         }
         break;
     }

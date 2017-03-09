@@ -39,8 +39,9 @@ private:
     // Common attributes.
     //static Attributes displayName("displayName");
     static std::array< std::tuple<const std::string, FlagType>, (size_t)FlagType::numflags> flagNames;
-    bool isChanged;
-    size_t changes; // Variable to hold the applied changes to this node. Each attribID has a bit in changes.
+
+    size_t recentChanges;    // Indicate if this node or any of its child have changed. LSB indicate newest change.
+    size_t attributeChanges; // Variable to hold the applied changes to this node. Each attribID has a bit in changes.
     size_t touchedAttributes; // Variable used to collect all used (active) attributes.
     //std::map<size_t, string> attributes; key<attribID,string>
     std::vector<NodeObserver*> subscribers;
@@ -49,13 +50,13 @@ protected:
     std::string name;
     BaseNode* pParent;
     std::vector<std::unique_ptr<BaseNode>> children;
-    void Notify();
 public:
     BaseNode(const std::string &nodeName, BaseNode* pParentNode = nullptr);
     virtual ~BaseNode();
 
-    const std::string&  GetName() const { return name; }
-    BaseNode* GetParent() const { return pParent; }
+    const std::string&  GetName() const { return name; };
+    BaseNode* GetParent() const { return pParent; };
+    BaseNode* GetRoot() const;
 
     // -------- Atributes --------
     // Get the string representation of a given attribute.
@@ -72,25 +73,31 @@ public:
     // Mark a given attribute as changed.
     inline void SetAttributeChanged(attribID_t attribID)
     { 
-        if (changes == 0)
+        if (attributeChanges == 0)
         {   // Notify the node tree that a change has been applied.
             SetNodeChanged();
         }
-        changes |= (size_t)1 << attribID;
-        touchedAttributes |= changes;
+        attributeChanges |= (size_t)1 << attribID;
+        touchedAttributes |= attributeChanges;
     }
-
-    inline bool IsAttributeChanged(attribID_t attribID) const { return (changes & ((size_t)1 << attribID))!=0;}
+    inline bool IsAttributeChanged(attribID_t attribID) const { return (attributeChanges & ((size_t)1 << attribID))!=0;}
     inline bool IsAttributeUsed(attribID_t attribID) const { return (touchedAttributes  & ((size_t)1 << attribID)) != 0; }
+    inline bool AnyChanges() { return recentChanges != 0; };
+    inline bool AnyRecentChanges() { return recentChanges & 1; };
 
+    void PushChangeHistory();
+    void ClearAllChanges();
 private:
     FlagType nodeFlag;
     std::string info;
 
     // Flag attribute methods.
-public: void SetFlags(const char* pValues);
-private: void GetFlags(std::string &strFlags) const;
-public: void SetFlag(FlagType flag, bool value);
+public:
+    void SetFlags(const char* pValues);
+private:
+    void GetFlags(std::string &strFlags) const;
+public:
+    void SetFlag(FlagType flag, bool value);
     bool GetFlag(FlagType flag) const;
     // Info attributes methods.
     const std::string &GetInfo() const {return info;}
@@ -99,6 +106,7 @@ public: void SetFlag(FlagType flag, bool value);
     // Add/remove observers to this node.
     void Subscribe(NodeObserver* pObserver);
     void UnSubscribe(NodeObserver* pObserver);
+    void Notify(bool recursive); // Notify all subscribers
 
 private:
     BaseNode* FindNodeInternal(const char * pNodePath);
@@ -107,12 +115,13 @@ public:
     BaseNode* FindNode(const char * pNodePath);
 
     template<typename TNode, typename ...Args>
-    BaseNode* AddChild(Args&&... params)
+    TNode* AddChild(Args&&... params)
     {
-        std::unique_ptr<BaseNode> newNode(new TNode(std::forward<Args>(params)...));
-        newNode->pParent = this;
+        TNode* retVal = new TNode(std::forward<Args>(params)...);
+        std::unique_ptr<BaseNode> newNode(retVal);
+        newNode->pParent = this;        
         children.push_back(std::move(newNode));
-        return children.back().get();
+        return retVal;
     }
 
     void SetNodeChanged();

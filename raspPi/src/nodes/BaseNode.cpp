@@ -23,8 +23,8 @@ std::array< std::tuple<const string, FlagType>, (size_t)FlagType::numflags > Bas
 
 
 BaseNode::BaseNode(const std::string &nodeName, BaseNode* pParentNode):
-    isChanged(true),
-    changes(0),
+    recentChanges(0),
+    attributeChanges(0),
     touchedAttributes(0),
     name(nodeName),
     pParent(pParentNode)
@@ -33,6 +33,16 @@ BaseNode::BaseNode(const std::string &nodeName, BaseNode* pParentNode):
 
 BaseNode::~BaseNode()
 {
+}
+
+BaseNode* BaseNode::GetRoot() const
+{
+    BaseNode* pNode = const_cast<BaseNode*>(this);
+    while (pNode->pParent)
+    {
+        pNode = pNode->pParent;
+    }
+    return pNode;
 }
 
 // Observer 
@@ -52,13 +62,63 @@ void BaseNode::UnSubscribe(NodeObserver* pObserver)
         [&](NodeObserver* pObs) {return pObs == pObserver;}), subscribers.end() );
 }
 
-void BaseNode::Notify()
+void BaseNode::Notify(bool recursive)
 {
-    for(auto pObserver : subscribers)
+    if (recentChanges && 0x10) // Is this node changed during last update.
     {
-        pObserver->Notify();
+        for (auto pObserver : subscribers)
+        {
+            pObserver->Notify();
+        }
+        if (recursive)
+        {
+            // Notify all childs aswell
+            for (const auto & child : children)
+            {
+                child->Notify(recursive);
+            }
+        }
     }
 }
+
+void BaseNode::SetNodeChanged()
+{
+    if (!AnyRecentChanges())
+    {
+        recentChanges |= 1; // Set LSB to indicate a new change.
+        if (pParent != nullptr)
+        {
+            pParent->SetNodeChanged(); // Proceed to set parent as changed.
+        }
+    }
+}
+
+void BaseNode::PushChangeHistory()
+{
+    if (AnyRecentChanges())
+    {
+        recentChanges <<= 1; // Shift changes one bit up.
+        // Also push changes for all childs.
+        for (const auto & child : children)
+        {
+            child->PushChangeHistory();
+        }
+    }
+}
+void BaseNode::ClearAllChanges()
+{
+    if (AnyChanges())
+    {
+        recentChanges = 0;      // Clear change history.
+        attributeChanges = 0;   // Clear attribute changes.
+                                // Do the same for all children.
+        for (const auto & child : children)
+        {
+            child->ClearAllChanges();
+        }
+    }
+}
+
 // Flag attribute
 void  BaseNode::SetFlags(const char* pValues)
 {
@@ -183,12 +243,6 @@ bool BaseNode::SetAttribute(attribID_t attribID, const char* pAttributeValue)
     }
 
     return true;
-    // Find attribute index.
-    // If found
-    //  Set the attribute
-    // else
-    //  CreateAttribute
-    // Indicate attribute changed-
 }
 
 // GetAttribute
@@ -209,18 +263,6 @@ bool BaseNode::GetAttribute(attribID_t attribID, string &strAttributeValue) cons
         return false; // Unknown attribute return false.
     }
     return true;
-}
-
-void BaseNode::SetNodeChanged()
-{
-    if(!isChanged)
-    {
-        isChanged = true;
-        if(pParent!= nullptr)
-        {
-            pParent->SetNodeChanged();
-        }
-    }
 }
 
 void BaseNode::Print(int indentLevel) const

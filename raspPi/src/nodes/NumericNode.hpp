@@ -1,5 +1,6 @@
 #pragma once
 
+#define _CRT_SECURE_NO_WARNINGS
 #if _MSC_VER <= 1800
     #define snprintf _snprintf
 #endif
