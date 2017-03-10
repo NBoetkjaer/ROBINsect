@@ -97,7 +97,8 @@ void BaseNode::PushChangeHistory()
 {
     if (AnyRecentChanges())
     {
-        recentChanges <<= 1; // Shift changes one bit up.
+        recentChanges &= ~1; // Clear LSB. Remove indication of most recent change.
+        recentChanges += 2; // increase change count by 2 (actual count is  'recentChanges >> 2') 
         // Also push changes for all childs.
         for (const auto & child : children)
         {

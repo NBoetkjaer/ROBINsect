@@ -40,7 +40,7 @@ private:
     //static Attributes displayName("displayName");
     static std::array< std::tuple<const std::string, FlagType>, (size_t)FlagType::numflags> flagNames;
 
-    size_t recentChanges;    // Indicate if this node or any of its child have changed. LSB indicate newest change.
+    size_t recentChanges;    // Indicate if this node or any of its child have changed. LSB indicate newest change, remaing bits act as a counter.
     size_t attributeChanges; // Variable to hold the applied changes to this node. Each attribID has a bit in changes.
     size_t touchedAttributes; // Variable used to collect all used (active) attributes.
     //std::map<size_t, string> attributes; key<attribID,string>
@@ -84,6 +84,8 @@ public:
     inline bool IsAttributeUsed(attribID_t attribID) const { return (touchedAttributes  & ((size_t)1 << attribID)) != 0; }
     inline bool AnyChanges() { return recentChanges != 0; };
     inline bool AnyRecentChanges() { return recentChanges & 1; };
+    inline int RecentChangeCount(){ return (recentChanges >> 2) + (recentChanges & 1); };
+
 
     void PushChangeHistory();
     void ClearAllChanges();
