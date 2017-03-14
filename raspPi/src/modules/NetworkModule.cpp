@@ -16,9 +16,10 @@ NetworkModule::~NetworkModule()
 
 void NetworkModule::Init(BaseNode& rootNode)
 {
+    pCurrentNode = &rootNode;
     BaseNode* pNode = rootNode.AddChild<BaseNode>("TelnetSocket");
-    pRcvNode = pNode->AddChild<Int64Node>("BytesRecived", 0);
-    pSentNode = pNode->AddChild<Int64Node>("BytesSent", 0);
+    pRcvNode = rootNode.AddChild<Int64Node>("BytesRecived", 0);
+    pSentNode = rootNode.AddChild<Int64Node>("BytesSent", 0);
     pConnectedNode = pNode->AddChild<BoolNode>("Connected", false);
 
     pNode->Subscribe(this);
@@ -69,6 +70,12 @@ void NetworkModule::Execute()
             buffer[dataLen] = 0; // Terminate the string.
             std::cout << buffer.data() << endl;
             pRcvNode->Set(sockAccept.GetBytesRecieved());
+            PrintNodes();
+            // ToDo - Check dataLen and send remaining data.
+            dataLen = consoleOutput.size();
+            retVal = sockAccept.Send(consoleOutput.data(), &dataLen);
+            std::cout << "Send " << retVal << ": ";
+            pSentNode->Set(sockAccept.GetBytesSent());
         }
         break;
     }
@@ -77,4 +84,45 @@ void NetworkModule::Execute()
     {   // Send reply to the broadcast.
     
     }
+}
+
+void NetworkModule::PrintNodes()
+{
+    consoleOutput = ERASE_ALL HOME FOREGROUND(GREEN);
+
+    std::string tmpStr = "/";
+    BaseNode * pNode = pCurrentNode;
+    while (pNode)
+    {
+        tmpStr = "/" + pNode->GetName() + tmpStr;
+        pNode = pNode->GetParent();
+    }
+    consoleOutput += "Current node: " + tmpStr + NEWLINE;
+    consoleOutput += FOREGROUND(DEFAULT_COLOR);
+
+    for (const auto &child : pCurrentNode->GetChilds())
+    {
+        consoleOutput += child->GetName();
+        // Make Value the first attribute.
+        if (child->GetAttribute(valueAttrib.GetID(), tmpStr))
+        {
+            consoleOutput +=  "=" + tmpStr;
+        }
+
+        for (attribID_t i = 0; i < Attribute::GetNumAttributes(); ++i)
+        {
+            if (!child->IsAttributeUsed(i) || i == valueAttrib.GetID())
+                continue;
+            if (child->GetAttribute(i, tmpStr))
+            {
+                consoleOutput += " " + Attribute::GetAttributeName(i) + "=" + tmpStr;
+            }
+            else
+            {
+                //assert(false);
+            }
+        }
+        consoleOutput += NEWLINE;
+    }
+    consoleOutput += ":";
 }

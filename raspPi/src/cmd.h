@@ -35,6 +35,7 @@
 
 #define NEWLINE "\r\n" ERASE_LINE
 
+ /*
 int _kbhit();
 int getch(void);
 
@@ -45,3 +46,4 @@ public:
 private:
 
 };
+*/

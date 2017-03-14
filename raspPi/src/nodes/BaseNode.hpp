@@ -55,7 +55,8 @@ public:
     virtual ~BaseNode();
 
     const std::string&  GetName() const { return name; };
-    BaseNode* GetParent() const { return pParent; };
+    BaseNode* GetParent() const { return pParent; };    
+    const std::vector<std::unique_ptr<BaseNode>>& GetChilds() const { return children; };
     BaseNode* GetRoot() const;
 
     // -------- Atributes --------
