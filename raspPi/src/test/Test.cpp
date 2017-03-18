@@ -59,6 +59,8 @@ int main(int argc, char* argv[])
     assert(root.GetFlag(FlagType::persist));
     assert(!root.GetFlag(FlagType::query));
 
+    root.Print();
+
     BaseNode* pTmpNode;
     pTmpNode = pStringNode->FindNode("/Base/Int32/");
     assert(pTmpNode->GetName() == "Int32");
@@ -84,6 +86,12 @@ int main(int argc, char* argv[])
     pTmpNode = pStringNode->FindNode(".././../Int32");
     assert(pTmpNode == nullptr);
 
+    pTmpNode = pStringNode->FindNode("../../../../Ba/Int3/F/S", true);
+    assert(pTmpNode == pStringNode);
+
+    pTmpNode = pStringNode->FindNode("../../../../B/I/F/S", true);
+    assert(pTmpNode == nullptr);
+
     pFloatNode->SetAttribute(Attribute::GetAttributeID("range"), "[12e-3,24.34e4]");
     pFloatNode->SetAttribute((attribID_t)unitAttrib, "m/s");
     pDoubleNode->SetAttribute(Attribute::GetAttributeID("range"), "[-180,180]");
@@ -99,7 +107,6 @@ int main(int argc, char* argv[])
     pInt32Node->SetAttribute(Attribute::GetAttributeID("value"), "25");
 
     pStringNode->SetAttribute(Attribute::GetAttributeID("value"), "Test string");    
-    root.Print(); 
 
 
     std::string tmpStr;

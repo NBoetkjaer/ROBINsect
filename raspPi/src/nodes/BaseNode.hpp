@@ -85,7 +85,7 @@ public:
     inline bool IsAttributeUsed(attribID_t attribID) const { return (touchedAttributes  & ((size_t)1 << attribID)) != 0; }
     inline bool AnyChanges() { return recentChanges != 0; };
     inline bool AnyRecentChanges() { return recentChanges & 1; };
-    inline int RecentChangeCount(){ return (recentChanges >> 2) + (recentChanges & 1); };
+    inline int RecentChangeCount(){ return int((recentChanges >> 2) + (recentChanges & 1)); };
 
 
     void PushChangeHistory();
@@ -112,10 +112,10 @@ public:
     void Notify(bool recursive); // Notify all subscribers
 
 private:
-    BaseNode* FindNodeInternal(const char * pNodePath);
+    BaseNode* FindNodeInternal(const char * pNodePath, bool allowPartialMatch);
 public:
-    BaseNode* FindNode(const std::string& nodePath);
-    BaseNode* FindNode(const char * pNodePath);
+    BaseNode* FindNode(const std::string& nodePath, bool allowPartialMatch = false);
+    BaseNode* FindNode(const char * pNodePath, bool allowPartialMatch = false);
 
     template<typename TNode, typename ...Args>
     TNode* AddChild(Args&&... params)

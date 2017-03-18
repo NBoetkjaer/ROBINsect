@@ -34,7 +34,7 @@ private:
     size_t bufferEndPos;
 
     void PrintNodes();
-//    void ProcessCmd();
+    void ProcessCmd(const char* pCmd);
 
     // Inherited via NodeObserver
     virtual void Notify() override;

@@ -27,7 +27,8 @@ BaseNode::BaseNode(const std::string &nodeName, BaseNode* pParentNode):
     attributeChanges(0),
     touchedAttributes(0),
     name(nodeName),
-    pParent(pParentNode)
+    pParent(pParentNode),
+    nodeFlag(FlagType(0))
 {
 }
 
@@ -176,6 +177,10 @@ void  BaseNode::SetFlags(const char* pValues)
         {
             SetFlag(flag, !removeFlag);
         }
+        else
+        {
+            return;
+        }
     } // End of while loop.
 }
 
@@ -279,17 +284,17 @@ void BaseNode::Print(int indentLevel) const
 // An absolute path is specified with a leading "/" eg. "/node1/node2/nodeToFind", in which case the function will begin the search from the root node.
 // The syntax of a relative path is "node2/nodeToFind" or "../node1/node2/nodeToFind" and the search is started from this node.
 // Return value: If the node is found a pointer to the requested node is returned, otherwise a nullptr is returned.
-BaseNode* BaseNode::FindNode(const std::string& nodePath) 
+BaseNode* BaseNode::FindNode(const std::string& nodePath, bool allowPartialMatch)
 {
-    return FindNodeInternal(nodePath.c_str());
+    return FindNodeInternal(nodePath.c_str(), allowPartialMatch);
 }
 
-BaseNode* BaseNode::FindNode(const char * pNodePath) 
+BaseNode* BaseNode::FindNode(const char * pNodePath, bool allowPartialMatch)
 {
-    return FindNodeInternal(pNodePath);
+    return FindNodeInternal(pNodePath, allowPartialMatch);
 }
 
-BaseNode* BaseNode::FindNodeInternal(const char * pNodePath) 
+BaseNode* BaseNode::FindNodeInternal(const char * pNodePath, bool allowPartialMatch)
 {
     static const char pathDelimiter = '/';
     if (pNodePath == nullptr) return nullptr;
@@ -304,17 +309,19 @@ BaseNode* BaseNode::FindNodeInternal(const char * pNodePath)
         {
             pNode = pNode->pParent;
         }
-        return pNode->FindNodeInternal(pNodePath + 1);
+        return pNode->FindNodeInternal(pNodePath + 1, allowPartialMatch);
     }
     // Special case if first two characters are ".." - then return the parent if not null.
     if (pNodePath[0] == '.' && pNodePath[1] != 0 && pNodePath[1] == '.' && pParent)
     {
-        if (pNodePath[2] == pathDelimiter) return pParent->FindNodeInternal(pNodePath + 3);
+        if (pNodePath[2] == pathDelimiter) return pParent->FindNodeInternal(pNodePath + 3, allowPartialMatch);
         if (pNodePath[2] == 0) return pParent;
     }
 
     // Otherwise look up (next) node name in nodePath.
     // Otherwise search children for at string match with next node.
+    BaseNode* pPartialMatchNode = nullptr;
+    const char* pPartialMatchPos = nullptr;
     for (const auto &child : children)
     {
         const char* pChildName = child->name.c_str();
@@ -328,9 +335,23 @@ BaseNode* BaseNode::FindNodeInternal(const char * pNodePath)
         // did we match to the end of child name?
         if (*pChildName == 0)
         {
-            if (*pNodeName == pathDelimiter) return child->FindNodeInternal(pNodeName + 1);
-            if (*pNodeName == 0) return child.get();
+            if (*pNodeName == pathDelimiter) { return child->FindNodeInternal(pNodeName + 1, allowPartialMatch);}
+            if (*pNodeName == 0) { return child.get(); }
         }
+        if (allowPartialMatch) // If partial match is allowed checke that the specified named is matched entirely.
+        {
+            if (*pNodeName == pathDelimiter || *pNodeName == 0)
+            {
+                if (pPartialMatchNode) { return nullptr; } // ambiguity - More than one child node have a partial match.
+                pPartialMatchNode = child.get();
+                pPartialMatchPos = pNodeName;
+            }
+        }
+    }
+    if (allowPartialMatch && pPartialMatchNode != nullptr)
+    {
+        if (*pPartialMatchPos == 0) { return pPartialMatchNode; }
+        return pPartialMatchNode->FindNodeInternal(pPartialMatchPos + 1, allowPartialMatch); // (+1) It must have been a delimiter. Move one pos forward.
     }
     return nullptr;
 }
