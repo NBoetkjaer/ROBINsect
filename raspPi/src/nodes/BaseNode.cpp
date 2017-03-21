@@ -1,9 +1,11 @@
 #include "BaseNode.hpp"
+#ifndef WIN32
+#include <strings.h>
+#endif
 #include <sstream>
 #include <algorithm>
 
 using namespace std;
-using namespace Util;
 
 // Register attributes.
 Attribute flagsAttrib("flags");
@@ -128,8 +130,6 @@ void  BaseNode::SetFlags(const char* pValues)
     // Parse string and set flags accordingly.
     static const char flagDelimiter = '|';
     bool moreflags = true;
-    FlagType newFlags = (FlagType) 0;
-
 
     if (pValues == nullptr) return;
     while (moreflags)

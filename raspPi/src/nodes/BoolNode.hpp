@@ -1,5 +1,7 @@
 #pragma once
-
+#ifndef WIN32
+#include <strings.h>
+#endif
 #include "AbstractValueNode.hpp" 
 
 class BoolNode : public AbstractValueNode<bool>

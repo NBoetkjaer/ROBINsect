@@ -34,13 +34,13 @@
 // Note: the use of ENABLE_BITMASK_OPERATORS macro must  be placed in global namespace.
 #define ENABLE_BITMASK_OPERATORS(x)                     \
 template<>                                              \
-struct ::Util::EnableBitMaskOperators<x>         \
+struct EnableBitMaskOperators<x>                        \
 {                                                       \
     static const bool enable = true;                    \
 };
 
-namespace Util
-{
+//namespace Util
+//{
     template<typename Enum>
     struct EnableBitMaskOperators
     {
@@ -122,4 +122,4 @@ namespace Util
             static_cast<underlying>(rhs));
         return lhs;
     }
-} // end of namespace Util
+//} // end of namespace Util

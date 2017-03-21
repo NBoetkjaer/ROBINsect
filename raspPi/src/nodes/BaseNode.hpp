@@ -2,20 +2,16 @@
 #include <array>
 #include <string>
 #include <vector>
-#include <list>
-#include <limits>
 #include <algorithm>
 #include <memory>
 #include <iostream>
-#include <typeinfo>
 #include "Attribute.hpp"
 
 #include "../util/BitmaskEnumClass.h"
 
-#if _MSC_VER
+#ifdef _MSC_VER
 #define strcasecmp _stricmp
 #endif
-//enum class NodeType { nodeNode, boolNode, intNode, floatNode, doubleNode, stringNode, enumNode };
 
 enum class FlagType :uint32_t {hide, readonly, logging, persist, query, numflags, invalidFlag = numflags};
 ENABLE_BITMASK_OPERATORS(FlagType) // Supply overloaded bitwise operators for FlagType.
@@ -36,14 +32,11 @@ public:
 class BaseNode
 {
 private:
-    // Common attributes.
-    //static Attributes displayName("displayName");
     static std::array< std::tuple<const std::string, FlagType>, (size_t)FlagType::numflags> flagNames;
 
     size_t recentChanges;    // Indicate if this node or any of its child have changed. LSB indicate newest change, remaing bits act as a counter.
     size_t attributeChanges; // Variable to hold the applied changes to this node. Each attribID has a bit in changes.
     size_t touchedAttributes; // Variable used to collect all used (active) attributes.
-    //std::map<size_t, string> attributes; key<attribID,string>
     std::vector<NodeObserver*> subscribers;
 
 protected:

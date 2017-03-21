@@ -31,7 +31,7 @@ std::vector<std::string>& Attribute::GetAttributes()
 
 const string& Attribute::GetAttributeName(attribID_t id)
 {
-    assert(id >= 0 && id < GetAttributes().size());
+    assert(id >= 0 && id < GetNumAttributes());
     return GetAttributes().at(id);
 }
 

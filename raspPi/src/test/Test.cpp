@@ -6,7 +6,9 @@
 #include <memory>
 #include <array>
 #include <vector>
+#ifdef WIN32
 #include <conio.h>
+#endif
 
 #include "../nodes/Nodes.hpp"
 
@@ -41,6 +43,8 @@ int main(int argc, char* argv[])
     BaseNode* pDoubleNode = pInt64Node->AddChild<DoubleNode>("Double", 0.0);
     BaseNode* pStringNode = pFloatNode->AddChild<StringNode>("String", "Test string.");
     
+    std::cout << "Num Attrib =" << (int)valueAttrib.GetNumAttributes() << std::endl;
+    std::cout << "GetAttributeID('info') =" << (int)Attribute::GetAttributeID("info") << std::endl;
 
     root.SetAttribute(Attribute::GetAttributeID("info"), "Dette er en test");
     assert(root.GetInfo()=="Dette er en test");
@@ -121,7 +125,7 @@ int main(int argc, char* argv[])
 
     
     pTmpNode = pFloatNode;
-    for (size_t i = 0; i < Attribute::GetNumAttributes(); ++i)
+    for (attribID_t i = 0; i < Attribute::GetNumAttributes(); ++i)
     {
         if (pTmpNode->IsAttributeUsed(i))
         {
@@ -136,7 +140,9 @@ int main(int argc, char* argv[])
             
         }
     }
+#ifdef WIN32
     Socket::InitLib(2, 2);
+#endif
     std::vector<std::unique_ptr<Module>> modules;
     modules.push_back(std::make_unique<NetworkModule>());
     std::cout << std::endl << "************************" << std::endl;
@@ -173,7 +179,9 @@ int main(int argc, char* argv[])
         // Clear all changes.
         root.ClearAllChanges();
     }
+#ifdef WIN32
     Socket::ExitLib();
+#endif
     return 0;
 }
 

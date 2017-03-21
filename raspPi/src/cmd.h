@@ -35,9 +35,10 @@
 
 #define NEWLINE "\r\n" ERASE_LINE
 
- /*
-int _kbhit();
-int getch(void);
+#ifndef _WIN32
+    int _kbhit();
+    int getch(void);
+#endif
 
 class cmd
 {
@@ -46,4 +47,4 @@ public:
 private:
 
 };
-*/
+

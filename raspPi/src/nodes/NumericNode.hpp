@@ -1,12 +1,15 @@
 #pragma once
 
 #define _CRT_SECURE_NO_WARNINGS
-#if _MSC_VER <= 1800
-    #define snprintf _snprintf
+#ifdef _MSC_VER
+    #if _MSC_VER <= 1800
+        #define snprintf _snprintf
+    #endif
 #endif
 
-#include "AbstractValueNode.hpp"
 #include <sstream>
+#include "AbstractValueNode.hpp"
+
 extern Attribute rangeAttrib;
 extern Attribute unitAttrib;
 extern Attribute prefixAttrib;
@@ -36,7 +39,7 @@ public:
         else if (unitAttrib.GetID() == attribID)
         {
             unit = pAttributeValue;
-            SetAttributeChanged(attribID);
+            BaseNode::SetAttributeChanged(attribID);
             return true;
         }
         else if (prefixAttrib.GetID() == attribID)
@@ -109,10 +112,10 @@ public:
         {
             return;
         }
-        SetAttributeChanged(rangeAttrib.GetID()); // Mark the change.
+        BaseNode::SetAttributeChanged(rangeAttrib.GetID()); // Mark the change.
         minValue = min;
         maxValue = max;
-        Set(value); // This will ensure that 'value' is within the new range.
+        Set(AbstractValueNode<T>::value); // This will ensure that 'value' is within the new range.
 
     }
 
@@ -123,7 +126,7 @@ public:
         //ToDo ... check.
         static const int maxLength = 30;
         strValue.resize(maxLength+1);
-        int len = snprintf(&strValue[0], maxLength, pFmt, value);
+        int len = snprintf(&strValue[0], maxLength, pFmt, AbstractValueNode<T>::value);
         if (len < 0) strValue.clear();
         if (len > maxLength) len = maxLength;
         strValue.resize(len);

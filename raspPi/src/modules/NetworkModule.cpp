@@ -1,6 +1,6 @@
 #include "NetworkModule.hpp"
 #include <ctype.h>
-#include <iostream>
+#include <iostream> // ToDo: Remove all debug print ...
 
 using namespace std;
 
@@ -61,7 +61,7 @@ void NetworkModule::Execute()
         {
             size_t dataLen = buffer.size(); 
             int retVal = sockAccept.Recieve(buffer.data(), &dataLen);
-            std::cout << "Recieve " << retVal << ": ";
+            std::cout << "Recieve " << retVal << ": " << "Total bytes : " << sockAccept.GetBytesRecieved() << std::endl;
             if(dataLen == 0)
             {
                 // Remote end is shutdown
@@ -79,7 +79,7 @@ void NetworkModule::Execute()
             // ToDo - Check dataLen and send remaining data.
             dataLen = consoleOutput.size();
             retVal = sockAccept.Send(consoleOutput.data(), &dataLen);
-            std::cout << "Send " << retVal << ": ";
+            std::cout << "Send " << retVal << ": " << "Total bytes:" << sockAccept.GetBytesSent() << std::endl;
             pSentNode->Set(sockAccept.GetBytesSent());
         }
         break;
@@ -118,7 +118,7 @@ void NetworkModule::ProcessCmd(const char* pCmd)
     while (*pChar != 0)
     {
         ++pChar;
-        if (*pChar == 0 || isspace(unsigned char(*pChar)) || *pChar == '=')
+        if (*pChar == 0 || isspace((unsigned char)(*pChar)) || *pChar == '=')
         {
             if (pCmdNode == nullptr)
             {
@@ -185,9 +185,17 @@ void NetworkModule::PrintNodes()
     consoleOutput += "Current node: " + tmpStr + NEWLINE;
     consoleOutput += FOREGROUND(DEFAULT_COLOR);
 
+    bool bShowAll = true;
     for (const auto &child : pCurrentNode->GetChilds())
     {
-        if(child->AnyRecentChanges()) consoleOutput += BACKGROUND(DEFAULT_COLOR);
+        if (!bShowAll && child->GetFlag(FlagType::hide))
+        {
+            continue; 
+        }
+        if (child->AnyRecentChanges())
+        {
+            consoleOutput += BACKGROUND(DEFAULT_COLOR); 
+        }
         consoleOutput += " - " BACKGROUND(DEFAULT_COLOR);
         consoleOutput += child->GetName();
         // Make Value the first attribute.
@@ -208,8 +216,9 @@ void NetworkModule::PrintNodes()
 
         for (attribID_t i = 0; i < Attribute::GetNumAttributes(); ++i)
         {
-            if (!child->IsAttributeUsed(i) || i == valueAttrib.GetID() || i == unitAttrib.GetID())
-                continue;
+            if (!child->IsAttributeUsed(i)) { continue; }
+            if(!bShowAll && (i == valueAttrib.GetID() || i == unitAttrib.GetID())) { continue; }
+                
             if (child->GetAttribute(i, tmpStr))
             {
                 consoleOutput += " " + Attribute::GetAttributeName(i) + "=" + FOREGROUND(CYAN) + tmpStr + FOREGROUND(DEFAULT_COLOR);
