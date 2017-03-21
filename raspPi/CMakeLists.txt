@@ -18,10 +18,11 @@ file(GLOB SOURCES_test "src/test/*.cpp")
 	include_directories(include  /usr/include/eigen3/)
 	
 	set(SOURCES 
-		${SOURCES_top}
+		#${SOURCES_top}
 		${SOURCES_comm}
 		${SOURCES_modules}
 		${SOURCES_nodes}
+		${SOURCES_test}
 	)
 
     ADD_DEFINITIONS(
