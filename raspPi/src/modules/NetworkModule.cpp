@@ -188,15 +188,24 @@ void NetworkModule::PrintNodes()
     bool bShowAll = true;
     for (const auto &child : pCurrentNode->GetChilds())
     {
-        if (!bShowAll && child->GetFlag(FlagType::hide))
+        bool hiddenChild = child->GetFlag(FlagType::hide);
+        if (!bShowAll && hiddenChild)
         {
             continue; 
         }
         if (child->AnyRecentChanges())
         {
-            consoleOutput += BACKGROUND(DEFAULT_COLOR); 
+            consoleOutput += BACKGROUND(RED); 
         }
-        consoleOutput += " - " BACKGROUND(DEFAULT_COLOR);
+        if(child->GetChilds().size())
+            consoleOutput += " + " BACKGROUND(DEFAULT_COLOR);
+        else
+            consoleOutput += " - " BACKGROUND(DEFAULT_COLOR);
+
+        if(hiddenChild)
+        {
+            consoleOutput += FOREGROUND(YELLOW);
+        }
         consoleOutput += child->GetName();
         // Make Value the first attribute.
         if (child->GetAttribute(valueAttrib.GetID(), tmpStr))
@@ -211,9 +220,8 @@ void NetworkModule::PrintNodes()
             {
                 consoleOutput += " " + tmpStr;
             }
-            consoleOutput += FOREGROUND(DEFAULT_COLOR);
         }
-
+        consoleOutput += FOREGROUND(DEFAULT_COLOR);
         for (attribID_t i = 0; i < Attribute::GetNumAttributes(); ++i)
         {
             if (!child->IsAttributeUsed(i)) { continue; }

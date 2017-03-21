@@ -1,10 +1,7 @@
 cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
 project(ROBINsect)
  
-
-#set(SOURCES src/mainapp.cpp src/Student.cpp)
-
-#However, the file(GLOB...) allows for wildcard additions:
+#The file(GLOB...) allows for wildcard additions:
 file(GLOB SOURCES_top "src/*.cpp")
 file(GLOB SOURCES_comm "src/communication/*.cpp")
 file(GLOB SOURCES_modules "src/modules/*.cpp")
@@ -44,6 +41,7 @@ add_executable(ROBINsect ${SOURCES} )
 
 source_group("Modules"	FILES ${SOURCES_modules})
 source_group("Nodes"    FILES ${SOURCES_nodes})
+source_group("Communication"    FILES ${SOURCES_comm})
 source_group("Test"    	FILES ${SOURCES_test})
 
 #install(TARGETS ROBINsect DESTINATION bin)
