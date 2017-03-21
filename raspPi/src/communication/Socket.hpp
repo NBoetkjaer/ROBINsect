@@ -52,7 +52,8 @@ private:
     int SocketError() const;
 
     SOCKET  socketID;
-    int64_t bytesSent, bytesRecieved;    
+    int64_t bytesSent;
+    int64_t bytesRecieved;
     SocketType socketType;
     bool isBlocking;
     bool bound;

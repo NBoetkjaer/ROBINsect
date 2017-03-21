@@ -1,17 +1,14 @@
 #include "Socket.hpp"
 #include <fcntl.h>
-//#include <string.h>
 
-#ifndef _WIN32
+#ifdef _WIN32
+#define VALID_SOCKET(socket) ((socket) != INVALID_SOCKET)
+#else
+#define VALID_SOCKET(socket) ((socket) >= 0)
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <string.h> // memset declared here.
 #endif
-
-
-#define VALID_SOCKET(socket) socket >= 0
-// #define IPPROTO_TCP 0
-// #define IPPROTO_UDP 0
-
 
 Socket::Socket()
     :socketID(0),
@@ -81,7 +78,7 @@ int Socket::Bind(uint16_t portNo, SocketType type)
         break;
     }
 
-    if (!socketID) // Error socket not created
+    if (!VALID_SOCKET(socketID)) // Error socket not created
         return SocketError();
 
     // SO_REUSEADDR allows app to connect to server
@@ -123,15 +120,15 @@ int Socket::Accept(const Socket &listningSocket)
 
     socklen_t addrlen = sizeof(SOCKADDR);
     newSockID = accept(listningSocket.socketID, &addr, &addrlen);
-    if (newSockID < 0)
-    {
-        return SocketError();
-    }
-    else
+    if (VALID_SOCKET(newSockID))
     {
         socketID = newSockID;
         connected = true;
         socketType = SocketType::TCP;
+    }
+    else
+    {
+        return SocketError();
     }
     return 0;
 }
@@ -247,4 +244,4 @@ int Socket::SocketError() const
 #else
     return errno;
 #endif
-};
+}
