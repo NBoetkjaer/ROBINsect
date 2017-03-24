@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <stdint.h>
 
 typedef int8_t attribID_t;
 #define INVALID_ATTRIBUTE_ID (-1)
