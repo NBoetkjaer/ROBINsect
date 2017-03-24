@@ -1,5 +1,4 @@
-#include "servo.h"
-#include <stdio.h>
+#include "servo.hpp"
 
 Servo::Servo()
 {
@@ -32,12 +31,12 @@ void Servo::SetRange(unsigned short pwmMin, unsigned short pwmMax, float angleMi
 
 unsigned short Servo::GetPWM(float angle)
 {
-	float pwm = angle *slope + offset;
+	float pwm = angle * slope + offset;
 	if(pwm < m_pwmMin) pwm = m_pwmMin;
 	if(pwm > m_pwmMax) pwm = m_pwmMax;
-	return (unsigned short)(pwm +0.5f);
+	return (unsigned short)(pwm + 0.5f);
 }
 float Servo::GetAngle(unsigned short pwm)
 {
-	return (pwm - offset)/slope;
+	return (pwm - offset) / slope;
 }

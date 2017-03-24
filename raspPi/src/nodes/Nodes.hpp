@@ -4,3 +4,4 @@
 #include "NumericNode.hpp"
 #include "BoolNode.hpp"
 #include "StringNode.hpp"
+#include "Pos3D_32f_Node.hpp"

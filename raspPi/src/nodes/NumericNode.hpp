@@ -1,6 +1,5 @@
 #pragma once
 
-#define _CRT_SECURE_NO_WARNINGS
 #ifdef _MSC_VER
     #if _MSC_VER <= 1800
         #define snprintf _snprintf
@@ -89,7 +88,10 @@ public:
     void SetRange(const char* pValues)
     {
         T _minValue, _maxValue;
-        int numSuccess = sscanf(pValues, pRangeFmt, &_minValue, &_maxValue);
+        const char *pChar = pValues;
+        // Skip leading white spaces.
+        while (*pChar != 0 && isspace(*pChar)) { ++pChar; }
+        int numSuccess = sscanf(pChar, pRangeFmt, &_minValue, &_maxValue);
         if (numSuccess == 2)
         {
             SetRange(_minValue, _maxValue);

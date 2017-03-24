@@ -1,21 +1,21 @@
-#include "NetworkModule.hpp"
+#include "TelnetModule.hpp"
 #include <ctype.h>
 #include <iostream> // ToDo: Remove all debug print ...
 
 using namespace std;
 
-NetworkModule::NetworkModule():
+TelnetModule::TelnetModule():
     state(State::Initialize)
 {
 
 }
 
-NetworkModule::~NetworkModule()
+TelnetModule::~TelnetModule()
 {
 
 }
 
-void NetworkModule::Init(BaseNode& rootNode)
+void TelnetModule::Init(BaseNode& rootNode)
 {
     pCurrentNode = &rootNode;
     BaseNode* pNode = rootNode.AddChild<BaseNode>("TelnetSocket");
@@ -26,7 +26,7 @@ void NetworkModule::Init(BaseNode& rootNode)
     rootNode.Subscribe(this);
 }
 
-void NetworkModule::Notify()
+void TelnetModule::Notify()
 {
     if (pCurrentNode->AnyRecentChanges())
     {
@@ -34,7 +34,7 @@ void NetworkModule::Notify()
     }
 }
 
-void NetworkModule::Execute()
+void TelnetModule::Execute()
 {
     switch (state)
     {
@@ -91,7 +91,7 @@ void NetworkModule::Execute()
     }
 }
 
-void NetworkModule::ProcessCmd(const char* pCmd)
+void TelnetModule::ProcessCmd(const char* pCmd)
 {    
     const char* pChar = pCmd;
     // Command syntax:
@@ -106,7 +106,7 @@ void NetworkModule::ProcessCmd(const char* pCmd)
 
     BaseNode* pCmdNode = nullptr;
     attribID_t attrId = INVALID_ATTRIBUTE_ID;
-    // Skip trailing white spaces.
+    // Skip leading white spaces.
     while (*pChar != 0 && isspace(*pChar))
     {
         ++pChar;
@@ -132,7 +132,7 @@ void NetworkModule::ProcessCmd(const char* pCmd)
                 attrId = Attribute::GetAttributeID(attribName.c_str());
                 if (attrId == INVALID_ATTRIBUTE_ID) return; // Unknown attribte. (ToDo should we create ??)
             }
-            // Skip trailing white spaces.
+            // Skip leading white spaces.
             while (*pChar != 0 && isspace(*pChar))
             {
                 ++pChar;
@@ -171,7 +171,7 @@ void NetworkModule::ProcessCmd(const char* pCmd)
     }
 }
 
-void NetworkModule::PrintNodes()
+void TelnetModule::PrintNodes()
 {
     consoleOutput = ERASE_ALL HOME FOREGROUND(GREEN);
 

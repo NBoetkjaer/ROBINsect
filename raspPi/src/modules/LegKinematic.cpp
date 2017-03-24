@@ -1,10 +1,10 @@
-#include "LegKinematic.h"
+#include "LegKinematic.hpp"
 #include <iostream>
-//#define _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
 #include <math.h>
 
-#define RAD2DEG(rad)  ((rad) * 180.0f / M_PI)
-#define DEG2RAD(deg)  ((deg) * M_PI / 180.0f)
+#define RAD2DEG(rad)  ((rad) * 180.0f / float(M_PI))
+#define DEG2RAD(deg)  ((deg) * float(M_PI) / 180.0f)
 using namespace std;
 using namespace Eigen;
 
@@ -30,7 +30,7 @@ void LegKinematic::setGoal(float goalX, float goalY, float goalZ)
     // Matrix4f linkT; // Link transform.
     // linkTransform(linkT, d1, M_PI/2.0f);	
     Matrix4f jointLinkT; // = jointT * linkT;
-    jointLinkTransform(jointLinkT, 0.0f, jointAngles[0], d1, M_PI / 2.0f);
+    jointLinkTransform(jointLinkT, 0.0f, jointAngles[0], d1, DEG2RAD(90.0f));
 
     invertTransform(jointLinkT);
     // Transform goal position into end of link 1 franejoint 1 frame.
@@ -108,10 +108,10 @@ void LegKinematic::getGoal(float& goalX, float& goalY, float& goalZ)
     2       0   a3  0   d3
 
     */
-    float ja[3] = { m_joint1Angle_rad, m_joint2Angle_rad, m_joint3Angle_rad };
-    float jd[3] = { 0 };
-    float ld[3] = { d1, d2, d3 };
-    float la[3] = { M_PI / 2.0f, 0.0f, 0.0f };
+    const float ja[3] = { m_joint1Angle_rad, m_joint2Angle_rad, m_joint3Angle_rad };
+    const float jd[3] = { 0 };
+    const float ld[3] = { d1, d2, d3 };
+    const float la[3] = { DEG2RAD(90.0f), 0.0f, 0.0f };
 
     Matrix4f transform = Matrix4f::Identity();
     for (int i = 0; i < 3; ++i)
@@ -139,13 +139,13 @@ void LegKinematic::setJoints(float joint1Angle_deg, float joint2Angle_deg, float
     m_joint3Angle_rad = DEG2RAD(joint3Angle_deg);
 }
 
-void LegKinematic::getJoints(float& joint1Angle_deg, float& joint2Angle_deg, float& joint3Angle_deg)
+void LegKinematic::getJoints(float& joint1Angle_deg, float& joint2Angle_deg, float& joint3Angle_deg) const
 {
     joint1Angle_deg = RAD2DEG(m_joint1Angle_rad);
     joint2Angle_deg = RAD2DEG(m_joint2Angle_rad);
     joint3Angle_deg = RAD2DEG(m_joint3Angle_rad);
 }
-float LegKinematic::getJoint(int idx)
+float LegKinematic::getJoint(int idx) const
 {
     switch (idx)
     {
@@ -156,7 +156,7 @@ float LegKinematic::getJoint(int idx)
     }
 }
 
-void LegKinematic::jointTransform(Matrix4f &jointT, float jd, float ja)
+void LegKinematic::jointTransform(Matrix4f &jointT, float jd, float ja) const
 {
     float s = sin(ja);
     float c = cos(ja);
@@ -167,10 +167,10 @@ void LegKinematic::jointTransform(Matrix4f &jointT, float jd, float ja)
     jointT(1, 0) = s;
     jointT(2, 3) = jd;
 }
-void LegKinematic::linkTransform(Matrix4f &linkT, float ld, float la)
+void LegKinematic::linkTransform(Matrix4f &linkT, float ld, float la) const
 {
-    float s = sin(la);
-    float c = cos(la);
+    const float s = sin(la);
+    const float c = cos(la);
     linkT.setIdentity();
     linkT(1, 1) = c;
     linkT(2, 2) = c;
@@ -178,7 +178,7 @@ void LegKinematic::linkTransform(Matrix4f &linkT, float ld, float la)
     linkT(2, 1) = s;
     linkT(0, 3) = ld;
 }
-void LegKinematic::jointLinkTransform(Eigen::Matrix4f &jointLinkT, float jd, float ja, float ld, float la)
+void LegKinematic::jointLinkTransform(Eigen::Matrix4f &jointLinkT, float jd, float ja, float ld, float la) const 
 {
     // Joint  transform.
     jointTransform(jointLinkT, jd, ja);
@@ -188,7 +188,7 @@ void LegKinematic::jointLinkTransform(Eigen::Matrix4f &jointLinkT, float jd, flo
     jointLinkT = jointLinkT * linkT;
 }
 
-void LegKinematic::invertTransform(Matrix4f &transform)
+void LegKinematic::invertTransform(Matrix4f &transform) const
 {
     transform.topLeftCorner<3, 3>().transposeInPlace();
     transform.topRightCorner<3, 1>() = -1.0f * transform.topLeftCorner<3, 3>() * transform.topRightCorner<3, 1>();

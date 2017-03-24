@@ -1,6 +1,5 @@
 // Test.cpp : Defines the entry point for the console application.
 //
-#define _CRT_SECURE_NO_WARNINGS
 
 #include <assert.h>
 #include <memory>
@@ -12,7 +11,8 @@
 
 #include "../nodes/Nodes.hpp"
 
-#include "../modules/NetworkModule.hpp"
+#include "../modules/TelnetModule.hpp"
+#include "../modules/InsectModule.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -144,7 +144,8 @@ int main(int argc, char* argv[])
     Socket::InitLib(2, 2);
 #endif
     std::vector<std::unique_ptr<Module>> modules;
-    modules.push_back(std::make_unique<NetworkModule>());
+    modules.push_back(std::make_unique<TelnetModule>());
+    modules.push_back(std::make_unique<InsectModule>());
     std::cout << std::endl << "************************" << std::endl;
     std::cout << "Initialize all modules" << std::endl;
     // Execute all modules.

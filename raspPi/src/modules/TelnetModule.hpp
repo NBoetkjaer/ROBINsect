@@ -6,7 +6,7 @@
 #include <array>
 #include <string>
 
-class NetworkModule : public Module, public NodeObserver
+class TelnetModule : public Module, public NodeObserver
 {
 private:
     BaseNode* pNetworkNode;
@@ -18,8 +18,8 @@ private:
 
     std::string consoleOutput;
 public:
-    NetworkModule();
-    virtual ~NetworkModule();
+    TelnetModule();
+    virtual ~TelnetModule();
     virtual void Execute();
     virtual void Init(BaseNode& rootNode) override;
 private:

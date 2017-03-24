@@ -10,7 +10,7 @@
 #include "../util/BitmaskEnumClass.h"
 
 #ifdef _MSC_VER
-#define strcasecmp _stricmp
+    #define strcasecmp _stricmp
 #endif
 
 enum class FlagType :uint32_t {hide, readonly, logging, persist, query, numflags, invalidFlag = numflags};
