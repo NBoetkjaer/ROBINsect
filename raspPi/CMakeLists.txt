@@ -46,7 +46,7 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 add_executable(ROBINsect ${SOURCES} )
 
 source_group("Modules"	FILES ${SOURCES_modules})
-source_group("Modules/hardware"	FILES ${SOURCES_modules_hw})
+source_group("Modules\\hardware"	FILES ${SOURCES_modules_hw})
 source_group("Nodes"    FILES ${SOURCES_nodes})
 source_group("Communication"    FILES ${SOURCES_comm})
 source_group("Test"    	FILES ${SOURCES_test})
