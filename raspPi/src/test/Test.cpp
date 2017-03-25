@@ -9,6 +9,8 @@
 #include <conio.h>
 #endif
 
+#include "../nodes/xml/nodeXmlConverter.hpp"
+#include "../nodes/NodeFactory.hpp"
 #include "../nodes/Nodes.hpp"
 
 #include "../modules/TelnetModule.hpp"
@@ -35,6 +37,8 @@ int main(int argc, char* argv[])
     std::cout << "Size of DoubleNode: " << sizeof(DoubleNode) << std::endl;
 
     
+    std::unique_ptr<BaseNode> baseNode = NodeFactory::CreateNode("node", "NodeFactoryTest");
+    root.AddChild<BaseNode>(std::move(baseNode));
     BaseNode* pNode = root.AddChild<BaseNode>("Base");
     BaseNode* pBoolNode = root.AddChild<BoolNode>("Bool", true);
     BaseNode* pInt32Node = pNode->AddChild<Int32Node>("Int32", 0);
@@ -146,6 +150,7 @@ int main(int argc, char* argv[])
     std::vector<std::unique_ptr<Module>> modules;
     modules.push_back(std::make_unique<TelnetModule>());
     modules.push_back(std::make_unique<InsectModule>());
+
     std::cout << std::endl << "************************" << std::endl;
     std::cout << "Initialize all modules" << std::endl;
     // Execute all modules.
@@ -153,6 +158,11 @@ int main(int argc, char* argv[])
     {
         pModul->Init(root);
     }
+
+    NodeXmlConverter xmlConv;
+    std::string test;
+    xmlConv.ConvertToXml(&root, test);
+
     std::cout << "Starting module loop" << std::endl;
     while (true)
     {

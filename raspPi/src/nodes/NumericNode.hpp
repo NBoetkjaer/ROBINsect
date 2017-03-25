@@ -20,7 +20,7 @@ class NumericNode : public AbstractValueNode<T>
     static const char* pRangeFmt;
 public:
     // Constructor
-    NumericNode(const std::string &nodeName, T val) :
+    NumericNode(const std::string &nodeName, T val = T(0)) :
         AbstractValueNode<T>(nodeName, val),
         minValue(std::numeric_limits<T>::lowest()),
         maxValue(std::numeric_limits<T>::max()) 

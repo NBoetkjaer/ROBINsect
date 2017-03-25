@@ -7,7 +7,7 @@
 class BoolNode : public AbstractValueNode<bool>
 {
 public:
-    BoolNode(const std::string &nodeName, bool val) : AbstractValueNode<bool>(nodeName, val){}
+    BoolNode(const std::string &nodeName, bool val = false) : AbstractValueNode<bool>(nodeName, val){}
     virtual ~BoolNode(){}
     virtual bool SetAttribute(attribID_t attribID, const char* pAttributeValue)
     {

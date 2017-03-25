@@ -7,6 +7,7 @@ file(GLOB SOURCES_comm "src/communication/*.*pp")
 file(GLOB SOURCES_modules "src/modules/*.*pp")
 file(GLOB SOURCES_modules_hw "src/modules/hardware/*.*pp")
 file(GLOB SOURCES_nodes "src/nodes/*.*pp")
+file(GLOB SOURCES_xml "src/nodes/xml/*.*pp")
 file(GLOB SOURCES_test "src/test/*.cpp")
 
  IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -16,11 +17,12 @@ file(GLOB SOURCES_test "src/test/*.cpp")
 	include_directories(include  /usr/include/eigen3/)
 	
 	set(SOURCES 
-		#${SOURCES_top}		
+		#${SOURCES_top}
 		${SOURCES_comm}
 		${SOURCES_modules}
-		${SOURCES_modules_hw}		
+		${SOURCES_modules_hw}
 		${SOURCES_nodes}
+		${SOURCES_xml}
 		${SOURCES_test}
 	)
 
@@ -37,6 +39,7 @@ ELSE (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 		${SOURCES_modules}
 		${SOURCES_modules_hw}
 		${SOURCES_nodes}
+		${SOURCES_xml}
 		${SOURCES_test}
 	)
 	ADD_DEFINITIONS(	
@@ -47,10 +50,11 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 add_executable(ROBINsect ${SOURCES} )
 
-source_group("Modules"	FILES ${SOURCES_modules})
+source_group("Modules"				FILES ${SOURCES_modules})
 source_group("Modules\\hardware"	FILES ${SOURCES_modules_hw})
-source_group("Nodes"    FILES ${SOURCES_nodes})
-source_group("Communication"    FILES ${SOURCES_comm})
-source_group("Test"    	FILES ${SOURCES_test})
+source_group("Nodes"				FILES ${SOURCES_nodes})
+source_group("Nodes\\xml"			FILES ${SOURCES_xml})
+source_group("Communication"		FILES ${SOURCES_comm})
+source_group("Test"					FILES ${SOURCES_test})
 
 #install(TARGETS ROBINsect DESTINATION bin)

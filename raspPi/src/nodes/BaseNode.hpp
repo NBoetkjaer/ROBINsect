@@ -110,6 +110,14 @@ public:
     BaseNode* FindNode(const std::string& nodePath, bool allowPartialMatch = false);
     BaseNode* FindNode(const char * pNodePath, bool allowPartialMatch = false);
 
+    template<typename TNode>
+    TNode* AddChild(std::unique_ptr<BaseNode> childNode)
+    {
+        TNode* retVal = dynamic_cast<TNode*>(childNode.get());
+        children.push_back(std::move(childNode));
+        return retVal;
+    }
+
     template<typename TNode, typename ...Args>
     TNode* AddChild(Args&&... params)
     {
