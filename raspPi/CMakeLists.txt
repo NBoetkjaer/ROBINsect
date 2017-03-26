@@ -17,7 +17,7 @@ file(GLOB SOURCES_test "src/test/*.cpp")
 	include_directories(include  /usr/include/eigen3/)
 	
 	set(SOURCES 
-		#${SOURCES_top}
+		${SOURCES_top}
 		${SOURCES_comm}
 		${SOURCES_modules}
 		${SOURCES_modules_hw}
@@ -25,7 +25,6 @@ file(GLOB SOURCES_test "src/test/*.cpp")
 		${SOURCES_xml}
 		${SOURCES_test}
 	)
-
     ADD_DEFINITIONS(
         -std=c++14 # Or -std=c++0x
         # Other flags
@@ -35,6 +34,7 @@ ELSE (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	
 	include_directories(include  ../../eigen3/)
 	set(SOURCES 		
+		${SOURCES_top}
 		${SOURCES_comm}
 		${SOURCES_modules}
 		${SOURCES_modules_hw}
