@@ -6,24 +6,30 @@
 using namespace std;
 using namespace rapidxml;
 
-const char* pTypeAttribute = "type";
-
-void NodeXmlConverter::AddNodeAttributes(xml_node<> *pXNode, const BaseNode* pNode)
+void NodeXmlConverter::AddNodeAttributes(xml_node<> *pXmlNode, const BaseNode* pNode)
 {
+    bool onlyChanges = true;
     string attribVal;
-    // Add type attribute.
-    xml_attribute<> *attr = doc.allocate_attribute(pTypeAttribute, NodeFactory::NodeTypeName(pNode).c_str());
-    pXNode->append_attribute(attr);
+    if (!onlyChanges)
+    {
+        // Add type attribute.
+        xml_attribute<> *attr = doc.allocate_attribute(typeAttrib.GetName().c_str(), NodeFactory::NodeTypeName(pNode).c_str());
+        pXmlNode->append_attribute(attr);
+    }
     // Add all used attributes.
     for (attribID_t i = 0; i < Attribute::GetNumAttributes(); ++i)
     {
+        if (onlyChanges && !pNode->IsAttributeChanged(i))
+        {
+            continue;
+        }
         if (pNode->IsAttributeUsed(i))
         {
             if (pNode->GetAttribute(i, attribVal))
             {
                 char *value = doc.allocate_string(attribVal.c_str());// Allocate string and copy name into it
                 xml_attribute<> *attr = doc.allocate_attribute(Attribute::GetAttributeName(i).c_str(), value);
-                pXNode->append_attribute(attr);
+                pXmlNode->append_attribute(attr);
             }
             else
             {
@@ -33,32 +39,112 @@ void NodeXmlConverter::AddNodeAttributes(xml_node<> *pXNode, const BaseNode* pNo
     }
 }
 
-void NodeXmlConverter::AddNodeChilds(xml_node<> *pXNode, const BaseNode* pParentNode)
+xml_node<> *NodeXmlConverter::AddChilds(const BaseNode* pParentNode, FlagType flagMask, bool onlyChangedNodes)
 {
     const auto &children = pParentNode->GetChilds();
-    for (const auto & childNode: children)
+    xml_node<> *pXmlParent = nullptr;
+    for (const auto & childNode : children)
     {
-        xml_node<> *pXChildNode = doc.allocate_node(node_element, childNode->GetName().c_str());
-        pXNode->append_node(pXChildNode);
-        // Append all attribute.
-        AddNodeAttributes(pXChildNode, childNode.get());
-        // Recursive call to add child childs
-        AddNodeChilds(pXChildNode, childNode.get());
+        if (onlyChangedNodes && !childNode->AnyChanges())
+        {
+            continue;
+        }
+        xml_node<> *pXmlChild = AddChilds(childNode.get(), flagMask, onlyChangedNodes);
+        if (pXmlChild != nullptr)
+        {
+            if (pXmlParent == nullptr)
+            {   // Create the childs parent node.
+                pXmlParent = doc.allocate_node(node_element, pParentNode->GetName().c_str());
+                // Only add attributes if mask is set.
+                if ((pParentNode->GetFlags() & flagMask) != FlagType::none
+                    || flagMask == FlagType::none) // If mask is FlagType::none it means 'don't use mask'.
+                {
+                    // Append all attributes.
+                    AddNodeAttributes(pXmlParent, pParentNode);
+                }
+            }
+            // Append child node.
+            pXmlParent->append_node(pXmlChild);
+        }
     }
+    if (!onlyChangedNodes || pParentNode->AnyChanges())
+    {
+        if ((pParentNode->GetFlags() & flagMask) != FlagType::none
+            || flagMask == FlagType::none) // If mask is FlagType::none it means 'don't use mask'.
+        {
+            if (pXmlParent == nullptr)
+            {   // Create the childs parent node.
+                pXmlParent = doc.allocate_node(node_element, pParentNode->GetName().c_str());
+                // Append all attributes.
+                AddNodeAttributes(pXmlParent, pParentNode);
+            }
+        }
+    }
+    return pXmlParent;
 }
 
-void NodeXmlConverter::ConvertToXml(const BaseNode* pRoot, std::string& xmlString)
+void NodeXmlConverter::ConvertToXml(const BaseNode* pRoot, std::string& xmlString, FlagType flagMask, bool onlyChangedNodes)
 {
     doc.clear();
-    xml_node<> *pXNode = doc.allocate_node(node_element, pRoot->GetName().c_str());
-    doc.append_node(pXNode);
-    AddNodeAttributes(pXNode, pRoot);
-    AddNodeChilds(pXNode, pRoot);
+    xml_node<> *pXmlNode = AddChilds(pRoot, flagMask, onlyChangedNodes);
+    if (pXmlNode)
+    {
+        doc.append_node(pXmlNode);
+    }
     xmlString.clear();
     print(std::back_inserter(xmlString), doc, 0);
 }
 
-void NodeXmlConverter::UpdataeTreeFromXml(BaseNode* pRoot, std::string& xml)
+void NodeXmlConverter::UpdateTreeFromXml(BaseNode* pRoot, std::string& xmlString)
 {
+    doc.clear();
+    doc.parse<0>(&xmlString[0]);
+    xml_node<> *pXmlNode = doc.first_node();
+    BaseNode* pNode = pRoot;
 
+    bool bMoreNodes = (pXmlNode != nullptr);
+    while (bMoreNodes)
+    {
+        // Check if current xml node exist in node tree.
+        pNode = pNode->FindNode(pXmlNode->name());
+        if (pNode)
+        {
+            UpdateNodeAttributes(pXmlNode, pNode);
+        }
+        else
+        {   // Node not found 
+            // create node
+        }
+        pXmlNode = pXmlNode->next_sibling();
+    }
+}
+
+void NodeXmlConverter::UpdateNodeAttributes(rapidxml::xml_node<> *pXmlNode, BaseNode* pNode)
+{
+    xml_attribute<> *pXmlAttribute = pXmlNode->first_attribute();
+    // Check all attributes
+    while (pXmlAttribute)
+    {
+        attribID_t attrId = Attribute::GetAttributeID(pXmlAttribute->name());
+        if (attrId != INVALID_ATTRIBUTE_ID)
+        {
+            bool success = pNode->SetAttribute(attrId, pXmlAttribute->value());
+            if (!success)
+            {
+                if (attrId == typeAttrib.GetID())
+                {
+                    if (NodeFactory::NodeTypeName(pNode).compare(pXmlAttribute->value()) != 0)
+                    {
+                        // Error: Tried to change the type of an existing node.
+                    }
+                }
+                // Unhandled attribute found in xml.
+            }
+        }
+        else
+        {
+            // Unknown attribute found in xml.
+        }
+        pXmlAttribute = pXmlAttribute->next_attribute();
+    }
 }

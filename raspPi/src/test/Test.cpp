@@ -9,6 +9,7 @@
 #include <conio.h>
 #endif
 
+#include "../application.hpp"
 #include "../nodes/xml/nodeXmlConverter.hpp"
 #include "../nodes/NodeFactory.hpp"
 #include "../nodes/Nodes.hpp"
@@ -102,6 +103,7 @@ int main(int argc, char* argv[])
 
     pFloatNode->SetAttribute(Attribute::GetAttributeID("range"), "[12e-3,24.34e4]");
     pFloatNode->SetAttribute((attribID_t)unitAttrib, "m/s");
+    pFloatNode->SetFlag(FlagType::persist, true);
     pDoubleNode->SetAttribute(Attribute::GetAttributeID("range"), "[-180,180]");
     pDoubleNode->SetAttribute((attribID_t)unitAttrib, "deg");
 
@@ -127,72 +129,16 @@ int main(int argc, char* argv[])
     pStringNode->GetAttribute((attribID_t)valueAttrib, tmpStr);
     std::cout << tmpStr << std::endl;
 
-    
-    pTmpNode = pFloatNode;
-    for (attribID_t i = 0; i < Attribute::GetNumAttributes(); ++i)
-    {
-        if (pTmpNode->IsAttributeUsed(i))
-        {
-            if (pTmpNode->GetAttribute(i, tmpStr))
-            {
-                std::cout << Attribute::GetAttributeName(i) << "= " << tmpStr << std::endl;
-            }
-            else
-            {
-                assert(false);
-            }
-            
-        }
-    }
-#ifdef WIN32
-    Socket::InitLib(2, 2);
-#endif
-    std::vector<std::unique_ptr<Module>> modules;
-    modules.push_back(std::make_unique<TelnetModule>());
-    modules.push_back(std::make_unique<InsectModule>());
+    std::string xmlStr;
+    NodeXmlConverter xmlConverter;
+    xmlConverter.ConvertToXml(&root, xmlStr);
 
-    std::cout << std::endl << "************************" << std::endl;
-    std::cout << "Initialize all modules" << std::endl;
-    // Execute all modules.
-    for (auto &pModul : modules)
-    {
-        pModul->Init(root);
-    }
+    Application app;
+    app.LoadConfig();
+    app.RunLoop();
+    app.SaveConfig();
 
-    NodeXmlConverter xmlConv;
-    std::string test;
-    xmlConv.ConvertToXml(&root, test);
 
-    std::cout << "Starting module loop" << std::endl;
-    while (true)
-    {
-        // Execute all modules.
-        for (auto &pModul : modules)
-        {
-            pModul->Execute();
-        }
-
-        // Continue to notify all nodes until the tree is stabilized.
-        const int maxIterations = 8*sizeof(size_t) - 1;
-        int iterations = 0;
-        while (root.AnyRecentChanges() && iterations++ < maxIterations )
-        {
-            root.PushChangeHistory();
-            root.Notify(true);
-        }
-        if (iterations >= maxIterations)
-        {
-            // ToDo Error.
-        }
-
-        // ToDo - Publish any changes.
-
-        // Clear all changes.
-        root.ClearAllChanges();
-    }
-#ifdef WIN32
-    Socket::ExitLib();
-#endif
     return 0;
 }
 
