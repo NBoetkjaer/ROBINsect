@@ -14,7 +14,7 @@ Attribute infoAttrib("info");
 Attribute optionsAttrib("options");
 
 // Define flag names 
-std::array< std::tuple<const string, FlagType>, (size_t)FlagType::numflags > BaseNode::flagNames =
+std::array< std::tuple<const string, FlagType>, (size_t)FlagBitType::numflags > BaseNode::flagNames =
 {
     make_tuple("hide"       , FlagType::hide),
     make_tuple("readonly"   , FlagType::readonly),
@@ -30,7 +30,7 @@ BaseNode::BaseNode(const std::string &nodeName, BaseNode* pParentNode):
     touchedAttributes(0),
     name(nodeName),
     pParent(pParentNode),
-    nodeFlag(FlagType(0))
+    nodeFlag(FlagType::none)
 {
 }
 
@@ -134,7 +134,7 @@ void  BaseNode::SetFlags(const char* pValues)
     if (pValues == nullptr) return;
     while (moreflags)
     {
-        FlagType flag = FlagType::invalidFlag;
+        FlagType flag = FlagType::none;
         // End of string stop parsing.
         if (*pValues == 0) break;
 
@@ -173,7 +173,7 @@ void  BaseNode::SetFlags(const char* pValues)
                 }
             }
         }
-        if (flag != FlagType::invalidFlag)
+        if (flag != FlagType::none)
         {
             SetFlag(flag, !removeFlag);
         }
@@ -189,7 +189,7 @@ void BaseNode::GetFlags(string &strFlags) const
     strFlags.clear();
     for (const auto & flagTup : flagNames)
     {
-        if (((1 << (uint32_t)get<1>(flagTup)) & (uint32_t)nodeFlag))
+        if ((get<1>(flagTup) & nodeFlag) != FlagType::none)
         {
             if (!strFlags.empty())
             {
@@ -206,12 +206,12 @@ void BaseNode::SetFlag(FlagType flag, bool value)
     if (value)
     {
         // Add flag.
-        nodeFlag |= (FlagType)(1 << (uint32_t)flag);
+        nodeFlag |= flag;
     }
     else
     {
         // Remove flag
-        nodeFlag &= (FlagType)(~(1 << (uint32_t)flag));
+        nodeFlag &= (~flag);
     }
     if (oldFlags != nodeFlag)
     {
@@ -221,7 +221,7 @@ void BaseNode::SetFlag(FlagType flag, bool value)
 
 bool BaseNode::GetFlag(FlagType flag) const
 {
-    return ((1<<(uint32_t)flag) & (uint32_t)nodeFlag) != 0;
+    return (flag & nodeFlag) != FlagType::none;
 }
 
 // Info attribute

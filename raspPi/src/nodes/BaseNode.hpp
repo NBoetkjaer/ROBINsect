@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <memory>
 #include <iostream>
+#include "Flags.hpp"
 #include "Attribute.hpp"
 
 #include "../util/BitmaskEnumClass.h"
@@ -12,9 +13,6 @@
 #ifdef _MSC_VER
     #define strcasecmp _stricmp
 #endif
-
-enum class FlagType :uint32_t {hide, readonly, logging, persist, query, numflags, invalidFlag = numflags};
-ENABLE_BITMASK_OPERATORS(FlagType) // Supply overloaded bitwise operators for FlagType.
 
 // Attributes: Value, Type, Range, flags, Enums, DisplayName, DisplayFormat, unit, prefix, info, ... 
 // Common attributes.
@@ -32,7 +30,7 @@ public:
 class BaseNode
 {
 private:
-    static std::array< std::tuple<const std::string, FlagType>, (size_t)FlagType::numflags> flagNames;
+    static std::array< std::tuple<const std::string, FlagType>, (size_t)FlagBitType::numflags> flagNames;
 
     size_t recentChanges;    // Indicate if this node or any of its child have changed. LSB indicate newest change, remaing bits act as a counter.
     size_t attributeChanges; // Variable to hold the applied changes to this node. Each attribID has a bit in changes.
@@ -76,9 +74,9 @@ public:
     }
     inline bool IsAttributeChanged(attribID_t attribID) const { return (attributeChanges & ((size_t)1 << attribID))!=0;}
     inline bool IsAttributeUsed(attribID_t attribID) const { return (touchedAttributes  & ((size_t)1 << attribID)) != 0; }
-    inline bool AnyChanges() { return recentChanges != 0; };
-    inline bool AnyRecentChanges() { return recentChanges & 1; };
-    inline int RecentChangeCount(){ return int((recentChanges >> 2) + (recentChanges & 1)); };
+    inline bool AnyChanges() const { return recentChanges != 0; };
+    inline bool AnyRecentChanges() const { return recentChanges & 1; };
+    inline int RecentChangeCount() const { return int((recentChanges >> 2) + (recentChanges & 1)); };
 
 
     void PushChangeHistory();
@@ -91,8 +89,9 @@ private:
 public:
     void SetFlags(const char* pValues);
 private:
-    void GetFlags(std::string &strFlags) const;
+    void GetFlags(std::string &strFlags) const;    
 public:
+    FlagType GetFlags() const { return nodeFlag; };
     void SetFlag(FlagType flag, bool value);
     bool GetFlag(FlagType flag) const;
     // Info attributes methods.
