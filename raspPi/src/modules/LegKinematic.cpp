@@ -9,7 +9,7 @@ using namespace std;
 using namespace Eigen;
 
 LegKinematic::LegKinematic()
-    : d1(90.0f), d2(125.0f), d3(150.0f), test{ 0.0f, 2 }
+    : d1(90.0f), d2(125.0f), d3(150.0f)
 {
 }
 
