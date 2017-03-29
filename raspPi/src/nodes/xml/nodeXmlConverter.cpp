@@ -6,9 +6,8 @@
 using namespace std;
 using namespace rapidxml;
 
-void NodeXmlConverter::AddNodeAttributes(xml_node<> *pXmlNode, const BaseNode* pNode)
+void NodeXmlConverter::AddNodeAttributes(xml_node<> *pXmlNode, const BaseNode* pNode, bool onlyChanges)
 {
-    bool onlyChanges = true;
     string attribVal;
     if (!onlyChanges)
     {
@@ -39,17 +38,17 @@ void NodeXmlConverter::AddNodeAttributes(xml_node<> *pXmlNode, const BaseNode* p
     }
 }
 
-xml_node<> *NodeXmlConverter::AddChilds(const BaseNode* pParentNode, FlagType flagMask, bool onlyChangedNodes)
+xml_node<> *NodeXmlConverter::AddChilds(const BaseNode* pParentNode, FlagType flagMask, bool onlyChanges)
 {
     const auto &children = pParentNode->GetChilds();
     xml_node<> *pXmlParent = nullptr;
     for (const auto & childNode : children)
     {
-        if (onlyChangedNodes && !childNode->AnyChanges())
+        if (onlyChanges && !childNode->AnyChanges())
         {
             continue;
         }
-        xml_node<> *pXmlChild = AddChilds(childNode.get(), flagMask, onlyChangedNodes);
+        xml_node<> *pXmlChild = AddChilds(childNode.get(), flagMask, onlyChanges);
         if (pXmlChild != nullptr)
         {
             if (pXmlParent == nullptr)
@@ -60,14 +59,14 @@ xml_node<> *NodeXmlConverter::AddChilds(const BaseNode* pParentNode, FlagType fl
                     || flagMask == FlagType::none) // If mask is FlagType::none it means 'don't use mask'.
                 {
                     // Append all attributes.
-                    AddNodeAttributes(pXmlParent, pParentNode);
+                    AddNodeAttributes(pXmlParent, pParentNode, onlyChanges);
                 }
             }
             // Append child node.
             pXmlParent->append_node(pXmlChild);
         }
     }
-    if (!onlyChangedNodes || pParentNode->AnyChanges())
+    if (!onlyChanges || pParentNode->AnyChanges())
     {
         if ((pParentNode->GetFlags() & flagMask) != FlagType::none
             || flagMask == FlagType::none) // If mask is FlagType::none it means 'don't use mask'.
@@ -76,17 +75,17 @@ xml_node<> *NodeXmlConverter::AddChilds(const BaseNode* pParentNode, FlagType fl
             {   // Create the childs parent node.
                 pXmlParent = doc.allocate_node(node_element, pParentNode->GetName().c_str());
                 // Append all attributes.
-                AddNodeAttributes(pXmlParent, pParentNode);
+                AddNodeAttributes(pXmlParent, pParentNode, onlyChanges);
             }
         }
     }
     return pXmlParent;
 }
 
-void NodeXmlConverter::ConvertToXml(const BaseNode* pRoot, std::string& xmlString, FlagType flagMask, bool onlyChangedNodes)
+void NodeXmlConverter::ConvertToXml(const BaseNode* pRoot, std::string& xmlString, FlagType flagMask, bool onlyChanges)
 {
     doc.clear();
-    xml_node<> *pXmlNode = AddChilds(pRoot, flagMask, onlyChangedNodes);
+    xml_node<> *pXmlNode = AddChilds(pRoot, flagMask, onlyChanges);
     if (pXmlNode)
     {
         doc.append_node(pXmlNode);
@@ -100,26 +99,11 @@ void NodeXmlConverter::UpdateTreeFromXml(BaseNode* pRoot, std::string& xmlString
     doc.clear();
     doc.parse<0>(&xmlString[0]);
     xml_node<> *pXmlNode = doc.first_node();
-    BaseNode* pNode = pRoot;
 
-    bool bMoreNodes = (pXmlNode != nullptr);
-    while (bMoreNodes)
-    {
-        // Check if current xml node exist in node tree.
-        pNode = pNode->FindNode(pXmlNode->name());
-        if (pNode)
-        {
-            UpdateNodeAttributes(pXmlNode, pNode);
-        }
-        else
-        {   // Node not found 
-            // create node
-        }
-        pXmlNode = pXmlNode->next_sibling();
-    }
+    UpdateChilds(pXmlNode, pRoot);
 }
 
-void NodeXmlConverter::UpdateNodeAttributes(rapidxml::xml_node<> *pXmlNode, BaseNode* pNode)
+void NodeXmlConverter::UpdateNodeAttributes(const rapidxml::xml_node<> *pXmlNode, BaseNode* pNode)
 {
     xml_attribute<> *pXmlAttribute = pXmlNode->first_attribute();
     // Check all attributes
@@ -146,5 +130,43 @@ void NodeXmlConverter::UpdateNodeAttributes(rapidxml::xml_node<> *pXmlNode, Base
             // Unknown attribute found in xml.
         }
         pXmlAttribute = pXmlAttribute->next_attribute();
+    }
+}
+
+void NodeXmlConverter::UpdateChilds(const rapidxml::xml_node<> *pXmlParentNode, BaseNode* pParentNode)
+{
+    if (pXmlParentNode == nullptr || pParentNode == nullptr) return;
+    xml_node<> *pXmlChildNode = pXmlParentNode->first_node();
+
+    while (pXmlChildNode)
+    {
+        // Check if current xml node exist in node tree.
+        BaseNode* pChildNode = pParentNode->FindNode(pXmlChildNode->name());
+        if (!pChildNode) // Node not found 
+        {   // create new node
+            // Find node type attribute.
+            xml_attribute<> *pXmlAttribute = pXmlChildNode->first_attribute(typeAttrib.GetName().c_str());
+            if (pXmlAttribute)
+            {
+                unique_ptr<BaseNode> newNode = NodeFactory::CreateNode(pXmlAttribute->value(), pXmlChildNode->name());
+                pChildNode = pParentNode->AddChild(std::move(newNode));
+            }
+            else
+            {
+                // Error xml node is missing type specifier.
+            }
+        }
+        if (pChildNode)
+        {
+            UpdateNodeAttributes(pXmlChildNode, pChildNode);
+            // Recursively update all childs (depth first)
+            UpdateChilds(pXmlChildNode, pChildNode);
+        }
+        else
+        {
+            // Error ...
+        }
+        // Take next sibling.
+        pXmlChildNode = pXmlChildNode->next_sibling();
     }
 }

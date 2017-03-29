@@ -9,12 +9,13 @@ class NodeXmlConverter
 public: 
     NodeXmlConverter() {}
     ~NodeXmlConverter() {}
-    void ConvertToXml(const BaseNode* pRoot, std::string& xml, FlagType flagMask = FlagType::none, bool onlyChangedNodes = false);
+    void ConvertToXml(const BaseNode* pRoot, std::string& xml, FlagType flagMask = FlagType::none, bool onlyChanges = false);
     void UpdateTreeFromXml(BaseNode* pRoot, std::string& xml);
 private:
     rapidxml::xml_document<> doc;
-    void AddNodeAttributes(rapidxml::xml_node<> *pXmlNode, const BaseNode* pNode);
-    rapidxml::xml_node<> *AddChilds(const BaseNode* pParentNode, FlagType flagMask, bool onlyChangedNodes);
+    void AddNodeAttributes(rapidxml::xml_node<> *pXmlNode, const BaseNode* pNode, bool onlyChanges);
+    rapidxml::xml_node<> *AddChilds(const BaseNode* pParentNode, FlagType flagMask, bool onlyChanges);
 
-    void UpdateNodeAttributes(rapidxml::xml_node<> *pXmlNode, BaseNode* pNode);
+    void UpdateNodeAttributes(const rapidxml::xml_node<> *pXmlNode, BaseNode* pNode);
+    void UpdateChilds(const rapidxml::xml_node<> *pXmlParentNode, BaseNode* pParentNode);
 };

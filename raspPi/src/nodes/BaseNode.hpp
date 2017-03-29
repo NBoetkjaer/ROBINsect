@@ -109,7 +109,7 @@ public:
     BaseNode* FindNode(const std::string& nodePath, bool allowPartialMatch = false);
     BaseNode* FindNode(const char * pNodePath, bool allowPartialMatch = false);
 
-    template<typename TNode>
+    template<typename TNode = BaseNode>
     TNode* AddChild(std::unique_ptr<BaseNode> childNode)
     {
         TNode* retVal = dynamic_cast<TNode*>(childNode.get());

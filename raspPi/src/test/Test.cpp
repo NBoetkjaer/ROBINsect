@@ -132,6 +132,11 @@ int main(int argc, char* argv[])
     std::string xmlStr;
     NodeXmlConverter xmlConverter;
     xmlConverter.ConvertToXml(&root, xmlStr);
+    std::cout << xmlStr;
+    BaseNode newTree("NewTree");
+    xmlConverter.UpdateTreeFromXml(&newTree, xmlStr);
+    xmlConverter.ConvertToXml(&newTree, xmlStr);
+    std::cout << xmlStr;
 
     Application app;
     app.LoadConfig();
