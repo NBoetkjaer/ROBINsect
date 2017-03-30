@@ -28,9 +28,21 @@ void TelnetModule::Init(BaseNode& rootNode)
 
 void TelnetModule::Notify()
 {
-    if (pCurrentNode->AnyRecentChanges())
+    if (pCurrentNode->AnyChanges())
     {
         PrintNodes();
+    }
+}
+
+void TelnetModule::Publish()
+{
+    if (consoleOutput.size() > 0)
+    {
+        // ToDo - Check dataLen and send remaining data.
+        size_t dataLen = consoleOutput.size();
+        int retVal = sockAccept.Send(consoleOutput.data(), &dataLen);
+        std::cout << "Send " << retVal << ": " << "Total bytes:" << sockAccept.GetBytesSent() << std::endl;
+        consoleOutput.clear();
     }
 }
 
@@ -75,13 +87,8 @@ void TelnetModule::Execute()
             ProcessCmd(buffer.data());
             std::cout << buffer.data() << endl;
             pRcvNode->Set(sockAccept.GetBytesRecieved());
-            //PrintNodes();
-            // ToDo - Check dataLen and send remaining data.
-            dataLen = consoleOutput.size();
-            retVal = sockAccept.Send(consoleOutput.data(), &dataLen);
-            std::cout << "Send " << retVal << ": " << "Total bytes:" << sockAccept.GetBytesSent() << std::endl;
-            pSentNode->Set(sockAccept.GetBytesSent());
         }
+        pSentNode->Set(sockAccept.GetBytesSent());
         break;
     }
 
@@ -193,7 +200,7 @@ void TelnetModule::PrintNodes()
         {
             continue; 
         }
-        if (child->AnyRecentChanges())
+        if (child->AnyChanges())
         {
             consoleOutput += BACKGROUND(RED); 
         }

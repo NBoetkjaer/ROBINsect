@@ -117,7 +117,7 @@ public:
         return retVal;
     }
 
-    template<typename TNode, typename ...Args>
+    template<typename TNode = BaseNode, typename ...Args>
     TNode* AddChild(Args&&... params)
     {
         TNode* retVal = new TNode(std::forward<Args>(params)...);

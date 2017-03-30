@@ -94,14 +94,7 @@ void NodeXmlConverter::ConvertToXml(const BaseNode* pRoot, std::string& xmlStrin
     print(std::back_inserter(xmlString), doc, 0);
 }
 
-void NodeXmlConverter::UpdateTreeFromXml(BaseNode* pRoot, std::string& xmlString)
-{
-    doc.clear();
-    doc.parse<0>(&xmlString[0]);
-    xml_node<> *pXmlNode = doc.first_node();
 
-    UpdateChilds(pXmlNode, pRoot);
-}
 
 void NodeXmlConverter::UpdateNodeAttributes(const rapidxml::xml_node<> *pXmlNode, BaseNode* pNode)
 {
@@ -169,4 +162,13 @@ void NodeXmlConverter::UpdateChilds(const rapidxml::xml_node<> *pXmlParentNode, 
         // Take next sibling.
         pXmlChildNode = pXmlChildNode->next_sibling();
     }
+}
+
+void NodeXmlConverter::UpdateTreeFromXml(BaseNode* pRoot, std::string& xmlString)
+{
+    doc.clear();
+    doc.parse<0>(&xmlString[0]);
+    xml_node<> *pXmlNode = doc.first_node();
+
+    UpdateChilds(pXmlNode, pRoot);
 }

@@ -15,12 +15,12 @@ private:
     BoolNode* pConnectedNode;
 
     BaseNode* pCurrentNode;
-
     std::string consoleOutput;
 public:
     TelnetModule();
     virtual ~TelnetModule();
     virtual void Execute();
+    virtual void Publish();
     virtual void Init(BaseNode& rootNode) override;
 private:
     enum class  State {Initialize, Listning, Connected};
