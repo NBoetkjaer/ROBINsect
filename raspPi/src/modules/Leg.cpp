@@ -7,8 +7,10 @@ Leg::Leg()
 {
     pNodeLeg = nullptr;
     pNodeMountPos = nullptr;
+    pNodeGoalPos = nullptr;
+    pNodeCurrentPos = nullptr;
+    pNodeMountSide = nullptr;
     pNodeJoints = { nullptr };
-    pNodeCurrentAngle = { nullptr };
     pNodeJointAngles = { nullptr };
     pNodeJointDistance = { nullptr };
     pNodeLinkAngle = { nullptr };
@@ -19,18 +21,27 @@ void Leg::Init(BaseNode& rootNode, int legNumber)
     string legNodeName = "Leg" + std::to_string(legNumber);
     pNodeLeg = rootNode.AddChild<BaseNode>(legNodeName);
     pNodeLeg->Subscribe(this);
+
     pNodeMountPos = pNodeLeg->AddChild<Pos3D_32f_Node>("MountPosistion");
+    pNodeMountPos->SetAttribute(unitAttrib.GetID(), "m");
+
+    pNodeMountSide = pNodeLeg->AddChild<BoolNode>("MountSide");
+    pNodeMountSide->SetAttribute(optionsAttrib.GetID(), "Left,Right");
+
+    pNodeGoalPos = pNodeLeg->AddChild<Pos3D_32f_Node>("GoalPos");
+    pNodeGoalPos->SetAttribute(unitAttrib.GetID(), "m");
+    
+    pNodeCurrentPos = pNodeLeg->AddChild<Pos3D_32f_Node>("CurrentPos");
+    pNodeCurrentPos->SetAttribute(unitAttrib.GetID(), "m");
+
     for (int jointIdx = 0; jointIdx < numJoints; ++jointIdx)
     {
         string jointNodeName ="joint" + std::to_string(jointIdx);
         pNodeJoints[jointIdx] = pNodeLeg->AddChild<BaseNode>(jointNodeName);
-        
-        pNodeCurrentAngle[jointIdx] = pNodeJoints[jointIdx]->AddChild<FloatNode>("currentAngle");
-        pNodeCurrentAngle[jointIdx]->SetAttribute(unitAttrib.GetID(), "deg");
-        pNodeCurrentAngle[jointIdx]->SetRange(-90.0f, 90.0f);
 
         pNodeJointAngles[jointIdx] = pNodeJoints[jointIdx]->AddChild<FloatNode>("jointAngle");
         pNodeJointAngles[jointIdx]->SetAttribute(unitAttrib.GetID(), "deg");
+        pNodeJointAngles[jointIdx]->SetRange(-90.0f, 90.0f);
 
         pNodeJointDistance[jointIdx] = pNodeJoints[jointIdx]->AddChild<FloatNode>("jointDistance");
         pNodeJointDistance[jointIdx]->SetAttribute(unitAttrib.GetID(), "m");

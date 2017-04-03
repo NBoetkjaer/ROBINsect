@@ -69,19 +69,56 @@ void Application::RunLoop()
     std::cout << "Starting module loop" << std::endl;
     int64_t loopCount = 0;
     auto prevTimestamp = chrono::high_resolution_clock::now();
-
     auto prevUpdate = prevTimestamp;
     auto elapsedAccum = std::chrono::seconds::zero();
     auto desiredLoopTime = std::chrono::microseconds(long(1000000.0f / pLoopFreqNode->Get()));
     auto nextTimeStamp = chrono::high_resolution_clock::now() + desiredLoopTime;
     float loopFreqAvg_Hz = 0;
+    const auto invalidTime = chrono::time_point<chrono::high_resolution_clock>::max();
+    vector<chrono::time_point<chrono::high_resolution_clock>> moduleTimeout(modules.size(), invalidTime);
     
     while (true)
     {
         auto timeStamp = chrono::high_resolution_clock::now();
+        auto minTime_point = nextTimeStamp;
+        // Call the periodic timeout for the relevant modules.
+        for(size_t idx = 0; idx < modules.size(); ++idx)
+        {
+            auto& pModule = modules.at(idx);
+            auto& mtime = moduleTimeout.at(idx);
+            if (mtime != invalidTime)
+            {
+                if (pModule->GetTimeout() < 0) // Turn off timer
+                {
+                    mtime = invalidTime;
+                    continue;
+                }
+                if (timeStamp > mtime) // Times up!
+                {
+                    pModule->OnTimer(); // Call timer function.
+                    mtime += chrono::milliseconds(pModule->GetTimeout()); // Schedule next timeout.
+                }
+                minTime_point = std::min(mtime, minTime_point);
+            }
+            else
+            {
+                if (pModule->GetTimeout() > 0) // Turn on timer
+                {
+                    mtime = timeStamp + chrono::milliseconds(pModule->GetTimeout());
+                    minTime_point = std::min(mtime, minTime_point);
+                }
+            }
+        }
+
+        if (minTime_point < nextTimeStamp && minTime_point > timeStamp) // A timeout will occur before next execute start.
+        {
+            //this_thread::sleep_for(minTime_point - timeStamp);
+            continue;
+        }
+
         if (nextTimeStamp > timeStamp)
         {
-            this_thread::sleep_for(std::chrono::microseconds(10));
+            this_thread::sleep_for(nextTimeStamp - timeStamp);
             continue;
         }
         auto elapsed = timeStamp - prevTimestamp;

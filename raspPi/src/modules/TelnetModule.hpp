@@ -13,14 +13,16 @@ private:
     Int64Node* pRcvNode;
     Int64Node* pSentNode;
     BoolNode* pConnectedNode;
-
     BaseNode* pCurrentNode;
     std::string consoleOutput;
+    bool updateOutput;
+    bool clearConsole;
 public:
     TelnetModule();
     virtual ~TelnetModule();
     virtual void Execute();
     virtual void Publish();
+    virtual void OnTimer();
     virtual void Init(BaseNode& rootNode) override;
 private:
     enum class  State {Initialize, Listning, Connected};
@@ -33,7 +35,7 @@ private:
     size_t bufferWritePos;
     size_t bufferEndPos;
 
-    void PrintNodes();
+    void PrintNodes(bool clear);
     void ProcessCmd(const char* pCmd);
 
     // Inherited via NodeObserver

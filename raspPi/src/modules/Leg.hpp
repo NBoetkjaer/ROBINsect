@@ -16,8 +16,11 @@ private:
     static const int numJoints = 3;
     BaseNode* pNodeLeg;
     Pos3D_32f_Node* pNodeMountPos;
+    Pos3D_32f_Node* pNodeGoalPos;
+    Pos3D_32f_Node* pNodeCurrentPos;
+    BoolNode* pNodeMountSide;
+
     std::array<BaseNode*, numJoints> pNodeJoints;
-    std::array<FloatNode*, numJoints> pNodeCurrentAngle;
     std::array<FloatNode*, numJoints> pNodeJointAngles;
     std::array<FloatNode*, numJoints> pNodeJointDistance;
     std::array<FloatNode*, numJoints> pNodeLinkAngle;

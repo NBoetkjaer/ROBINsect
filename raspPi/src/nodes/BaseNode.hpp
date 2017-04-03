@@ -131,7 +131,7 @@ public:
 
     void SetNodeChanged();
     void Print(int indentLevel = 0) const;
-
+protected:
     static void GetOptions(std::string& strOptions, const std::vector<std::string> & options, const char delimiter = ',');
     static void SetOptions(const char* pValues, std::vector<std::string> & options, const char delimiter = ',');
     static void SetOptionValue(const char* pValue, const std::vector<std::string> & options, int &value);

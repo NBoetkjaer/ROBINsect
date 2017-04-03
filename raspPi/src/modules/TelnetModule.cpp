@@ -7,7 +7,7 @@ using namespace std;
 TelnetModule::TelnetModule():
     state(State::Initialize)
 {
-
+    SetTimeout(200);
 }
 
 TelnetModule::~TelnetModule()
@@ -30,9 +30,19 @@ void TelnetModule::Notify()
 {
     if (pCurrentNode->AnyChanges())
     {
-        PrintNodes();
+        updateOutput = true;
     }
 }
+
+void TelnetModule::OnTimer()
+{
+    if (updateOutput)
+    {
+        PrintNodes(clearConsole);
+        updateOutput = false;
+        clearConsole = false;
+    }
+};
 
 void TelnetModule::Publish()
 {
@@ -44,6 +54,7 @@ void TelnetModule::Publish()
         std::cout << "Send " << retVal << ": " << "Total bytes:" << sockAccept.GetBytesSent() << std::endl;
         consoleOutput.clear();
     }
+
 }
 
 void TelnetModule::Execute()
@@ -85,6 +96,8 @@ void TelnetModule::Execute()
             }
             buffer.at(dataLen) = 0; // Terminate the string.
             ProcessCmd(buffer.data());
+            updateOutput = true;
+            clearConsole = true;
             std::cout << buffer.data() << endl;
             pRcvNode->Set(sockAccept.GetBytesRecieved());
         }
@@ -174,14 +187,19 @@ void TelnetModule::ProcessCmd(const char* pCmd)
         {
             pCurrentNode = pCmdNode;
         }
-        PrintNodes();
     }
 }
 
-void TelnetModule::PrintNodes()
+void TelnetModule::PrintNodes(bool clear)
 {
-    consoleOutput = ERASE_ALL HOME FOREGROUND(GREEN);
-
+    if (clear)
+    {
+        consoleOutput = ERASE_ALL HOME FOREGROUND(GREEN);
+    }
+    else
+    {
+        consoleOutput = SAVE_POS HOME FOREGROUND(GREEN);
+    }
     std::string tmpStr = "/";
     BaseNode * pNode = pCurrentNode;
     while (pNode)
@@ -245,5 +263,13 @@ void TelnetModule::PrintNodes()
         }
         consoleOutput += NEWLINE;
     }
-    consoleOutput += ":";
+    
+    if (clear)
+    {
+        consoleOutput += NEWLINE "~:";
+    }
+    else
+    {
+        consoleOutput += RESTORE_POS;
+    }
 }
