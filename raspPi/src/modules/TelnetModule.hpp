@@ -20,9 +20,9 @@ private:
 public:
     TelnetModule();
     virtual ~TelnetModule();
-    virtual void Execute();
-    virtual void Publish();
-    virtual void OnTimer();
+    virtual void Execute() override;
+    virtual void Publish() override;
+    virtual void OnTimer() override;
     virtual void Init(BaseNode& rootNode) override;
 private:
     enum class  State {Initialize, Listning, Connected};

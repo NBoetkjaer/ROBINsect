@@ -40,6 +40,7 @@ public:
 
     virtual void GetValue(std::string &strValue) const = 0;
     virtual void SetValue(const char* pValues) = 0;
+    inline bool IsValueChanged() const { return BaseNode::IsAttributeChanged(valueAttrib.GetID()); }
 
     virtual void Set(const T &newValue)
     {

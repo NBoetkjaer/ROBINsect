@@ -9,6 +9,7 @@ public:
     virtual ~Leg() {};
 
     void Init(BaseNode& rootNode, int legNumber);
+    void Execute();
     // Inherited via NodeObserver
     virtual void Notify() override;
 

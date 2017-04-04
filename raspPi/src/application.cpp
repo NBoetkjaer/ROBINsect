@@ -65,21 +65,22 @@ void Application::RunLoop()
     NodeXmlConverter xmlConv;
     std::string test;
     xmlConv.ConvertToXml(&root, test);
-
+    typedef chrono::steady_clock ClockType;
     std::cout << "Starting module loop" << std::endl;
     int64_t loopCount = 0;
-    auto prevTimestamp = chrono::high_resolution_clock::now();
-    auto prevUpdate = prevTimestamp;
+    auto timeStamp = ClockType::now();
+    auto prevTimestamp = timeStamp;
+    auto prevUpdate = timeStamp;
     auto elapsedAccum = std::chrono::seconds::zero();
     auto desiredLoopTime = std::chrono::microseconds(long(1000000.0f / pLoopFreqNode->Get()));
-    auto nextTimeStamp = chrono::high_resolution_clock::now() + desiredLoopTime;
+    auto nextTimeStamp = timeStamp + desiredLoopTime;
     float loopFreqAvg_Hz = 0;
-    const auto invalidTime = chrono::time_point<chrono::high_resolution_clock>::max();
-    vector<chrono::time_point<chrono::high_resolution_clock>> moduleTimeout(modules.size(), invalidTime);
-    
+    const auto invalidTime = decltype(timeStamp)::max();
+    vector<decltype(timeStamp)> moduleTimeout(modules.size(), invalidTime);
+     
     while (true)
     {
-        auto timeStamp = chrono::high_resolution_clock::now();
+        timeStamp = ClockType::now();
         auto minTime_point = nextTimeStamp;
         // Call the periodic timeout for the relevant modules.
         for(size_t idx = 0; idx < modules.size(); ++idx)
@@ -109,20 +110,19 @@ void Application::RunLoop()
                 }
             }
         }
-
-        if (minTime_point < nextTimeStamp && minTime_point > timeStamp) // A timeout will occur before next execute start.
+        auto delay = minTime_point - timeStamp;
+        if (delay > std::chrono::seconds::zero()) { this_thread::sleep_for(delay); }
+        if(minTime_point == nextTimeStamp) // Next action is loop execute
         {
-            //this_thread::sleep_for(minTime_point - timeStamp);
+            timeStamp = ClockType::now();
+        }
+        else // Next action is a timeout.
+        {
             continue;
         }
 
-        if (nextTimeStamp > timeStamp)
-        {
-            this_thread::sleep_for(nextTimeStamp - timeStamp);
-            continue;
-        }
-        auto elapsed = timeStamp - prevTimestamp;
-        nextTimeStamp = timeStamp + desiredLoopTime;
+        auto  elapsed = timeStamp - prevTimestamp;
+        nextTimeStamp +=  desiredLoopTime;
         prevTimestamp = timeStamp;
 
         const int filterLen = 10;

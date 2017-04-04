@@ -28,4 +28,8 @@ void InsectModule::Notify()
 
 void InsectModule::Execute()
 {
+    for (auto leg : legs)
+    {
+        leg.Execute();
+    }
 }

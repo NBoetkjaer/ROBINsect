@@ -56,4 +56,18 @@ void Leg::Init(BaseNode& rootNode, int legNumber)
 
 void Leg::Notify()
 {
+    if(pNodeMountPos->IsValueChanged() || pNodeMountSide->IsValueChanged())
+    {
+        // Update Body -> Leg transformation.
+    }
+
+    if (pNodeGoalPos->IsValueChanged())
+    {
+        // Calculate a new trajectory.
+    }
+}
+
+void Leg::Execute()
+{
+
 }

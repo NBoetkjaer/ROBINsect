@@ -42,7 +42,7 @@ void TelnetModule::OnTimer()
         updateOutput = false;
         clearConsole = false;
     }
-};
+}
 
 void TelnetModule::Publish()
 {
@@ -54,7 +54,6 @@ void TelnetModule::Publish()
         std::cout << "Send " << retVal << ": " << "Total bytes:" << sockAccept.GetBytesSent() << std::endl;
         consoleOutput.clear();
     }
-
 }
 
 void TelnetModule::Execute()
