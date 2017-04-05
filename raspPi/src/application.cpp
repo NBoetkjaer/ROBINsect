@@ -1,5 +1,6 @@
 #include "application.hpp"
 
+#include <fstream>
 #include <string>
 #include <chrono>
 #include <thread>
@@ -7,6 +8,8 @@
 #include "modules/InsectModule.hpp"
 
 using namespace std;
+
+static const char* pConfigFileName = "ROBINsect.xml";
 
 Application::Application():
     root("root")
@@ -26,20 +29,38 @@ Application::~Application()
 void Application::LoadConfig()
 {
     string xmlStr;
-    // ToDo load config xml from file.
-    xmlConverter.UpdateTreeFromXml(&root, xmlStr);
+    // Load config xml from file.
+    ifstream configFile(pConfigFileName, ios::in | ios::ate);
+    if (configFile.is_open())
+    {
+        streampos fsize = configFile.tellg();
+        
+        xmlStr.resize((size_t)fsize);
+        configFile.seekg(0, ios::beg);
+        configFile.read(&xmlStr[0], fsize);
+        configFile.close();
+
+        xmlConverter.UpdateTreeFromXml(&root, xmlStr);
+    }
 }
 
 void Application::SaveConfig()
 {
     string xmlStr;
-    xmlConverter.ConvertToXml(&root, xmlStr);
-    // ToDo Save to file...
+    xmlConverter.ConvertToXml(&root, xmlStr/*, FlagType::persist*/);
+    if (xmlStr.size() < 5) 
+        return;
+    // Save to file.
+    ofstream configFile(pConfigFileName);
+    if (configFile.is_open())
+    {
+        configFile << xmlStr;
+        configFile.close();
+    }
 }
 
 void Application::RunLoop()
 {
-    std::vector<std::unique_ptr<Module>> modules;
     modules.push_back(std::make_unique<TelnetModule>());
     modules.push_back(std::make_unique<InsectModule>());
 
@@ -53,6 +74,8 @@ void Application::RunLoop()
     pActualLoopFreqNode->SetAttribute(unitAttrib.GetID(), "Hz");
 
     pLoopCountNode = pSystemNode->AddChild<Int64Node>("LoopCounter");
+
+    pSaveConfig = pSystemNode->AddChild<BoolNode>("SaveConfiguration");
 
     std::cout << std::endl << "************************" << std::endl;
     std::cout << "Initialize all modules" << std::endl;
@@ -137,6 +160,12 @@ void Application::RunLoop()
             pActualLoopFreqNode->Set(loopFreqAvg_Hz);
             pLoopCountNode->Set(loopCount);
             desiredLoopTime = std::chrono::microseconds(long(1000000.0f / pLoopFreqNode->Get()));
+        }
+
+        if (pSaveConfig->Get())
+        {   // Save configuration and reset save flag.
+            SaveConfig();
+            pSaveConfig->Set(false);
         }
 
         // Execute all modules.

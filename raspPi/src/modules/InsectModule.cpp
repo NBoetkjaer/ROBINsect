@@ -15,10 +15,12 @@ void InsectModule::Init(BaseNode& rootNode)
     pNodeInsect = rootNode.AddChild<BaseNode>("Insect");
     pNodeInsect->Subscribe(this);
 
+    pNodeLegs = pNodeInsect->AddChild<BaseNode>("Legs");
+
     pNodePosition = pNodeInsect->AddChild<Pos3D_32f_Node>("BodyPosition");
     for(int legIdx = 0; legIdx < numLegs; ++legIdx) 
     {
-        legs[legIdx].Init(*pNodeInsect, legIdx);
+        legs[legIdx].Init(*pNodeLegs, legIdx);
     }
 }
 

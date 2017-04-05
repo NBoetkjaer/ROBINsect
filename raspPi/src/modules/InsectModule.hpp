@@ -18,6 +18,7 @@ private:
 
     // Nodes
     BaseNode* pNodeInsect;
+    BaseNode* pNodeLegs;
     std::array<Leg, numLegs> legs;
     Pos3D_32f_Node* pNodePosition;
 };

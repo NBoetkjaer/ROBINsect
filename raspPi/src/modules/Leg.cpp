@@ -18,26 +18,27 @@ Leg::Leg()
 }
 void Leg::Init(BaseNode& rootNode, int legNumber)
 {
-    string legNodeName = "Leg" + std::to_string(legNumber);
+    string legNodeName = std::to_string(legNumber);
     pNodeLeg = rootNode.AddChild<BaseNode>(legNodeName);
     pNodeLeg->Subscribe(this);
 
-    pNodeMountPos = pNodeLeg->AddChild<Pos3D_32f_Node>("MountPosistion");
+    pNodeMountPos = pNodeLeg->AddChild<Pos3D_32f_Node>("mountPosistion");
     pNodeMountPos->SetAttribute(unitAttrib.GetID(), "m");
 
-    pNodeMountSide = pNodeLeg->AddChild<BoolNode>("MountSide");
-    pNodeMountSide->SetAttribute(optionsAttrib.GetID(), "Left,Right");
+    pNodeMountSide = pNodeLeg->AddChild<BoolNode>("mountSide");
+    pNodeMountSide->SetAttribute(optionsAttrib.GetID(), "left,right");
 
-    pNodeGoalPos = pNodeLeg->AddChild<Pos3D_32f_Node>("GoalPos");
+    pNodeGoalPos = pNodeLeg->AddChild<Pos3D_32f_Node>("goalPos");
     pNodeGoalPos->SetAttribute(unitAttrib.GetID(), "m");
     
-    pNodeCurrentPos = pNodeLeg->AddChild<Pos3D_32f_Node>("CurrentPos");
+    pNodeCurrentPos = pNodeLeg->AddChild<Pos3D_32f_Node>("currentPos");
     pNodeCurrentPos->SetAttribute(unitAttrib.GetID(), "m");
 
+    BaseNode* pJointParent = pNodeLeg->AddChild("joints");
     for (int jointIdx = 0; jointIdx < numJoints; ++jointIdx)
     {
-        string jointNodeName ="joint" + std::to_string(jointIdx);
-        pNodeJoints[jointIdx] = pNodeLeg->AddChild<BaseNode>(jointNodeName);
+        string jointNodeName = std::to_string(jointIdx);
+        pNodeJoints[jointIdx] = pJointParent->AddChild<BaseNode>(jointNodeName);
 
         pNodeJointAngles[jointIdx] = pNodeJoints[jointIdx]->AddChild<FloatNode>("jointAngle");
         pNodeJointAngles[jointIdx]->SetAttribute(unitAttrib.GetID(), "deg");

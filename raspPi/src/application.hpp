@@ -15,11 +15,14 @@ public:
     void SaveConfig();
 
 private:
+    std::vector<std::unique_ptr<Module>> modules;
+
     BaseNode root;
     BaseNode* pSystemNode;
     FloatNode* pLoopFreqNode;
     FloatNode* pActualLoopFreqNode;
     Int64Node* pLoopCountNode;
+    BoolNode* pSaveConfig;
 
     NodeXmlConverter xmlConverter;
 };

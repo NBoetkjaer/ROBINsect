@@ -81,7 +81,7 @@ void TelnetModule::Execute()
     case State::Connected:
         if(sockAccept.IsReadPending(0))
         {
-            size_t dataLen = buffer.size(); 
+            size_t dataLen = buffer.size() - 1;
             int retVal = sockAccept.Recieve(buffer.data(), &dataLen);
             std::cout << "Recieve " << retVal << ": " << "Total bytes : " << sockAccept.GetBytesRecieved() << std::endl;
             if(dataLen == 0 || retVal != 0)
@@ -93,7 +93,13 @@ void TelnetModule::Execute()
                 state = State::Initialize;
                 return;
             }
+            // remove trailing whitespaces.
+            while (dataLen > 0 && isspace((unsigned char)buffer.at(dataLen - 1)))
+            {
+                dataLen--;
+            }
             buffer.at(dataLen) = 0; // Terminate the string.
+
             ProcessCmd(buffer.data());
             updateOutput = true;
             clearConsole = true;
