@@ -84,7 +84,7 @@ void TelnetModule::Execute()
             size_t dataLen = buffer.size(); 
             int retVal = sockAccept.Recieve(buffer.data(), &dataLen);
             std::cout << "Recieve " << retVal << ": " << "Total bytes : " << sockAccept.GetBytesRecieved() << std::endl;
-            if(dataLen == 0)
+            if(dataLen == 0 || retVal != 0)
             {
                 // Remote end is shutdown
                 std::cout << "Remote end disconnected - Shutdown (sockAccept) " << sockAccept.Shutdown() << endl;

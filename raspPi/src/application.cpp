@@ -121,12 +121,13 @@ void Application::RunLoop()
             continue;
         }
 
-        auto  elapsed = timeStamp - prevTimestamp;
+        auto  elapsed_us = chrono::duration<float, micro>(timeStamp - prevTimestamp).count();
         nextTimeStamp +=  desiredLoopTime;
         prevTimestamp = timeStamp;
 
         const int filterLen = 10;
-        loopFreqAvg_Hz = ((filterLen - 1.0f) * loopFreqAvg_Hz + 1000000.0f / chrono::duration<float, micro>(elapsed).count()) / filterLen;
+        if (elapsed_us > 0)
+            loopFreqAvg_Hz = ((filterLen - 1.0f) * loopFreqAvg_Hz + 1000000.0f / elapsed_us) / filterLen;
 
         loopCount++;
         // Update nodes

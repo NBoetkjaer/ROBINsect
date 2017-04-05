@@ -138,6 +138,12 @@ void  BaseNode::SetFlags(const char* pValues)
         // End of string stop parsing.
         if (*pValues == 0) break;
 
+        // Skip leading white spaces.
+        while (*pValues != 0 && isspace(*pValues))
+        {
+            ++pValues;
+        }
+
         bool removeFlag = false;
         if (pValues[0] == '-')
         {
@@ -159,6 +165,12 @@ void  BaseNode::SetFlags(const char* pValues)
             {
                 pValue++;
                 pFlagName++;
+            }
+
+            // Skip trailing white spaces.
+            while (*pValue != 0 && isspace(*pValue))
+            {
+                ++pValue;
             }
 
             // did we match to the end of flag name?
