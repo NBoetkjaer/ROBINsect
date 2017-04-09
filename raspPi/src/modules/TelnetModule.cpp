@@ -18,10 +18,10 @@ TelnetModule::~TelnetModule()
 void TelnetModule::Init(BaseNode& rootNode)
 {
     pCurrentNode = &rootNode;
-    BaseNode* pNode = rootNode.AddChild<BaseNode>("TelnetSocket");
-    pRcvNode = pNode->AddChild<Int64Node>("BytesRecived", 0);
-    pSentNode = pNode->AddChild<Int64Node>("BytesSent", 0);
-    pConnectedNode = pNode->AddChild<BoolNode>("Connected", false);
+    BaseNode* pNode = rootNode.FindOrCreateChild<BaseNode>("TelnetSocket");
+    pRcvNode = pNode->FindOrCreateChild<Int64Node>("BytesRecived");
+    pSentNode = pNode->FindOrCreateChild<Int64Node>("BytesSent");
+    pConnectedNode = pNode->FindOrCreateChild<BoolNode>("Connected");
 
     rootNode.Subscribe(this);
 }

@@ -106,13 +106,53 @@ public:
 private:
     BaseNode* FindNodeInternal(const char * pNodePath, bool allowPartialMatch);
 public:
-    BaseNode* FindNode(const std::string& nodePath, bool allowPartialMatch = false);
-    BaseNode* FindNode(const char * pNodePath, bool allowPartialMatch = false);
+    template<typename TNode = BaseNode>
+    TNode* FindNode(const std::string& nodePath, bool allowPartialMatch = false)
+    {
+        return dynamic_cast<TNode*>(FindNodeInternal(nodePath.c_str(), allowPartialMatch));
+    }
+
+    template<typename TNode = BaseNode>
+    TNode* FindNode(const char * pNodePath, bool allowPartialMatch = false)
+    {
+        return dynamic_cast<TNode*>(FindNodeInternal(pNodePath, allowPartialMatch));
+    }
+
+    BaseNode* FindChild(const char * pNodeName)
+    {   // Search in children
+        for (const auto &child : children)
+        {
+            if (child->name.compare(pNodeName) == 0) return child.get();
+        }
+        return nullptr;
+    }
+
+    template<typename TNode = BaseNode, typename ...Args>
+    TNode* FindOrCreateChild(const char * pNodeName, Args&&... params)
+    {
+        BaseNode* childNode = FindChild(pNodeName);
+        if (childNode)
+        {
+            if (typeid(*childNode) != typeid(TNode))
+            {
+                // Error unexpected type
+            }
+            return dynamic_cast<TNode*>(childNode);
+        }
+        return AddChild<TNode>(pNodeName, std::forward<Args>(params)...);
+    }
+
+    template<typename TNode = BaseNode, typename ...Args>
+    TNode* FindOrCreateChild(const std::string& nodeName, Args&&... params)
+    {
+        return FindOrCreateChild<TNode>(nodeName.c_str(), std::forward<Args>(params)...);
+    }
 
     template<typename TNode = BaseNode>
     TNode* AddChild(std::unique_ptr<BaseNode> childNode)
     {
         TNode* retVal = dynamic_cast<TNode*>(childNode.get());
+        childNode->pParent = this;
         children.push_back(std::move(childNode));
         return retVal;
     }

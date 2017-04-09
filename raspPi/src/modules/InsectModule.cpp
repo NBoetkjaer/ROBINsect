@@ -12,13 +12,13 @@ InsectModule::~InsectModule()
 
 void InsectModule::Init(BaseNode& rootNode)
 {
-    pNodeInsect = rootNode.AddChild<BaseNode>("Insect");
-    pNodeInsect->Subscribe(this);
+    pNodeInsect = rootNode.FindOrCreateChild<BaseNode>("Insect");
+    //pNodeInsect->Subscribe(this);
 
-    pNodeLegs = pNodeInsect->AddChild<BaseNode>("Legs");
+    pNodeLegs = pNodeInsect->FindOrCreateChild<BaseNode>("Legs");
 
-    pNodePosition = pNodeInsect->AddChild<Pos3D_32f_Node>("BodyPosition");
-    for(int legIdx = 0; legIdx < numLegs; ++legIdx) 
+    pNodePosition = pNodeInsect->FindOrCreateChild<Pos3D_32f_Node>("BodyPosition");
+    for(size_t legIdx = 0; legIdx < legs.size(); ++legIdx)
     {
         legs[legIdx].Init(*pNodeLegs, legIdx);
     }

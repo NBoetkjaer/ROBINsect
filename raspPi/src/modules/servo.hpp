@@ -1,15 +1,24 @@
 #pragma once
+#include "../nodes/Nodes.hpp"
 
-class Servo
+class Servo : public NodeObserver
 {
-	public:
-		Servo();
-		Servo(unsigned short pwmMin, unsigned short pwmMax, float angleMin, float angleMax);
-		void SetRange(unsigned short pwmMin, unsigned short pwmMax, float angleMin, float angleMax);
-		unsigned short GetPWM(float angle);
-		float GetAngle(unsigned short pwm);
-	private:
-		unsigned short m_pwmMin, m_pwmMax;
-		float m_angleMin, m_angleMax;
-		float slope, offset;
+    public:
+        Servo(); 
+        void Init(BaseNode& parentNode, int servoNumber);
+        unsigned short GetPWM(float angle);
+        float GetAngle(unsigned short pwm);
+
+        virtual void Notify() override;
+    private:
+        UInt16Node* pNodePWM;
+        FloatNode* pNodeAngle;
+        FloatNode* pNodeSetAngle;
+        BaseNode *pCalibrationNode;
+        UInt16Node* pNodeMinPWM;
+        UInt16Node* pNodeMaxPWM;
+        FloatNode* pNodeMinAngle;
+        FloatNode* pNodeMaxAngle;
+
+        float slope, offset;
 };

@@ -296,16 +296,6 @@ void BaseNode::Print(int indentLevel) const
 // An absolute path is specified with a leading "/" eg. "/node1/node2/nodeToFind", in which case the function will begin the search from the root node.
 // The syntax of a relative path is "node2/nodeToFind" or "../node1/node2/nodeToFind" and the search is started from this node.
 // Return value: If the node is found a pointer to the requested node is returned, otherwise a nullptr is returned.
-BaseNode* BaseNode::FindNode(const std::string& nodePath, bool allowPartialMatch)
-{
-    return FindNodeInternal(nodePath.c_str(), allowPartialMatch);
-}
-
-BaseNode* BaseNode::FindNode(const char * pNodePath, bool allowPartialMatch)
-{
-    return FindNodeInternal(pNodePath, allowPartialMatch);
-}
-
 BaseNode* BaseNode::FindNodeInternal(const char * pNodePath, bool allowPartialMatch)
 {
     static const char pathDelimiter = '/';

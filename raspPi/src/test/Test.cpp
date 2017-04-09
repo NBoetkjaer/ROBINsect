@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
     std::cout << xmlStr;
 
     Application app;
-    //app.LoadConfig();
+    app.LoadConfig();
     app.RunLoop();
     app.SaveConfig();
 

@@ -23,6 +23,7 @@ private:
     FloatNode* pActualLoopFreqNode;
     Int64Node* pLoopCountNode;
     BoolNode* pSaveConfig;
+    BoolNode* pLoadConfig;
 
     NodeXmlConverter xmlConverter;
 };

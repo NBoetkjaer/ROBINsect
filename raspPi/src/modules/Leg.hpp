@@ -14,6 +14,7 @@ public:
     virtual void Notify() override;
 
 private:
+    uint16_t legID;
     static const int numJoints = 3;
     BaseNode* pNodeLeg;
     Pos3D_32f_Node* pNodeMountPos;
@@ -21,10 +22,16 @@ private:
     Pos3D_32f_Node* pNodeCurrentPos;
     BoolNode* pNodeMountSide;
 
+
     std::array<BaseNode*, numJoints> pNodeJoints;
     std::array<FloatNode*, numJoints> pNodeJointAngles;
     std::array<FloatNode*, numJoints> pNodeJointDistance;
     std::array<FloatNode*, numJoints> pNodeLinkAngle;
     std::array<FloatNode*, numJoints> pNodeLinkDistance;
+
+    StringNode* pNodeServoPath; // ToDo: implement node mirrors instead.
+    std::array<UInt16Node*, numJoints> pNodeServoID;
+    std::array<FloatNode*, numJoints> pNodeServoAngle;
+
     LegKinematic kinematic;
 };

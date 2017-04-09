@@ -6,6 +6,7 @@
 #include <thread>
 #include "modules/TelnetModule.hpp"
 #include "modules/InsectModule.hpp"
+#include "modules/ServoModule.hpp"
 
 using namespace std;
 
@@ -63,23 +64,26 @@ void Application::RunLoop()
 {
     modules.push_back(std::make_unique<TelnetModule>());
     modules.push_back(std::make_unique<InsectModule>());
+    modules.push_back(std::make_unique<ServoModule>());
 
     // Add system nodes to node tree.
-    pSystemNode = root.AddChild("SystemInfo");
+    pSystemNode = root.FindOrCreateChild("SystemInfo");
     
-    pLoopFreqNode = pSystemNode->AddChild<FloatNode>("LoopFrequency", 60.0f);
+    pLoopFreqNode = pSystemNode->FindOrCreateChild<FloatNode>("LoopFrequency");
+    pLoopFreqNode->Set(60.0f);
     pLoopFreqNode->SetAttribute(unitAttrib.GetID(), "Hz");
 
-    pActualLoopFreqNode = pSystemNode->AddChild<FloatNode>("ActualLoopFrequency", 60.0f);
+    pActualLoopFreqNode = pSystemNode->FindOrCreateChild<FloatNode>("ActualLoopFrequency");
     pActualLoopFreqNode->SetAttribute(unitAttrib.GetID(), "Hz");
 
-    pLoopCountNode = pSystemNode->AddChild<Int64Node>("LoopCounter");
+    pLoopCountNode = pSystemNode->FindOrCreateChild<Int64Node>("LoopCounter");
 
-    pSaveConfig = pSystemNode->AddChild<BoolNode>("SaveConfiguration");
+    pSaveConfig = pSystemNode->FindOrCreateChild<BoolNode>("SaveConfiguration");
+    pLoadConfig = pSystemNode->FindOrCreateChild<BoolNode>("LoadConfiguration");
 
     std::cout << std::endl << "************************" << std::endl;
     std::cout << "Initialize all modules" << std::endl;
-    // Execute all modules.
+    // Initialize all modules.
     for (auto &pModul : modules)
     {
         pModul->Init(root);
@@ -167,6 +171,13 @@ void Application::RunLoop()
             SaveConfig();
             pSaveConfig->Set(false);
         }
+
+        if (pLoadConfig->Get())
+        {   // Load configuration and reset load flag.
+            LoadConfig();
+            pLoadConfig->Set(false);
+        }
+
 
         // Execute all modules.
         for (auto &pModul : modules)

@@ -1,41 +1,85 @@
 #include "servo.hpp"
-
-Servo::Servo()
+#include <string>
+using namespace std;
+Servo::Servo():
+    pNodePWM(nullptr),
+    pNodeAngle(nullptr),
+    pNodeSetAngle(nullptr),
+    pCalibrationNode(nullptr),
+    pNodeMinPWM(nullptr),
+    pNodeMaxPWM(nullptr),
+    pNodeMinAngle(nullptr),
+    pNodeMaxAngle(nullptr),
+    slope(1.0f),
+    offset(0.0f)
 {
-	SetRange(200, 650, -90.f, 90.f);
+	//SetRange(200, 650, -90.f, 90.f);
 }
 
-Servo::Servo(unsigned short pwmMin, unsigned short pwmMax, float angleMin, float angleMax)
+void Servo::Init(BaseNode& parentNode, int servoNumber)
 {
-	SetRange(pwmMin, pwmMax,  angleMin, angleMax);
+    string nodeName = std::to_string(servoNumber);
+    BaseNode *pServoNode = parentNode.FindOrCreateChild(nodeName);
+    if (pServoNode == nullptr)
+    {
+        // ToDo error.
+    }
+    pServoNode->Subscribe(this);
+
+    pNodePWM = pServoNode->FindOrCreateChild<UInt16Node>("PWM", 0, 150, 700);
+    pNodeAngle = pServoNode->FindOrCreateChild<FloatNode>("Angle");
+    pNodeAngle->SetAttribute(unitAttrib.GetID(), "deg");
+
+    pNodeSetAngle = pServoNode->FindOrCreateChild<FloatNode>("SetAngle", 0.0f, -90.0f, 90.0f);
+    pNodeSetAngle->SetAttribute(unitAttrib.GetID(), "deg");
+
+    pCalibrationNode = pServoNode->FindOrCreateChild("Calibration");
+    if (pCalibrationNode == nullptr)
+    {
+        // ToDo error.
+    }
+
+    pNodeMinPWM = pCalibrationNode->FindOrCreateChild<UInt16Node>("MinPWM", 200);
+    pNodeMaxPWM = pCalibrationNode->FindOrCreateChild<UInt16Node>("MaxPWM", 650);
+    pNodeMinAngle = pCalibrationNode->FindOrCreateChild<FloatNode>("MinAngle", -90.f);
+    pNodeMinAngle->SetAttribute(unitAttrib.GetID(), "deg");
+    pNodeMaxAngle = pCalibrationNode->FindOrCreateChild<FloatNode>("MaxAngle", 90.0f);
+    pNodeMaxAngle->SetAttribute(unitAttrib.GetID(), "deg");
 }
 
-void Servo::SetRange(unsigned short pwmMin, unsigned short pwmMax, float angleMin, float angleMax)
+void Servo::Notify()
 {
-	m_pwmMin = pwmMin;
-	m_pwmMax = pwmMax;
-	m_angleMin = angleMin;
-	m_angleMax = angleMax;
+    if (pCalibrationNode->AnyChanges())
+    {
+        float diffAngle = pNodeMaxAngle->Get() - pNodeMinAngle->Get();
+        float diffPWM = (float)pNodeMaxPWM->Get() - (float)pNodeMinPWM->Get();
+        if (diffAngle != 0.0f)
+        {
+            slope = diffPWM / diffAngle;
+        }
 
-	slope = (m_pwmMax - m_pwmMin) / (m_angleMax - m_angleMin);
-
-	if( m_angleMax>m_angleMin)
-	{
-		offset = m_pwmMin -  m_angleMin * slope ;
-	}
-	else
-	{
-		offset = m_pwmMax -  m_angleMax * slope;
-	}
+        if (pNodeMaxAngle->Get() > pNodeMinAngle->Get())
+        {
+            offset = pNodeMinPWM->Get() - pNodeMinAngle->Get() * slope;
+        }
+        else
+        {
+            offset = pNodeMaxPWM->Get() - pNodeMaxAngle->Get() * slope;
+        }
+    }
+    if (pNodeSetAngle->IsValueChanged())
+    {
+        pNodePWM->Set(GetPWM(pNodeSetAngle->Get()));
+        pNodeAngle->Set(GetAngle(pNodePWM->Get()));
+    }
 }
 
 unsigned short Servo::GetPWM(float angle)
 {
 	float pwm = angle * slope + offset;
-	if(pwm < m_pwmMin) pwm = m_pwmMin;
-	if(pwm > m_pwmMax) pwm = m_pwmMax;
 	return (unsigned short)(pwm + 0.5f);
 }
+
 float Servo::GetAngle(unsigned short pwm)
 {
 	return (pwm - offset) / slope;
