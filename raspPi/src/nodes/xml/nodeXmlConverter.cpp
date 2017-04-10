@@ -18,11 +18,11 @@ void NodeXmlConverter::AddNodeAttributes(xml_node<> *pXmlNode, const BaseNode* p
     // Add all used attributes.
     for (attribID_t i = 0; i < Attribute::GetNumAttributes(); ++i)
     {
-        if (onlyChanges && !pNode->IsAttributeChanged(i))
+        if (onlyChanges && !pNode->BaseNode::IsAttributeChanged(i))
         {
             continue;
         }
-        if (pNode->IsAttributeUsed(i))
+        if (pNode->BaseNode::IsAttributeUsed(i))
         {
             if (pNode->GetAttribute(i, attribVal))
             {
@@ -134,7 +134,7 @@ void NodeXmlConverter::UpdateChilds(const rapidxml::xml_node<> *pXmlParentNode, 
     while (pXmlChildNode)
     {
         // Check if current xml node exist in node tree.
-        BaseNode* pChildNode = pParentNode->FindNode(pXmlChildNode->name());
+        BaseNode* pChildNode = pParentNode->FindNode(pXmlChildNode->name(), false, false);
         if (!pChildNode) // Node not found 
         {   // create new node
             // Find node type attribute.

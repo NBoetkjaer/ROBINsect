@@ -23,7 +23,7 @@ public:
     virtual void Execute() override;
     virtual void Publish() override;
     virtual void OnTimer() override;
-    virtual void Init(BaseNode& rootNode) override;
+    virtual void CreateNodes(BaseNode& rootNode) override;
 private:
     enum class  State {Initialize, Listning, Connected};
     State state;

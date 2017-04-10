@@ -83,15 +83,37 @@ void Application::RunLoop()
 
     std::cout << std::endl << "************************" << std::endl;
     std::cout << "Initialize all modules" << std::endl;
-    // Initialize all modules.
+    // Let all modules create its nodes.
     for (auto &pModul : modules)
     {
-        pModul->Init(root);
+        pModul->CreateNodes(root);
     }
-
+    // Update node tree with setting loaded from configuration file.
+    LoadConfig();
+    // Link any mirrors.
+    root.LinkAllMirrors();
+    // Let all modules lookup mirrors and other required nodes.
+    for (auto &pModul : modules)
+    {
+        pModul->LookupNodes();
+    }
+//// Test
+//    MirrorNode* pTestNode = root.FindOrCreateChild<MirrorNode>("MirrorTest", "/Insect/BodyPosition");
+//    MirrorNode* pTestNode2 = pTestNode->FindOrCreateChild<MirrorNode>("MirrorTest2", "/SystemInfo/LoopCounter");
+//
+//    pTestNode->LinkMirror();
+//    pTestNode2->LinkMirror();
+//
+//    Pos3D_32f_Node* pBodyPos = pTestNode->GetMirrorSource<Pos3D_32f_Node>();
+//    FloatNode* pLoop = root.FindNode<FloatNode>("/MirrorTest/MirrorTest2", false, false);
+//    pBodyPos = root.FindNode<Pos3D_32f_Node>("/MirrorTest", false, true);
+//    pBodyPos->SetPosition(1, 2, 3);
+//
+//
     NodeXmlConverter xmlConv;
-    std::string test;
-    xmlConv.ConvertToXml(&root, test);
+//    std::string test;
+//    xmlConv.ConvertToXml(&root, test);
+//// Test end
     typedef chrono::steady_clock ClockType;
     std::cout << "Starting module loop" << std::endl;
     int64_t loopCount = 0;

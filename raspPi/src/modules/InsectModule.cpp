@@ -10,7 +10,7 @@ InsectModule::~InsectModule()
 {
 }
 
-void InsectModule::Init(BaseNode& rootNode)
+void InsectModule::CreateNodes(BaseNode& rootNode)
 {
     pNodeInsect = rootNode.FindOrCreateChild<BaseNode>("Insect");
     //pNodeInsect->Subscribe(this);
@@ -20,7 +20,7 @@ void InsectModule::Init(BaseNode& rootNode)
     pNodePosition = pNodeInsect->FindOrCreateChild<Pos3D_32f_Node>("BodyPosition");
     for(size_t legIdx = 0; legIdx < legs.size(); ++legIdx)
     {
-        legs[legIdx].Init(*pNodeLegs, legIdx);
+        legs[legIdx].CreateNodes(*pNodeLegs, legIdx);
     }
 }
 

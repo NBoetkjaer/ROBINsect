@@ -13,13 +13,21 @@ void ServoModule::Execute()
 {
 }
 
-void ServoModule::Init(BaseNode& rootNode)
+void ServoModule::CreateNodes(BaseNode& rootNode)
 {
     BaseNode* pNodeHardware = rootNode.FindOrCreateChild("Hardware");
     BaseNode* pNodeServos = pNodeHardware->FindOrCreateChild("Servos");
     for (size_t i = 0; i < servos.size(); ++i)
     {
-        servos[i].Init(*pNodeServos, i);
+        servos[i].CreateNodes(*pNodeServos, i);
+    }
+}
+
+void ServoModule::LookupNodes()
+{
+    for (size_t i = 0; i < servos.size(); ++i)
+    {
+        servos[i].LookupNodes();
     }
 }
 

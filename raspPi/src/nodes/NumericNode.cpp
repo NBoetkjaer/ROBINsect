@@ -6,9 +6,9 @@ Attribute unitAttrib("unit");
 Attribute prefixAttrib("prefix");
 
 template<>
-const char* UInt16Node::pFmt = "%u";
+const char* UInt16Node::pFmt = "%hu";
 template<>
-const char* UInt16Node::pRangeFmt = "[%u,%u]";
+const char* UInt16Node::pRangeFmt = "[%hu,%hu]";
 
 template<>
 const char* Int32Node::pFmt = "%d";

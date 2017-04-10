@@ -10,7 +10,7 @@ public:
     InsectModule();
     virtual ~InsectModule();
     virtual void Execute() override;
-    virtual void Init(BaseNode& rootNode) override;
+    virtual void CreateNodes(BaseNode& rootNode) override;
 private:
     static const int numLegs = 6;
     // Inherited via NodeObserver

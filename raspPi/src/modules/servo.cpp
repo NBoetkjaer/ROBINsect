@@ -13,13 +13,12 @@ Servo::Servo():
     slope(1.0f),
     offset(0.0f)
 {
-	//SetRange(200, 650, -90.f, 90.f);
 }
 
-void Servo::Init(BaseNode& parentNode, int servoNumber)
+void Servo::CreateNodes(BaseNode& parentNode, int servoNumber)
 {
     string nodeName = std::to_string(servoNumber);
-    BaseNode *pServoNode = parentNode.FindOrCreateChild(nodeName);
+    pServoNode = parentNode.FindOrCreateChild(nodeName);
     if (pServoNode == nullptr)
     {
         // ToDo error.
@@ -29,9 +28,12 @@ void Servo::Init(BaseNode& parentNode, int servoNumber)
     pNodePWM = pServoNode->FindOrCreateChild<UInt16Node>("PWM", 0, 150, 700);
     pNodeAngle = pServoNode->FindOrCreateChild<FloatNode>("Angle");
     pNodeAngle->SetAttribute(unitAttrib.GetID(), "deg");
-
-    pNodeSetAngle = pServoNode->FindOrCreateChild<FloatNode>("SetAngle", 0.0f, -90.0f, 90.0f);
-    pNodeSetAngle->SetAttribute(unitAttrib.GetID(), "deg");
+    // Create mirror 
+    const int numJoints = 3;
+    int legID = servoNumber / numJoints;
+    int jointID = servoNumber % numJoints;
+    string path = "/Insect/Legs/" + to_string(legID) + "/Joints/" + to_string(jointID) + "/jointAngle";
+    pServoNode->FindOrCreateChild<MirrorNode>("SetAngle", path);
 
     pCalibrationNode = pServoNode->FindOrCreateChild("Calibration");
     if (pCalibrationNode == nullptr)
@@ -45,6 +47,11 @@ void Servo::Init(BaseNode& parentNode, int servoNumber)
     pNodeMinAngle->SetAttribute(unitAttrib.GetID(), "deg");
     pNodeMaxAngle = pCalibrationNode->FindOrCreateChild<FloatNode>("MaxAngle", 90.0f);
     pNodeMaxAngle->SetAttribute(unitAttrib.GetID(), "deg");
+}
+
+void Servo::LookupNodes()
+{
+    pNodeSetAngle = pServoNode->FindNode<FloatNode>("SetAngle");
 }
 
 void Servo::Notify()
@@ -67,7 +74,7 @@ void Servo::Notify()
             offset = pNodeMaxPWM->Get() - pNodeMaxAngle->Get() * slope;
         }
     }
-    if (pNodeSetAngle->IsValueChanged())
+    if (pNodeSetAngle && pNodeSetAngle->IsValueChanged())
     {
         pNodePWM->Set(GetPWM(pNodeSetAngle->Get()));
         pNodeAngle->Set(GetAngle(pNodePWM->Get()));

@@ -22,7 +22,8 @@ int main(int argc, char* argv[])
 {
     BaseNode root("root");
 
-    std::cout << "Size of std::vector<NodeObserver>: " << sizeof(std::vector<NodeObserver>) << std::endl;
+    std::cout << "Size of std::vector<NodeObserver*>: " << sizeof(std::vector<NodeObserver*>) << std::endl;
+    std::cout << "Size of std::forward_list<MirrorNodes*>: " << sizeof(std::forward_list<MirrorNode*>) << std::endl;
     std::vector<std::unique_ptr<BaseNode>> testVec;
     std::cout << "Size of std::vector<std::unique_ptr<BaseNode>>: " << sizeof(testVec) << std::endl;
     std::cout << "Initial capacity of a vector: " << testVec.capacity() << std::endl;
@@ -140,7 +141,6 @@ int main(int argc, char* argv[])
     std::cout << xmlStr;
 
     Application app;
-    app.LoadConfig();
     app.RunLoop();
     app.SaveConfig();
 

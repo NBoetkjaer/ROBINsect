@@ -8,7 +8,7 @@ public:
     Leg();
     virtual ~Leg() {};
 
-    void Init(BaseNode& rootNode, int legNumber);
+    void CreateNodes(BaseNode& rootNode, int legNumber);
     void Execute();
     // Inherited via NodeObserver
     virtual void Notify() override;
@@ -28,10 +28,6 @@ private:
     std::array<FloatNode*, numJoints> pNodeJointDistance;
     std::array<FloatNode*, numJoints> pNodeLinkAngle;
     std::array<FloatNode*, numJoints> pNodeLinkDistance;
-
-    StringNode* pNodeServoPath; // ToDo: implement node mirrors instead.
-    std::array<UInt16Node*, numJoints> pNodeServoID;
-    std::array<FloatNode*, numJoints> pNodeServoAngle;
 
     LegKinematic kinematic;
 };

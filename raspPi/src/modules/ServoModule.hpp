@@ -11,7 +11,8 @@ public:
     virtual ~ServoModule();
 
     virtual void Execute() override;
-    virtual void Init(BaseNode& rootNode) override;
+    virtual void CreateNodes(BaseNode& rootNode) override;
+    virtual void LookupNodes() override;
 
     virtual void Notify() override;
 private:

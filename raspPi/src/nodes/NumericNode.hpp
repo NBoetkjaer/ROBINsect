@@ -96,7 +96,7 @@ public:
         T _minValue, _maxValue;
         const char *pChar = pValues;
         // Skip leading white spaces.
-        while (*pChar != 0 && isspace(*pChar)) { ++pChar; }
+        while (*pChar != 0 && isspace((unsigned char)*pChar)) { ++pChar; }
         int numSuccess = sscanf(pChar, pRangeFmt, &_minValue, &_maxValue);
         if (numSuccess == 2)
         {

@@ -1,4 +1,5 @@
 #include "BaseNode.hpp"
+#include "MirrorNode.hpp"
 #ifndef WIN32
 #include <strings.h>
 #endif
@@ -55,14 +56,13 @@ void BaseNode::Subscribe(NodeObserver* pObserver)
     if ( std::find(subscribers.begin(), subscribers.end(), pObserver) != subscribers.end() )
         return;
     // Add observer to list of subscribers.
-    subscribers.push_back(pObserver);
+    subscribers.push_front(pObserver);
 
 }
 
 void BaseNode::UnSubscribe(NodeObserver* pObserver)
 {
-    subscribers.erase(std::remove_if(subscribers.begin(), subscribers.end(),
-        [&](NodeObserver* pObs) {return pObs == pObserver;}), subscribers.end() );
+    std::remove(subscribers.begin(), subscribers.end(), pObserver);
 }
 
 void BaseNode::Notify(bool recursive)
@@ -84,6 +84,36 @@ void BaseNode::Notify(bool recursive)
     }
 }
 
+bool BaseNode::LinkAllMirrors()
+{
+    bool success = true;
+    MirrorNode *pMirror = dynamic_cast<MirrorNode*>(this);
+    if (pMirror != nullptr) // Check if this node is a mirror.
+    {
+        success &= pMirror->LinkMirror();
+    }
+    // Recursively try to link any mirrors.
+    for (const auto & child : children)
+    {
+        success &= child->LinkAllMirrors();
+    }
+    return success;
+}
+
+void BaseNode::AddMirror(MirrorNode* pMirror)
+{
+    // Check if the mirror is already in the list.
+    if (std::find(mirrors.begin(), mirrors.end(), pMirror) != mirrors.end())
+        return;
+    // Add mirror to list of mirrors.
+    mirrors.push_front(pMirror);
+}
+
+void BaseNode::RemoveMirror(MirrorNode* pMirror)
+{
+    std::remove(mirrors.begin(), mirrors.end(), pMirror);
+}
+
 void BaseNode::SetNodeChanged()
 {
     if (!AnyRecentChanges())
@@ -92,6 +122,10 @@ void BaseNode::SetNodeChanged()
         if (pParent != nullptr)
         {
             pParent->SetNodeChanged(); // Proceed to set parent as changed.
+        }
+        for(auto mirror: mirrors)
+        {
+            mirror->SetNodeChanged(); // Mark all the mirrors (if any) as changed.
         }
     }
 }
@@ -139,7 +173,7 @@ void  BaseNode::SetFlags(const char* pValues)
         if (*pValues == 0) break;
 
         // Skip leading white spaces.
-        while (*pValues != 0 && isspace(*pValues))
+        while (*pValues != 0 && isspace((unsigned char)*pValues))
         {
             ++pValues;
         }
@@ -168,7 +202,7 @@ void  BaseNode::SetFlags(const char* pValues)
             }
 
             // Skip trailing white spaces.
-            while (*pValue != 0 && isspace(*pValue))
+            while (*pValue != 0 && isspace((unsigned char)*pValue))
             {
                 ++pValue;
             }
@@ -296,8 +330,18 @@ void BaseNode::Print(int indentLevel) const
 // An absolute path is specified with a leading "/" eg. "/node1/node2/nodeToFind", in which case the function will begin the search from the root node.
 // The syntax of a relative path is "node2/nodeToFind" or "../node1/node2/nodeToFind" and the search is started from this node.
 // Return value: If the node is found a pointer to the requested node is returned, otherwise a nullptr is returned.
-BaseNode* BaseNode::FindNodeInternal(const char * pNodePath, bool allowPartialMatch)
+BaseNode* BaseNode::FindNodeInternal(const char * pNodePath, bool allowPartialMatch, bool resolveMirrors)
 {
+    if (resolveMirrors && (typeid(*this) == typeid(MirrorNode)))
+    {
+        MirrorNode * pMirror = dynamic_cast<MirrorNode*> (this);
+        if (pMirror == nullptr || pMirror->GetMirrorSource() == nullptr)
+        {
+            // ToDo: Handle error.
+            return nullptr;
+        }
+        return pMirror->GetMirrorSource()->FindNodeInternal(pNodePath, allowPartialMatch, resolveMirrors);
+    }
     static const char pathDelimiter = '/';
     if (pNodePath == nullptr) return nullptr;
     // Special case for an empty string - just return this.
@@ -311,16 +355,16 @@ BaseNode* BaseNode::FindNodeInternal(const char * pNodePath, bool allowPartialMa
         {
             pNode = pNode->pParent;
         }
-        return pNode->FindNodeInternal(pNodePath + 1, allowPartialMatch);
+        return pNode->FindNodeInternal(pNodePath + 1, allowPartialMatch, resolveMirrors);
     }
     // Special case if first two characters are ".." - then return the parent if not null.
     if (pNodePath[0] == '.' && pNodePath[1] != 0 && pNodePath[1] == '.' && pParent)
     {
-        if (pNodePath[2] == pathDelimiter) return pParent->FindNodeInternal(pNodePath + 3, allowPartialMatch);
+        if (pNodePath[2] == pathDelimiter) return pParent->FindNodeInternal(pNodePath + 3, allowPartialMatch, resolveMirrors);
         if (pNodePath[2] == 0) return pParent;
     }
 
-    // Otherwise look up (next) node name in nodePath.
+    // Otherwise lookup (next) node name in nodePath.
     // Otherwise search children for at string match with next node.
     BaseNode* pPartialMatchNode = nullptr;
     const char* pPartialMatchPos = nullptr;
@@ -337,8 +381,21 @@ BaseNode* BaseNode::FindNodeInternal(const char * pNodePath, bool allowPartialMa
         // did we match to the end of child name?
         if (*pChildName == 0)
         {
-            if (*pNodeName == pathDelimiter) { return child->FindNodeInternal(pNodeName + 1, allowPartialMatch);}
-            if (*pNodeName == 0) { return child.get(); }
+            if (*pNodeName == pathDelimiter) { return child->FindNodeInternal(pNodeName + 1, allowPartialMatch, resolveMirrors);}
+            if (*pNodeName == 0) 
+            {
+                if (resolveMirrors && (typeid(*(child.get())) == typeid(MirrorNode)))
+                {
+                    MirrorNode * pMirror = dynamic_cast<MirrorNode*> (child.get());
+                    if (pMirror == nullptr || pMirror->GetMirrorSource() == nullptr)
+                    {
+                        // ToDo: Handle error.
+                        return nullptr;
+                    }
+                    return pMirror->GetMirrorSource();
+                }
+                return child.get();
+            }
         }
         if (allowPartialMatch) // If partial match is allowed checke that the specified named is matched entirely.
         {
@@ -352,8 +409,21 @@ BaseNode* BaseNode::FindNodeInternal(const char * pNodePath, bool allowPartialMa
     }
     if (allowPartialMatch && pPartialMatchNode != nullptr)
     {
-        if (*pPartialMatchPos == 0) { return pPartialMatchNode; }
-        return pPartialMatchNode->FindNodeInternal(pPartialMatchPos + 1, allowPartialMatch); // (+1) It must have been a delimiter. Move one pos forward.
+        if (*pPartialMatchPos == 0) 
+        { 
+            if (resolveMirrors && (typeid(*pPartialMatchNode) == typeid(MirrorNode)))
+            {
+                MirrorNode * pMirror = dynamic_cast<MirrorNode*> (pPartialMatchNode);
+                if (pMirror == nullptr || pMirror->GetMirrorSource() == nullptr)
+                {
+                    // ToDo: Handle error.
+                    return nullptr;
+                }
+                return pMirror->GetMirrorSource();
+            }
+            return pPartialMatchNode; 
+        }
+        return pPartialMatchNode->FindNodeInternal(pPartialMatchPos + 1, allowPartialMatch, resolveMirrors); // (+1) It must have been a delimiter. Move one pos forward.
     }
     return nullptr;
 }

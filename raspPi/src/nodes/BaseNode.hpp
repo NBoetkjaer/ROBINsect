@@ -2,6 +2,7 @@
 #include <array>
 #include <string>
 #include <vector>
+#include <forward_list>
 #include <algorithm>
 #include <memory>
 #include <iostream>
@@ -21,6 +22,8 @@ extern Attribute typeAttrib;
 extern Attribute infoAttrib;
 extern Attribute optionsAttrib;
 
+class MirrorNode; // Forward declare.
+
 class NodeObserver
 {
 public:
@@ -35,8 +38,8 @@ private:
     size_t recentChanges;    // Indicate if this node or any of its child have changed. LSB indicate newest change, remaing bits act as a counter.
     size_t attributeChanges; // Variable to hold the applied changes to this node. Each attribID has a bit in changes.
     size_t touchedAttributes; // Variable used to collect all used (active) attributes.
-    std::vector<NodeObserver*> subscribers;
-
+    std::forward_list<NodeObserver*> subscribers;
+    std::forward_list<MirrorNode*> mirrors;
 protected:
     std::string name;
     BaseNode* pParent;
@@ -72,8 +75,8 @@ public:
         attributeChanges |= (size_t)1 << attribID;
         touchedAttributes |= attributeChanges;
     }
-    inline bool IsAttributeChanged(attribID_t attribID) const { return (attributeChanges & ((size_t)1 << attribID))!=0;}
-    inline bool IsAttributeUsed(attribID_t attribID) const { return (touchedAttributes  & ((size_t)1 << attribID)) != 0; }
+    virtual inline bool IsAttributeChanged(attribID_t attribID) const { return (attributeChanges & ((size_t)1 << attribID))!=0;}
+    virtual inline bool IsAttributeUsed(attribID_t attribID) const { return (touchedAttributes  & ((size_t)1 << attribID)) != 0; }
     inline bool AnyChanges() const { return recentChanges != 0; };
     inline bool AnyRecentChanges() const { return recentChanges & 1; };
     inline int RecentChangeCount() const { return int((recentChanges >> 2) + (recentChanges & 1)); };
@@ -103,19 +106,23 @@ public:
     void UnSubscribe(NodeObserver* pObserver);
     void Notify(bool recursive); // Notify all subscribers
 
+    void AddMirror(MirrorNode* pMirror);
+    void RemoveMirror(MirrorNode* pMirror);
+    bool LinkAllMirrors();
+
 private:
-    BaseNode* FindNodeInternal(const char * pNodePath, bool allowPartialMatch);
+    BaseNode* FindNodeInternal(const char * pNodePath, bool allowPartialMatch, bool resolveMirrors);
 public:
     template<typename TNode = BaseNode>
-    TNode* FindNode(const std::string& nodePath, bool allowPartialMatch = false)
+    TNode* FindNode(const std::string& nodePath, bool allowPartialMatch = false, bool resolveMirrors = true)
     {
-        return dynamic_cast<TNode*>(FindNodeInternal(nodePath.c_str(), allowPartialMatch));
+        return dynamic_cast<TNode*>(FindNodeInternal(nodePath.c_str(), allowPartialMatch, resolveMirrors));
     }
 
     template<typename TNode = BaseNode>
-    TNode* FindNode(const char * pNodePath, bool allowPartialMatch = false)
+    TNode* FindNode(const char * pNodePath, bool allowPartialMatch = false, bool resolveMirrors = true)
     {
-        return dynamic_cast<TNode*>(FindNodeInternal(pNodePath, allowPartialMatch));
+        return dynamic_cast<TNode*>(FindNodeInternal(pNodePath, allowPartialMatch, resolveMirrors));
     }
 
     BaseNode* FindChild(const char * pNodeName)
@@ -127,46 +134,19 @@ public:
         return nullptr;
     }
 
+    template<typename TNode = BaseNode>
+    TNode* AddChild(std::unique_ptr<BaseNode> childNode);
+
     template<typename TNode = BaseNode, typename ...Args>
-    TNode* FindOrCreateChild(const char * pNodeName, Args&&... params)
-    {
-        BaseNode* childNode = FindChild(pNodeName);
-        if (childNode)
-        {
-            if (typeid(*childNode) != typeid(TNode))
-            {
-                // Error unexpected type
-            }
-            return dynamic_cast<TNode*>(childNode);
-        }
-        return AddChild<TNode>(pNodeName, std::forward<Args>(params)...);
-    }
+    TNode* AddChild(Args&&... params);
+
+    template<typename TNode = BaseNode, typename ...Args>
+    TNode* FindOrCreateChild(const char * pNodeName, Args&&... params);
 
     template<typename TNode = BaseNode, typename ...Args>
     TNode* FindOrCreateChild(const std::string& nodeName, Args&&... params)
     {
         return FindOrCreateChild<TNode>(nodeName.c_str(), std::forward<Args>(params)...);
-    }
-
-    template<typename TNode = BaseNode>
-    TNode* AddChild(std::unique_ptr<BaseNode> childNode)
-    {
-        TNode* retVal = dynamic_cast<TNode*>(childNode.get());
-        childNode->pParent = this;
-        children.push_back(std::move(childNode));
-        return retVal;
-    }
-
-    template<typename TNode = BaseNode, typename ...Args>
-    TNode* AddChild(Args&&... params)
-    {
-        TNode* retVal = new TNode(std::forward<Args>(params)...);
-        std::unique_ptr<BaseNode> newNode(retVal);
-        newNode->pParent = this;
-        // ToDo: Validate node name (must be unique and no special characters which are not allowed in an XML tag name)
-        //newNode->GetName()
-        children.push_back(std::move(newNode));
-        return retVal;
     }
 
     void SetNodeChanged();

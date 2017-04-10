@@ -5,12 +5,14 @@ class Servo : public NodeObserver
 {
     public:
         Servo(); 
-        void Init(BaseNode& parentNode, int servoNumber);
+        void CreateNodes(BaseNode& parentNode, int servoNumber);
+        void LookupNodes();
         unsigned short GetPWM(float angle);
         float GetAngle(unsigned short pwm);
 
         virtual void Notify() override;
     private:
+        BaseNode *pServoNode;
         UInt16Node* pNodePWM;
         FloatNode* pNodeAngle;
         FloatNode* pNodeSetAngle;

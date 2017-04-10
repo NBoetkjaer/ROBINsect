@@ -15,7 +15,7 @@ TelnetModule::~TelnetModule()
 
 }
 
-void TelnetModule::Init(BaseNode& rootNode)
+void TelnetModule::CreateNodes(BaseNode& rootNode)
 {
     pCurrentNode = &rootNode;
     BaseNode* pNode = rootNode.FindOrCreateChild<BaseNode>("TelnetSocket");
@@ -132,7 +132,7 @@ void TelnetModule::ProcessCmd(const char* pCmd)
     BaseNode* pCmdNode = nullptr;
     attribID_t attrId = INVALID_ATTRIBUTE_ID;
     // Skip leading white spaces.
-    while (*pChar != 0 && isspace(*pChar))
+    while (*pChar != 0 && isspace((unsigned char)*pChar))
     {
         ++pChar;
     }
@@ -148,7 +148,7 @@ void TelnetModule::ProcessCmd(const char* pCmd)
             if (pCmdNode == nullptr)
             {
                 std::string nodePath(pStartNodePath, pChar); // Get nodepath from cmd text.
-                pCmdNode = pCurrentNode->FindNode(nodePath, true);
+                pCmdNode = pCurrentNode->FindNode(nodePath, true, true);
                 if (pCmdNode == nullptr) return; // Node not found.
             }
             else if(attrId == INVALID_ATTRIBUTE_ID)
@@ -158,7 +158,7 @@ void TelnetModule::ProcessCmd(const char* pCmd)
                 if (attrId == INVALID_ATTRIBUTE_ID) return; // Unknown attribte. (ToDo should we create ??)
             }
             // Skip leading white spaces.
-            while (*pChar != 0 && isspace(*pChar))
+            while (*pChar != 0 && isspace((unsigned char)*pChar))
             {
                 ++pChar;
             }
@@ -240,7 +240,10 @@ void TelnetModule::PrintNodes(bool clear)
         // Make Value the first attribute.
         if (child->GetAttribute(valueAttrib.GetID(), tmpStr))
         {
-            consoleOutput += FOREGROUND(CYAN);
+            if(child->GetFlag(FlagType::readonly))
+                consoleOutput += FOREGROUND(DEFAULT_COLOR);
+            else
+                consoleOutput += FOREGROUND(CYAN);
             consoleOutput +=  "=" + tmpStr;
             if (child->GetAttribute(prefixAttrib.GetID(), tmpStr))
             {

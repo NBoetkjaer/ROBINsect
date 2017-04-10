@@ -47,7 +47,7 @@ public:
         float values[3];
         const char *pChar = pValues;
         // Skip leading white spaces.
-        while (*pChar != 0 && isspace(*pChar)) { ++pChar; }
+        while (*pChar != 0 && isspace((unsigned char)*pChar)) { ++pChar; }
         int numSuccess = sscanf(pChar, pFormat , &values[0], &values[1], &values[2]);
         if (numSuccess == 3)
         { 
