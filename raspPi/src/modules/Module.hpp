@@ -14,7 +14,7 @@ public:
     // LoookupNodes should not try to set any attributes, since this will overwrite settings loaded
     // from configuration file. 
     virtual void LookupNodes() {};
-    virtual void Execute() = 0; // May add info into the tree
+    virtual void Execute() {}; // May add info into the tree
     virtual void OnTimer() {}; // May add info into the tree
     virtual void Publish() {}; // May not add info to the tree
     inline void SetTimeout(int milliseconds) { timeoutPeriod_ms = milliseconds; };

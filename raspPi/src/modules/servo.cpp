@@ -25,7 +25,6 @@ void Servo::CreateNodes(BaseNode& parentNode, int servoNumber)
     }
     pServoNode->Subscribe(this);
 
-    pNodePWM = pServoNode->FindOrCreateChild<UInt16Node>("PWM", 0, 150, 700);
     pNodeAngle = pServoNode->FindOrCreateChild<FloatNode>("Angle");
     pNodeAngle->SetAttribute(unitAttrib.GetID(), "deg");
     // Create mirror 
@@ -34,6 +33,9 @@ void Servo::CreateNodes(BaseNode& parentNode, int servoNumber)
     int jointID = servoNumber % numJoints;
     string path = "/Insect/Legs/" + to_string(legID) + "/Joints/" + to_string(jointID) + "/jointAngle";
     pServoNode->FindOrCreateChild<MirrorNode>("SetAngle", path);
+    int controllerID = servoNumber / 9;
+    path = "/Hardware/PWMControllers/" + to_string(controllerID) + "/" + to_string(servoNumber % 9);
+    pServoNode->FindOrCreateChild<MirrorNode>("PWM", path);
 
     pCalibrationNode = pServoNode->FindOrCreateChild("Calibration");
     if (pCalibrationNode == nullptr)
@@ -52,6 +54,7 @@ void Servo::CreateNodes(BaseNode& parentNode, int servoNumber)
 void Servo::LookupNodes()
 {
     pNodeSetAngle = pServoNode->FindNode<FloatNode>("SetAngle");
+    pNodePWM = pServoNode->FindNode<UInt16Node>("PWM");
 }
 
 void Servo::Notify()

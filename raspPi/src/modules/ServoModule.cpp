@@ -25,9 +25,9 @@ void ServoModule::CreateNodes(BaseNode& rootNode)
 
 void ServoModule::LookupNodes()
 {
-    for (size_t i = 0; i < servos.size(); ++i)
+    for (auto& servo: servos)
     {
-        servos[i].LookupNodes();
+        servo.LookupNodes();
     }
 }
 

@@ -47,6 +47,7 @@ enum REG
 #define INT_OSC_FREQ (25000000.0f) // Hz
 #define CHANNEL_COUNT (16)
 #define BV(bit) (1<<(bit))  // Bit value.
+
 pca9685::pca9685()
     : m_file(-1)
 {
@@ -59,9 +60,8 @@ pca9685::pca9685()
 pca9685::~pca9685()
 {
 }
-int pca9685::init()
+int pca9685::init(int adapter_nr, int i2c_addr)
 {
-    int adapter_nr = 1; /* probably dynamically determined */
     char filename[20];
 
     snprintf(filename, 19, "/dev/i2c-%d", adapter_nr);
@@ -71,8 +71,7 @@ int pca9685::init()
         return m_file;
     }
 
-    int addr = 0x70; /* The I2C address */
-    if (ioctl(m_file, I2C_SLAVE, addr) < 0) {
+    if (ioctl(m_file, I2C_SLAVE, i2c_addr) < 0) {
         /* ERROR HANDLING; you can check errno to see what went wrong */
         return m_file;
     }

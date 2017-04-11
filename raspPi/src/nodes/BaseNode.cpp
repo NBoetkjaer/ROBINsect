@@ -33,6 +33,8 @@ BaseNode::BaseNode(const std::string &nodeName, BaseNode* pParentNode):
     pParent(pParentNode),
     nodeFlag(FlagType::none)
 {
+    if (pParent)
+        pParent->SetNodeChanged();
 }
 
 BaseNode::~BaseNode()
