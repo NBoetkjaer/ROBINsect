@@ -1,15 +1,14 @@
 #include "LegKinematic.hpp"
 #include <iostream>
-#define _USE_MATH_DEFINES
-#include <math.h>
 
-#define RAD2DEG(rad)  ((rad) * 180.0f / float(M_PI))
-#define DEG2RAD(deg)  ((deg) * float(M_PI) / 180.0f)
 using namespace std;
 using namespace Eigen;
 
-LegKinematic::LegKinematic()
-    : d1(90.0f), d2(125.0f), d3(150.0f)
+LegKinematic::LegKinematic() :
+    m_jd{ 0 },
+    m_ja{ 0 },
+    m_ld{ 0.090f, 0.125f, 0.150f },
+    m_la{ DEG2RAD(90.0f), 0.0f, 0.0f }
 {
 }
 
@@ -28,9 +27,9 @@ void LegKinematic::setGoal(float goalX, float goalY, float goalZ)
     // Matrix4f jointT; // Joint  transform.
     // jointTransform(jointT, 0.0f, m_joint1Angle_rad);
     // Matrix4f linkT; // Link transform.
-    // linkTransform(linkT, d1, M_PI/2.0f);	
+    // linkTransform(linkT, ld[0], M_PI/2.0f);	
     Matrix4f jointLinkT; // = jointT * linkT;
-    jointLinkTransform(jointLinkT, 0.0f, jointAngles[0], d1, DEG2RAD(90.0f));
+    jointLinkTransform(jointLinkT, m_jd[0], jointAngles[0], m_ld[0], m_la[0]);
 
     invertTransform(jointLinkT);
     // Transform goal position into end of link 1 franejoint 1 frame.
@@ -47,18 +46,18 @@ void LegKinematic::setGoal(float goalX, float goalY, float goalZ)
     x = goal(0);
     y = goal(1);
     float dist = hypot(x, y);
-    if (dist > (d2 + d3) || dist < fabs(d2 - d3) || dist == 0.0f)
+    if (dist > (m_ld[1] + m_ld[2]) || dist < fabs(m_ld[1] - m_ld[2]) || dist == 0.0f)
     {
         cout << "Goal un-reachable.";
         return;
     }
 
-    float a = ((d2*d2) - (d3*d3) + (dist*dist)) / (2.0f*dist);
-    if (d2 == a)
+    float a = ((m_ld[1]*m_ld[1]) - (m_ld[2]*m_ld[2]) + (dist*dist)) / (2.0f*dist);
+    if (m_ld[1] == a)
     {
         cout << "Goal has only one solution.";
     }
-    float h = sqrtf(d2*d2 - a*a);
+    float h = sqrtf(m_ld[1]*m_ld[1] - a*a);
     x2 = x * a / dist;
     y2 = y * a / dist;
 
@@ -74,7 +73,7 @@ void LegKinematic::setGoal(float goalX, float goalY, float goalZ)
     //cout << "m_joint2Angle_rad: " << RAD2DEG(m_joint2Angle_rad) << std::endl;	
 
     // Transform the goal point into the coordinate frame of link 2.
-    jointLinkTransform(jointLinkT, 0.0f, jointAngles[1], d2, 0.0f);
+    jointLinkTransform(jointLinkT, m_jd[1], jointAngles[1], m_ld[1], m_la[1]);
     invertTransform(jointLinkT);
     goal = jointLinkT * goal;
 
@@ -86,38 +85,18 @@ void LegKinematic::setGoal(float goalX, float goalY, float goalZ)
     // y = x*s + y*c;
     jointAngles[2] = atan2(goal(1), goal(0));
 
-    m_joint1Angle_rad = jointAngles[0];
-    m_joint2Angle_rad = jointAngles[1];
-    m_joint3Angle_rad = jointAngles[2];
+    m_ja[0] = jointAngles[0];
+    m_ja[1] = jointAngles[1];
+    m_ja[2] = jointAngles[2];
 }
 
 void LegKinematic::getGoal(float& goalX, float& goalY, float& goalZ)
 {
-    /*
-    Denavit-Hartenberg description:
-
-    Jd - Joint distance
-    Ja - Joint angle
-    La - link angle
-    Ld - link distance
-
-    _____________
-    Joint   jd  Ja  La  Ld
-    0       0   a1  90  d1
-    1       0   a2  0   d2
-    2       0   a3  0   d3
-
-    */
-    const float ja[3] = { m_joint1Angle_rad, m_joint2Angle_rad, m_joint3Angle_rad };
-    const float jd[3] = { 0 };
-    const float ld[3] = { d1, d2, d3 };
-    const float la[3] = { DEG2RAD(90.0f), 0.0f, 0.0f };
-
     Matrix4f transform = Matrix4f::Identity();
     for (int i = 0; i < 3; ++i)
     {
         Matrix4f jointLinkT;
-        jointLinkTransform(jointLinkT, jd[i], ja[i], ld[i], la[i]);
+        jointLinkTransform(jointLinkT, m_jd[i], m_ja[i], m_ld[i], m_la[i]);
         transform = transform * jointLinkT;
         /* Debug output.
         std::cout << "Link" << i << std::endl << std::endl;
@@ -134,26 +113,42 @@ void LegKinematic::getGoal(float& goalX, float& goalY, float& goalZ)
 
 void LegKinematic::setJoints(float joint1Angle_deg, float joint2Angle_deg, float joint3Angle_deg)
 {
-    m_joint1Angle_rad = DEG2RAD(joint1Angle_deg);
-    m_joint2Angle_rad = DEG2RAD(joint2Angle_deg);
-    m_joint3Angle_rad = DEG2RAD(joint3Angle_deg);
+    m_ja[0] = DEG2RAD(joint1Angle_deg);
+    m_ja[1] = DEG2RAD(joint2Angle_deg);
+    m_ja[2] = DEG2RAD(joint3Angle_deg);
 }
 
 void LegKinematic::getJoints(float& joint1Angle_deg, float& joint2Angle_deg, float& joint3Angle_deg) const
 {
-    joint1Angle_deg = RAD2DEG(m_joint1Angle_rad);
-    joint2Angle_deg = RAD2DEG(m_joint2Angle_rad);
-    joint3Angle_deg = RAD2DEG(m_joint3Angle_rad);
+    joint1Angle_deg = RAD2DEG(m_ja[0]);
+    joint2Angle_deg = RAD2DEG(m_ja[1]);
+    joint3Angle_deg = RAD2DEG(m_ja[2]);
 }
 float LegKinematic::getJoint(int idx) const
 {
-    switch (idx)
+    if (idx < 0 || idx > 2)
     {
-    case 0: return RAD2DEG(m_joint1Angle_rad);
-    case 1: return RAD2DEG(m_joint2Angle_rad);
-    case 2: return RAD2DEG(m_joint3Angle_rad);
-    default: return 0.0f;
+        return 0.0f;
     }
+    return RAD2DEG(m_ja[idx]);
+
+}
+void LegKinematic::SetDH_LinkDist(int idx, float linkDist)
+{
+    if (idx < 0 || idx > 2)
+    {
+        return;
+    }
+    m_ld[idx] = linkDist;
+}
+
+void LegKinematic::SetDH_LinkAngle(int idx, float linkAngle)
+{
+    if (idx < 0 || idx > 2)
+    {
+        return;
+    }
+    m_la[idx] = linkAngle;
 }
 
 void LegKinematic::jointTransform(Matrix4f &jointT, float jd, float ja) const

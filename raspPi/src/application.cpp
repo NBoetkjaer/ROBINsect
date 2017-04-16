@@ -49,7 +49,7 @@ void Application::LoadConfig()
 void Application::SaveConfig()
 {
     string xmlStr;
-    xmlConverter.ConvertToXml(&root, xmlStr/*, FlagType::persist*/);
+    xmlConverter.ConvertToXml(&root, xmlStr, FlagType::persist);
     if (xmlStr.size() < 5) 
         return;
     // Save to file.
@@ -231,7 +231,7 @@ void Application::RunLoop()
         xmlConv.ConvertToXml(&root, test, FlagType::none, true);
         if (test.size() > 5)
         {
-            cout << test << endl;
+            //cout << test << endl;
         }
         test.clear();
         // Clear all changes.

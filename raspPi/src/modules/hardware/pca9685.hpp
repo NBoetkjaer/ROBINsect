@@ -11,7 +11,8 @@ class pca9685
 public:
     pca9685();
     ~pca9685();
-    int init(int adapter_nr = 1, int i2c_addr = 0x70);
+    int init(int adapter_nr = 1, unsigned int i2c_addr = 0x70);
+    int selectAddress(unsigned int i2c_addr);
     float setUpdateFrequency(float freq_Hz);
     void setPWM(__u8 channel, unsigned short on, unsigned short off);
     int readAllChannels();

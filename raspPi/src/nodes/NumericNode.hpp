@@ -170,7 +170,10 @@ private:
 };
 
 typedef NumericNode<uint16_t> UInt16Node;
+typedef NumericNode<uint32_t> UInt32Node;
+
 typedef NumericNode<int32_t> Int32Node;
 typedef NumericNode<int64_t> Int64Node;
+
 typedef NumericNode<float> FloatNode;
 typedef NumericNode<double> DoubleNode;

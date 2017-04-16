@@ -60,7 +60,7 @@ pca9685::pca9685()
 pca9685::~pca9685()
 {
 }
-int pca9685::init(int adapter_nr, int i2c_addr)
+int pca9685::init(int adapter_nr, unsigned int i2c_addr)
 {
     char filename[20];
 
@@ -70,12 +70,11 @@ int pca9685::init(int adapter_nr, int i2c_addr)
         /* ERROR HANDLING; you can check errno to see what went wrong */
         return m_file;
     }
-
-    if (ioctl(m_file, I2C_SLAVE, i2c_addr) < 0) {
+    __s32 res = selectAddress(i2c_addr);
+    if (res < 0) {
         /* ERROR HANDLING; you can check errno to see what went wrong */
-        return m_file;
+        return res;
     }
-
 
     __s32 mode1 = i2c_smbus_read_byte_data(m_file, MODE1);
     if (mode1 < 0) { return mode1; }
@@ -83,7 +82,7 @@ int pca9685::init(int adapter_nr, int i2c_addr)
     mode1 |= BV(AI);
     mode1 &= ~BV(SLEEP);
     //mode1 |= BV(RESTART);	
-    __s32 res = i2c_smbus_write_byte_data(m_file, MODE1, mode1);
+    res = i2c_smbus_write_byte_data(m_file, MODE1, mode1);
     if (res < 0) { return res; }
     return 0;
 
@@ -95,10 +94,15 @@ int pca9685::init(int adapter_nr, int i2c_addr)
     return 0;
 }
 
+int pca9685::selectAddress(unsigned int i2c_addr)
+{
+    return  ioctl(m_file, I2C_SLAVE, i2c_addr);
+}
+
 float pca9685::setUpdateFrequency(float freq_Hz)
 {
     int prescalValue = (int)((INT_OSC_FREQ / 4096.0f / freq_Hz) - 1.0f + 0.5f);
-    if (prescalValue < 3 && prescalValue >  255) return -1.0f;
+    if (prescalValue < 0x03 || prescalValue >  0xFF) return -1.0f;
     // Read mode1 register 
     __s32 mode1 = i2c_smbus_read_byte_data(m_file, MODE1);
     if (mode1 < 0) {
@@ -149,10 +153,10 @@ int pca9685::writeAllChannels()
 {
     __s32 res;
     __u8 len = I2C_SMBUS_I2C_BLOCK_MAX;
-    // 16 channels of 4 bytes each, we can read 32 bytes in one transaction, so we only need two transactions to transfer all channel data.
+    // 16 channels of 4 bytes each, we can write 32 bytes in one transaction, so we only need two transactions to transfer all channel data.
     for (__u8 i = 0; i < 2; ++i)
     {
-        // Read a block of registers.
+        // Write a block of registers.
         res = i2c_smbus_write_i2c_block_data(m_file, LED0_ON_L + i*len, len, &m_channels[i*len]);
         if (res < 0) {
             printf("Failed to write block\n");

@@ -8,7 +8,10 @@ template <typename T>
 class AbstractValueNode : public BaseNode
 {
 public:
-    AbstractValueNode(const std::string &nodeName, T val) : BaseNode(nodeName), value(val) { }
+    AbstractValueNode(const std::string &nodeName, T val) : BaseNode(nodeName), value(val) 
+    {
+        SetAttributeChanged(valueAttrib.GetID());
+    }
     virtual ~AbstractValueNode(){}
     virtual bool GetAttribute(attribID_t attribID, std::string &strAttributeValue) const
     {

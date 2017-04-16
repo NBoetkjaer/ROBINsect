@@ -28,13 +28,13 @@ void Leg::CreateNodes(BaseNode& rootNode, int legNumber)
 
     pNodeLeg->Subscribe(this);
 
-    pNodeMountPos = pNodeLeg->FindOrCreateChild<Pos3D_32f_Node>("mountPosistion");
+    pNodeMountPos = pNodeLeg->FindOrCreateChild<Pos3D_32f_Node>("mountPosition");
     pNodeMountPos->SetAttribute(unitAttrib.GetID(), "m");
 
     pNodeMountSide = pNodeLeg->FindOrCreateChild<BoolNode>("mountSide");
     pNodeMountSide->SetAttribute(optionsAttrib.GetID(), "left,right");
 
-    pNodeGoalPos = pNodeLeg->FindOrCreateChild<Pos3D_32f_Node>("goalPos");
+    pNodeGoalPos = pNodeLeg->FindOrCreateChild<Pos3D_32f_Node>("goalPos", 0.1f, 0.0f, -0.15f);
     pNodeGoalPos->SetAttribute(unitAttrib.GetID(), "m");
     
     pNodeCurrentPos = pNodeLeg->FindOrCreateChild<Pos3D_32f_Node>("currentPos");
@@ -46,30 +46,55 @@ void Leg::CreateNodes(BaseNode& rootNode, int legNumber)
         string jointNodeName = std::to_string(jointIdx);
         pNodeJoints[jointIdx] = pJointParent->FindOrCreateChild<BaseNode>(jointNodeName);
 
-        pNodeJointAngles[jointIdx] = pNodeJoints[jointIdx]->FindOrCreateChild<FloatNode>("jointAngle",0.0f,-90.0f, 90.f);
+        pNodeJointAngles[jointIdx] = pNodeJoints[jointIdx]->FindOrCreateChild<FloatNode>("jointAngle", 0.0f, -90.0f, 90.f);
         pNodeJointAngles[jointIdx]->SetAttribute(unitAttrib.GetID(), "deg");
 
-        pNodeJointDistance[jointIdx] = pNodeJoints[jointIdx]->FindOrCreateChild<FloatNode>("jointDistance");
-        pNodeJointDistance[jointIdx]->SetAttribute(unitAttrib.GetID(), "m");
+        float linkDist = 0.087f;
+        if(jointIdx == 0)
+        {
+            linkDist = 0.06f;
+            pNodeJointAngles[jointIdx]->SetRange(-90.0f, 70.0f);
+        }
 
-        pNodeLinkAngle[jointIdx] = pNodeJoints[jointIdx]->FindOrCreateChild<FloatNode>("linkAngle");
-        pNodeLinkAngle[jointIdx]->SetAttribute(unitAttrib.GetID(), "deg");
-
-        pNodeLinkDistance[jointIdx] = pNodeJoints[jointIdx]->FindOrCreateChild<FloatNode>("linkDistance");
+        pNodeLinkDistance[jointIdx] = pNodeJoints[jointIdx]->FindOrCreateChild<FloatNode>("linkDistance", linkDist);
         pNodeLinkDistance[jointIdx]->SetAttribute(unitAttrib.GetID(), "m");
     }
 }
 
 void Leg::Notify()
 {
-    if(pNodeMountPos->IsValueChanged() || pNodeMountSide->IsValueChanged())
+    if(pNodeMountPos->AnyChanges() || pNodeMountSide->IsValueChanged())
     {
+        if (!pNodeMountSide->Get()) // right side 
+        {
+            kinematic.SetDH_LinkAngle(DEG2RAD(90), DEG2RAD(180), 0.0f);
+        }
+        else
+        { 
+            kinematic.SetDH_LinkAngle(DEG2RAD(-90), DEG2RAD(180), 0.0f);
+        }
         // Update Body -> Leg transformation.
     }
 
-    if (pNodeGoalPos->IsValueChanged())
+    if (pNodeGoalPos->AnyChanges())
     {
         // Calculate a new trajectory.
+        float x, y, z;
+        pNodeGoalPos->GetPosition(x, y, z);
+        pNodeCurrentPos->SetPosition(x, y, z);
+        kinematic.setGoal(x, y, z);
+        for (size_t jointIdx = 0; jointIdx < pNodeJoints.size(); ++jointIdx)
+        {
+            pNodeJointAngles[jointIdx]->Set(kinematic.getJoint(jointIdx));
+        }
+    }
+
+    for (size_t jointIdx = 0; jointIdx < pNodeJoints.size(); ++jointIdx)
+    {
+        if (pNodeLinkDistance[jointIdx]->IsValueChanged())
+        {
+            kinematic.SetDH_LinkDist(jointIdx, pNodeLinkDistance[jointIdx]->Get());
+        }
     }
 }
 

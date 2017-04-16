@@ -7,12 +7,13 @@
 
 using namespace std;
 
-static const array< tuple<type_index, std::string>, 10> typeNames =
+static const array< tuple<type_index, std::string>, 11> typeNames =
 {
     std::make_tuple(std::type_index(typeid(BaseNode)),       "node"),
     std::make_tuple(std::type_index(typeid(MirrorNode)),     "mirror"),
     std::make_tuple(std::type_index(typeid(BoolNode)),       "bool"),
     std::make_tuple(std::type_index(typeid(UInt16Node)),     "uint16"),
+    std::make_tuple(std::type_index(typeid(UInt32Node)),     "uint32"),
     std::make_tuple(std::type_index(typeid(Int32Node)),      "int32"),
     std::make_tuple(std::type_index(typeid(Int64Node)),      "int64"),
     std::make_tuple(std::type_index(typeid(FloatNode)),      "float"),
@@ -37,6 +38,7 @@ std::unique_ptr<BaseNode> NodeFactory::CreateNode(const std::string& nodeType, c
         CREATE_NODE(MirrorNode);
         CREATE_NODE(BoolNode);
         CREATE_NODE(UInt16Node);
+        CREATE_NODE(UInt32Node);
         CREATE_NODE(Int32Node);
         CREATE_NODE(Int64Node);
         CREATE_NODE(FloatNode);

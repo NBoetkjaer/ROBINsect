@@ -6,12 +6,12 @@
 class Pos3D_32f_Node : public StringNode
 {
 public:
-    Pos3D_32f_Node(const std::string &nodeName)
+    Pos3D_32f_Node(const std::string &nodeName, float x = 0.0f, float y = 0.0f, float z = 0.0f)
         : StringNode(nodeName, "[0,0,0]")
     {
-        pNodeX = this->AddChild<FloatNode>("X", 0.0f);
-        pNodeY = this->AddChild<FloatNode>("Y", 0.0f);
-        pNodeZ = this->AddChild<FloatNode>("Z", 0.0f);
+        pNodeX = this->AddChild<FloatNode>("X", x);
+        pNodeY = this->AddChild<FloatNode>("Y", y);
+        pNodeZ = this->AddChild<FloatNode>("Z", z);
     }
     virtual ~Pos3D_32f_Node(){}
     
@@ -30,8 +30,8 @@ public:
     void GetPosition(float& x, float& y, float &z) const 
     {
         x = pNodeX->Get();
-        y = pNodeX->Get();
-        z = pNodeX->Get();
+        y = pNodeY->Get();
+        z = pNodeZ->Get();
     }
 
     void SetPosition(float x, float y, float z)

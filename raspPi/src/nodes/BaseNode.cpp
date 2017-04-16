@@ -26,7 +26,7 @@ std::array< std::tuple<const string, FlagType>, (size_t)FlagBitType::numflags > 
 
 
 BaseNode::BaseNode(const std::string &nodeName, BaseNode* pParentNode):
-    recentChanges(0),
+    recentChanges(1),
     attributeChanges(0),
     touchedAttributes(0),
     name(nodeName),
@@ -248,7 +248,7 @@ void BaseNode::GetFlags(string &strFlags) const
     }
 }
 
-void BaseNode::SetFlag(FlagType flag, bool value)
+void BaseNode::SetFlag(FlagType flag, bool value, bool recursive)
 {
     FlagType oldFlags = nodeFlag;
     if (value)
@@ -264,6 +264,13 @@ void BaseNode::SetFlag(FlagType flag, bool value)
     if (oldFlags != nodeFlag)
     {
         SetAttributeChanged(flagsAttrib.GetID()); // Mark the change.;
+    }
+    if (recursive)
+    {
+        for (const auto &child : children)
+        {
+            child->SetFlag(flag, value, recursive);
+        }
     }
 }
 

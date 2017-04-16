@@ -43,12 +43,14 @@ void Servo::CreateNodes(BaseNode& parentNode, int servoNumber)
         // ToDo error.
     }
 
-    pNodeMinPWM = pCalibrationNode->FindOrCreateChild<UInt16Node>("MinPWM", 200);
-    pNodeMaxPWM = pCalibrationNode->FindOrCreateChild<UInt16Node>("MaxPWM", 650);
+    pNodeMinPWM = pCalibrationNode->FindOrCreateChild<UInt16Node>("MinPWM", 165);
+    pNodeMaxPWM = pCalibrationNode->FindOrCreateChild<UInt16Node>("MaxPWM", 580);
+
     pNodeMinAngle = pCalibrationNode->FindOrCreateChild<FloatNode>("MinAngle", -90.f);
     pNodeMinAngle->SetAttribute(unitAttrib.GetID(), "deg");
     pNodeMaxAngle = pCalibrationNode->FindOrCreateChild<FloatNode>("MaxAngle", 90.0f);
     pNodeMaxAngle->SetAttribute(unitAttrib.GetID(), "deg");
+    pCalibrationNode->SetFlag(FlagType::persist, true, true);
 }
 
 void Servo::LookupNodes()

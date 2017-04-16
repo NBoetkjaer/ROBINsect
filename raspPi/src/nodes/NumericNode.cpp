@@ -11,6 +11,11 @@ template<>
 const char* UInt16Node::pRangeFmt = "[%hu,%hu]";
 
 template<>
+const char* UInt32Node::pFmt = "%x";
+template<>
+const char* UInt32Node::pRangeFmt = "[%x,%x]";
+
+template<>
 const char* Int32Node::pFmt = "%d";
 template<>
 const char* Int32Node::pRangeFmt = "[%d,%d]";

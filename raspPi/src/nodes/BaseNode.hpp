@@ -95,7 +95,7 @@ private:
     void GetFlags(std::string &strFlags) const;    
 public:
     FlagType GetFlags() const { return nodeFlag; };
-    void SetFlag(FlagType flag, bool value);
+    void SetFlag(FlagType flag, bool value, bool recursive = false);
     bool GetFlag(FlagType flag) const;
     // Info attributes methods.
     const std::string &GetInfo() const {return info;}

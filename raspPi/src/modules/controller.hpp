@@ -18,5 +18,7 @@ class Controller : public NodeObserver
         std::array<UInt16Node*, 16> channels;
 
         BaseNode *pNodeController;
-        
+        UInt16Node *pNodeI2CDevice;
+        UInt32Node *pNodeI2CAddr;
+        FloatNode *pNodePwmFrequency;
 };
