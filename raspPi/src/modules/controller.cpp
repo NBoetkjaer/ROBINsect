@@ -14,7 +14,7 @@ void Controller::CreateNodes(BaseNode& parentNode, int controllerID)
     //pNodeController->Subscribe(this);
     
     pNodeI2CDevice = pNodeController->FindOrCreateChild<UInt16Node>("i2c_device", 1);
-    pNodeI2CAddr = pNodeController->FindOrCreateChild<UInt32Node>("i2c_Addr", 0x70 + controllerID);
+    pNodeI2CAddr = pNodeController->FindOrCreateChild<UInt32Node>("i2c_Addr", 0x40 + controllerID);
     pNodePwmFrequency = pNodeController->FindOrCreateChild<FloatNode>("pwmFrequency", 60.0f, 50.0f, 200.0f );
     pNodeController->FindOrCreateChild("Channels");
     for (size_t iChan = 0; iChan < channels.size(); ++iChan)

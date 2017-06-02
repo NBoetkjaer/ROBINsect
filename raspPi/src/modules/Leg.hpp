@@ -1,6 +1,7 @@
 #pragma once
 #include "Module.hpp"
 #include  "LegKinematic.hpp"
+#include  <Eigen/Dense>
 
 class Leg : public NodeObserver
 {
@@ -9,10 +10,11 @@ public:
     virtual ~Leg() {};
 
     void CreateNodes(BaseNode& rootNode, int legNumber);
-    void Execute();
+    //void Execute();
     // Inherited via NodeObserver
     virtual void Notify() override;
-
+    
+    void SetGoal(float x, float y, float z);
 private:
     uint16_t legID;
     static const int numJoints = 3;
@@ -30,4 +32,5 @@ private:
     std::array<FloatNode*, numJoints> pNodeLinkDistance;
 
     LegKinematic kinematic;
+    Eigen::Affine3f toLegT;
 };

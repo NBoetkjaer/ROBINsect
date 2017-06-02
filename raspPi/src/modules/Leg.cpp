@@ -1,5 +1,6 @@
 #include "Leg.hpp"
 #include <string>
+#include <Eigen/Dense>
 
 using namespace std;
 
@@ -46,7 +47,7 @@ void Leg::CreateNodes(BaseNode& rootNode, int legNumber)
         string jointNodeName = std::to_string(jointIdx);
         pNodeJoints[jointIdx] = pJointParent->FindOrCreateChild<BaseNode>(jointNodeName);
 
-        pNodeJointAngles[jointIdx] = pNodeJoints[jointIdx]->FindOrCreateChild<FloatNode>("jointAngle", 0.0f, -90.0f, 90.f);
+        pNodeJointAngles[jointIdx] = pNodeJoints[jointIdx]->FindOrCreateChild<FloatNode>("jointAngle", 0.0f, -105.0f, 105.f);
         pNodeJointAngles[jointIdx]->SetAttribute(unitAttrib.GetID(), "deg");
 
         float linkDist = 0.087f;
@@ -98,7 +99,19 @@ void Leg::Notify()
     }
 }
 
-void Leg::Execute()
+void Leg::SetGoal(float x, float y, float z)
 {
-
+    // Transform to the leg coordinate system.
+    if (!pNodeMountSide->Get()) // right side 
+    {
+    }
+    else
+    {
+    }
+    pNodeGoalPos->SetPosition(x, y, z);
 }
+
+//void Leg::Execute()
+//{
+//
+//}

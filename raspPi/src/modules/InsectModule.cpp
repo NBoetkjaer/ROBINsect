@@ -32,6 +32,7 @@ void InsectModule::Execute()
 {
     for (auto leg : legs)
     {
-        leg.Execute();
+        //leg.Execute();
+        //leg.SetGoal();
     }
 }
