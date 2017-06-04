@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ROBINinspect
 {
-    class MirrorNode : BaseNode
+    public class MirrorNode : BaseNode
     {
         public MirrorNode(String nodeName, String path, BaseNode parent = null)
             : base(nodeName, parent)
