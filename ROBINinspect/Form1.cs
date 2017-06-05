@@ -67,6 +67,17 @@ namespace ROBINinspect
             Pos3D_32f_Node posNode = new Pos3D_32f_Node("Pos3D");
             posNode.SetAttribute(AttributeTypes.value, "[1.1, 2.2, 3.3]");
 
+
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            string xmlText = System.IO.File.ReadAllText(@"..\..\ROBINsect.xml");
+            BaseNode rootNode = new BaseNode("root");
+            NodeXmlConverter xmlConv = new NodeXmlConverter();
+            xmlConv.UpdateTreeFromXml(rootNode, xmlText);
+
         }
     }
 }

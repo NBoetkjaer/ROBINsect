@@ -220,7 +220,7 @@ namespace ROBINinspect
             SetNodeChanged();
         }
 
-        private BaseNode FindNodeInChildren(String nodeName)
+        public BaseNode FindNodeInChildren(String nodeName)
         {
             if (children == null) return null;
             foreach (BaseNode node in children)

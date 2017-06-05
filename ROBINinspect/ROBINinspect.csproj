@@ -58,9 +58,10 @@
     <Compile Include="nodes\FloatNode.cs" />
     <Compile Include="nodes\IntNode.cs" />
     <Compile Include="nodes\MirrorNode.cs" />
+    <Compile Include="nodes\NodeFactory.cs" />
     <Compile Include="nodes\Pos3D_32f_Node.cs" />
     <Compile Include="nodes\StringNode.cs" />
-    <Compile Include="nodes\xml\nodeXmlConverter.cs" />
+    <Compile Include="nodes\xml\NodeXmlConverter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">

@@ -8,8 +8,8 @@ namespace ROBINinspect
 {
     public class MirrorNode : BaseNode
     {
-        public MirrorNode(String nodeName, String path, BaseNode parent = null)
-            : base(nodeName, parent)
+        public MirrorNode(String nodeName, String path = "")
+            : base(nodeName)
         {
             mirrorPath = path;
         }
