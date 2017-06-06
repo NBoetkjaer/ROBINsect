@@ -10,7 +10,15 @@ namespace ROBINinspect
 
     internal abstract class Attributes
     {
-        private static String[] attributeNames;        
+        private static String[] attributeNames;
+        private static AttributeTypes[] attributes;
+        public static AttributeTypes[] ValidAttributes
+        {
+            get
+            {
+                return attributes;
+            }
+        }
         public static String Name(AttributeTypes type)
         {
             if (type < 0 || type >= AttributeTypes.lastAttribute) return String.Empty;
@@ -18,10 +26,12 @@ namespace ROBINinspect
             {
                 Array enumArr = Enum.GetValues(typeof(AttributeTypes));
                 attributeNames = new String[enumArr.Length-2]; //-2:  not last and unknown.
+                attributes = new AttributeTypes[enumArr.Length - 2];
                 foreach (AttributeTypes eAttributeType in enumArr)
                 {
                     if (eAttributeType == AttributeTypes.lastAttribute) break;
                     attributeNames[(int)eAttributeType] = eAttributeType.ToString();
+                    attributes[(int)eAttributeType] = eAttributeType;
                 }
             }
             return attributeNames[(int)type];

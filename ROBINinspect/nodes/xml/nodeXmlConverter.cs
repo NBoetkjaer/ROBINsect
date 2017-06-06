@@ -36,6 +36,7 @@ namespace ROBINinspect
             xmlrd.Read();
             while (xmlrd.NodeType != XmlNodeType.EndElement)
             {
+                bool noEndElement = xmlrd.IsEmptyElement;
                 // We have a child.
                 child = parentNode.FindNodeInChildren(xmlrd.LocalName);
                 if (child == null)
@@ -55,15 +56,14 @@ namespace ROBINinspect
                 if (child == null) return;
 
                 UpdateNodeAttributes(xmlrd, child);
-               // xmlrd.Read();
-                if (xmlrd.NodeType == XmlNodeType.EndElement)
+                if (noEndElement)
                 {
-                    //xmlrd.Read();
-                    UpdateChilds(xmlrd, parentNode);
+                    xmlrd.Read(); // Read next element and continue.
                 }
                 else
                 {
                     UpdateChilds(xmlrd, child);
+                    xmlrd.Read(); // Read end element.
                 }
             }
         }
