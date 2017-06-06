@@ -1,7 +1,5 @@
 <root>
 	<Hardware>
-		<MinPWM type="uint16" flags="persist" value="165"/>
-		<MaxPWM type="uint16" flags="persist" value="580"/>	
 		<Servos>
 			<s0>
 				<Calibration type="node" flags="persist">
@@ -11,142 +9,62 @@
 					<MaxAngle type="float" flags="persist" value="90" unit="deg"/>
 				</Calibration>
 			</s0>
-			<1>
+			<s1>
 				<Calibration type="node" flags="persist">
 					<MinPWM type="uint16" flags="persist" value="165"/>
 					<MaxPWM type="uint16" flags="persist" value="580"/>
 					<MinAngle type="float" flags="persist" value="-90" unit="deg"/>
 					<MaxAngle type="float" flags="persist" value="90" unit="deg"/>
 				</Calibration>
-			</1>
-			<2>
+			</s1>
+			<s2>
 				<Calibration type="node" flags="persist">
 					<MinPWM type="uint16" flags="persist" value="165"/>
 					<MaxPWM type="uint16" flags="persist" value="580"/>
 					<MinAngle type="float" flags="persist" value="-90" unit="deg"/>
 					<MaxAngle type="float" flags="persist" value="90" unit="deg"/>
 				</Calibration>
-			</2>
-			<3>
+			</s2>
+			<s3>
 				<Calibration type="node" flags="persist">
 					<MinPWM type="uint16" flags="persist" value="165"/>
 					<MaxPWM type="uint16" flags="persist" value="580"/>
 					<MinAngle type="float" flags="persist" value="-90" unit="deg"/>
 					<MaxAngle type="float" flags="persist" value="90" unit="deg"/>
 				</Calibration>
-			</3>
-			<4>
+			</s3>
+			<s4>
 				<Calibration type="node" flags="persist">
 					<MinPWM type="uint16" flags="persist" value="165"/>
 					<MaxPWM type="uint16" flags="persist" value="580"/>
 					<MinAngle type="float" flags="persist" value="-90" unit="deg"/>
 					<MaxAngle type="float" flags="persist" value="90" unit="deg"/>
 				</Calibration>
-			</4>
-			<5>
+			</s4>
+			<s5>
 				<Calibration type="node" flags="persist">
 					<MinPWM type="uint16" flags="persist" value="165"/>
 					<MaxPWM type="uint16" flags="persist" value="580"/>
 					<MinAngle type="float" flags="persist" value="-90" unit="deg"/>
 					<MaxAngle type="float" flags="persist" value="90" unit="deg"/>
 				</Calibration>
-			</5>
-			<6>
+			</s5>
+			<s6>
 				<Calibration type="node" flags="persist">
 					<MinPWM type="uint16" flags="persist" value="165"/>
 					<MaxPWM type="uint16" flags="persist" value="580"/>
 					<MinAngle type="float" flags="persist" value="-90" unit="deg"/>
 					<MaxAngle type="float" flags="persist" value="90" unit="deg"/>
 				</Calibration>
-			</6>
-			<7>
+			</s6>
+			<s7>
 				<Calibration type="node" flags="persist">
 					<MinPWM type="uint16" flags="persist" value="165"/>
 					<MaxPWM type="uint16" flags="persist" value="580"/>
 					<MinAngle type="float" flags="persist" value="-90" unit="deg"/>
 					<MaxAngle type="float" flags="persist" value="90" unit="deg"/>
 				</Calibration>
-			</7>
-			<8>
-				<Calibration type="node" flags="persist">
-					<MinPWM type="uint16" flags="persist" value="165"/>
-					<MaxPWM type="uint16" flags="persist" value="580"/>
-					<MinAngle type="float" flags="persist" value="-90" unit="deg"/>
-					<MaxAngle type="float" flags="persist" value="90" unit="deg"/>
-				</Calibration>
-			</8>
-			<9>
-				<Calibration type="node" flags="persist">
-					<MinPWM type="uint16" flags="persist" value="165"/>
-					<MaxPWM type="uint16" flags="persist" value="580"/>
-					<MinAngle type="float" flags="persist" value="-90" unit="deg"/>
-					<MaxAngle type="float" flags="persist" value="90" unit="deg"/>
-				</Calibration>
-			</9>
-			<10>
-				<Calibration type="node" flags="persist">
-					<MinPWM type="uint16" flags="persist" value="165"/>
-					<MaxPWM type="uint16" flags="persist" value="580"/>
-					<MinAngle type="float" flags="persist" value="-90" unit="deg"/>
-					<MaxAngle type="float" flags="persist" value="90" unit="deg"/>
-				</Calibration>
-			</10>
-			<11>
-				<Calibration type="node" flags="persist">
-					<MinPWM type="uint16" flags="persist" value="165"/>
-					<MaxPWM type="uint16" flags="persist" value="580"/>
-					<MinAngle type="float" flags="persist" value="-90" unit="deg"/>
-					<MaxAngle type="float" flags="persist" value="90" unit="deg"/>
-				</Calibration>
-			</11>
-			<12>
-				<Calibration type="node" flags="persist">
-					<MinPWM type="uint16" flags="persist" value="165"/>
-					<MaxPWM type="uint16" flags="persist" value="580"/>
-					<MinAngle type="float" flags="persist" value="-90" unit="deg"/>
-					<MaxAngle type="float" flags="persist" value="90" unit="deg"/>
-				</Calibration>
-			</12>
-			<13>
-				<Calibration type="node" flags="persist">
-					<MinPWM type="uint16" flags="persist" value="165"/>
-					<MaxPWM type="uint16" flags="persist" value="580"/>
-					<MinAngle type="float" flags="persist" value="-90" unit="deg"/>
-					<MaxAngle type="float" flags="persist" value="90" unit="deg"/>
-				</Calibration>
-			</13>
-			<14>
-				<Calibration type="node" flags="persist">
-					<MinPWM type="uint16" flags="persist" value="165"/>
-					<MaxPWM type="uint16" flags="persist" value="580"/>
-					<MinAngle type="float" flags="persist" value="-90" unit="deg"/>
-					<MaxAngle type="float" flags="persist" value="90" unit="deg"/>
-				</Calibration>
-			</14>
-			<15>
-				<Calibration type="node" flags="persist">
-					<MinPWM type="uint16" flags="persist" value="165"/>
-					<MaxPWM type="uint16" flags="persist" value="580"/>
-					<MinAngle type="float" flags="persist" value="-90" unit="deg"/>
-					<MaxAngle type="float" flags="persist" value="90" unit="deg"/>
-				</Calibration>
-			</15>
-			<16>
-				<Calibration type="node" flags="persist">
-					<MinPWM type="uint16" flags="persist" value="165"/>
-					<MaxPWM type="uint16" flags="persist" value="580"/>
-					<MinAngle type="float" flags="persist" value="-90" unit="deg"/>
-					<MaxAngle type="float" flags="persist" value="90" unit="deg"/>
-				</Calibration>
-			</16>
-			<17>
-				<Calibration type="node" flags="persist">
-					<MinPWM type="uint16" flags="persist" value="165"/>
-					<MaxPWM type="uint16" flags="persist" value="580"/>
-					<MinAngle type="float" flags="persist" value="-90" unit="deg"/>
-					<MaxAngle type="float" flags="persist" value="90" unit="deg"/>
-				</Calibration>
-			</17>
+			</s7>
 		</Servos>
 	</Hardware>
 </root>

@@ -22,7 +22,7 @@ namespace ROBINinspect
             // settings.NameTable = xmlNt;
             settings.CheckCharacters = false;
             settings.IgnoreWhitespace = true;
-            XmlReader xmlrd = XmlReader.Create(new StringReader(strXml), settings);
+            XmlReader xmlrd = XmlTextReader.Create(new StringReader(strXml), settings);
             xmlrd.Read();
 
             UpdateChilds(xmlrd, root);
@@ -36,6 +36,7 @@ namespace ROBINinspect
             xmlrd.Read();
             while (xmlrd.NodeType != XmlNodeType.EndElement)
             {
+                bool noEndElement = xmlrd.IsEmptyElement;
                 // We have a child.
                 child = parentNode.FindNodeInChildren(xmlrd.LocalName);
                 if (child == null)
@@ -55,15 +56,14 @@ namespace ROBINinspect
                 if (child == null) return;
 
                 UpdateNodeAttributes(xmlrd, child);
-               // xmlrd.Read();
-                if (xmlrd.NodeType == XmlNodeType.EndElement)
+                if (noEndElement)
                 {
-                    //xmlrd.Read();
-                    UpdateChilds(xmlrd, parentNode);
+                    xmlrd.Read(); // This child has no childs itself - continue in while loop.
                 }
                 else
-                {
-                    UpdateChilds(xmlrd, child);
+                {                   
+                    UpdateChilds(xmlrd, child); // recursively update childs.
+                    xmlrd.Read(); // Read the end element.
                 }
             }
         }
