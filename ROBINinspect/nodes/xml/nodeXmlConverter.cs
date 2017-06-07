@@ -22,7 +22,7 @@ namespace ROBINinspect
             // settings.NameTable = xmlNt;
             settings.CheckCharacters = false;
             settings.IgnoreWhitespace = true;
-            XmlReader xmlrd = XmlTextReader.Create(new StringReader(strXml), settings);
+            XmlReader xmlrd = XmlReader.Create(new StringReader(strXml), settings);
             xmlrd.Read();
 
             UpdateChilds(xmlrd, root);

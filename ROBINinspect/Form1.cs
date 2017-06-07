@@ -66,9 +66,6 @@ namespace ROBINinspect
 
             Pos3D_32f_Node posNode = new Pos3D_32f_Node("Pos3D");
             posNode.SetAttribute(AttributeTypes.value, "[1.1, 2.2, 3.3]");
-
-
-
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -78,6 +75,50 @@ namespace ROBINinspect
             NodeXmlConverter xmlConv = new NodeXmlConverter();
             xmlConv.UpdateTreeFromXml(rootNode, xmlText);
 
+            treeView1.BeginUpdate();
+            TreeNode rootTreeNode = treeView1.Nodes.Add(rootNode.Name);
+            rootTreeNode.Tag = rootNode;
+            AddChildrenToNodeTree(rootNode, rootTreeNode);
+            treeView1.EndUpdate();
+        }
+
+        private void AddChildrenToNodeTree(BaseNode parentNode , TreeNode tnode)
+        {
+            foreach (BaseNode childNode in parentNode.Children)
+            {
+                TreeNode childTNode = tnode.Nodes.Add(childNode.Name);
+                childTNode.Tag = childNode;
+                if (childNode.Children.Count > 0)
+                {
+                    AddChildrenToNodeTree(childNode, childTNode);
+                }
+            }
+        }
+
+        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            dataGridView1.Rows.Clear();
+            dataGridView1.ColumnCount = 2;
+            if(treeView1.SelectedNode != null)
+            {
+                BaseNode node = treeView1.SelectedNode.Tag as BaseNode;
+                if (node == null) return;
+                string nodeType = NodeFactory.TypeAsString(NodeFactory.NodeType(node));
+                dataGridView1.Columns[0].HeaderText = "Attribute";
+                dataGridView1.Columns[0].ReadOnly = true;
+                dataGridView1.Columns[1].HeaderText = nodeType;
+                foreach (AttributeTypes attr in Attributes.ValidAttributes)
+                {
+                    if(node.IsAttributeUsed(attr))
+                    {
+                        string attribValue = String.Empty;
+                        if(node.GetAttribute(attr, ref attribValue))
+                        {
+                             dataGridView1.Rows.Add(attr, attribValue);
+                        }
+                    }
+                }
+            }
         }
     }
 }
