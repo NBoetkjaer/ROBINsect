@@ -70,11 +70,16 @@ namespace ROBINinspect
 
         private void button2_Click(object sender, EventArgs e)
         {
+            // Deserialize
             string xmlText = System.IO.File.ReadAllText(@"..\..\ROBINsect.xml");
             BaseNode rootNode = new BaseNode("root");
             NodeXmlConverter xmlConv = new NodeXmlConverter();
             xmlConv.UpdateTreeFromXml(rootNode, xmlText);
+            // Serialize
+            xmlText = String.Empty;
+            xmlConv.ConvertToXml(rootNode, ref xmlText);
 
+            // Visualize
             treeView1.BeginUpdate();
             TreeNode rootTreeNode = treeView1.Nodes.Add(rootNode.Name);
             rootTreeNode.Tag = rootNode;

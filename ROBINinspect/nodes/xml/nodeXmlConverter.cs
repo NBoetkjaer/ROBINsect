@@ -10,9 +10,58 @@ namespace ROBINinspect
 {
     public class NodeXmlConverter
     {
-        void ConvertToXml(BaseNode root, ref String strXml, FlagType flagMask = FlagType.none, bool onlyChanges = false)
+        public void ConvertToXml(BaseNode root, ref String strXml, FlagType flagMask = FlagType.none, bool onlyChanges = false)
         {
-            throw new NotImplementedException();
+            StringWriter strWriter = new StringWriter();
+            XmlWriter xmlwr = new XmlTextWriter(strWriter);
+
+            xmlwr.WriteStartElement(root.Name);
+            AddChilds(xmlwr, root, flagMask, onlyChanges);
+            xmlwr.WriteEndElement();
+            xmlwr.Close();
+            strXml = strWriter.ToString();
+        }
+
+        void AddChilds(XmlWriter xmlwr, BaseNode parentNode, FlagType flagMask, bool onlyChanges)
+        {
+            foreach(BaseNode child in parentNode.Children)
+            {
+                if (onlyChanges && !child.AnyChanges())
+                {
+                    continue;
+                }
+                xmlwr.WriteStartElement(child.Name);
+                AddNodeAttributes(xmlwr, child, onlyChanges);
+                if(child.Children.Count > 0)
+                {
+                    AddChilds(xmlwr, child, flagMask, onlyChanges);
+                }
+                xmlwr.WriteEndElement();
+            }
+        }
+
+        void AddNodeAttributes(XmlWriter xmlwr, BaseNode node, bool onlyChanges)
+        {
+            if (!onlyChanges)
+            {
+                // Add type attribute.
+                xmlwr.WriteAttributeString(Attributes.Name(AttributeTypes.type), NodeFactory.TypeAsString(NodeFactory.NodeType(node)));
+            }
+            foreach (AttributeTypes attr in Attributes.ValidAttributes)
+            {
+                if(node.IsAttributeUsed(attr))
+                {
+                    if(onlyChanges && !node.IsAttributeChanged(attr))
+                    {
+                        continue;
+                    }
+                    String attrValue = String.Empty;
+                    if(node.GetAttribute(attr, ref attrValue))
+                    {
+                        xmlwr.WriteAttributeString(Attributes.Name(attr), attrValue);
+                    }
+                }
+            }
         }
 
         public void UpdateTreeFromXml(BaseNode root, String strXml)
@@ -27,7 +76,6 @@ namespace ROBINinspect
 
             UpdateChilds(xmlrd, root);
         }
-
 
         void UpdateChilds(XmlReader xmlrd, BaseNode parentNode)
         {

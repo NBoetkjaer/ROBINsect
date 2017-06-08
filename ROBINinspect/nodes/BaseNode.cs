@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -20,6 +21,24 @@ namespace ROBINinspect
         {
             get { return children.AsReadOnly(); }
         }
+
+        public IEnumerable<BaseNode> ChildrenIterator()
+        {
+            int numChilds = children.Count;
+            foreach(BaseNode ownChild in children)
+            { 
+                yield return ownChild;
+            }
+            if (this.GetType() == typeof(MirrorNode))
+            {
+                
+                foreach (BaseNode mirrorChild in (this as MirrorNode).MirrorSource.children)
+                { 
+                    yield return mirrorChild; 
+                }
+            }
+        }
+
 
         protected BaseNode parentNode;
         public BaseNode ParentNode
@@ -209,12 +228,15 @@ namespace ROBINinspect
         }
         #endregion
 
-        bool AnyChanges()  { return recentChanges != 0; }
-        bool AnyRecentChanges()  { return (recentChanges & 1) == 1; }
-        int RecentChangeCount() { return (int)((recentChanges >> 2) + (recentChanges & 1)); }
+        public bool AnyChanges()  { return recentChanges != 0; }
+        public bool AnyRecentChanges() { return (recentChanges & 1) == 1; }
+        public int RecentChangeCount() { return (int)((recentChanges >> 2) + (recentChanges & 1)); }
 
         public void AddChild(BaseNode childNode)
         {
+            if (Children.Contains(childNode)) return; // No duplicates allowed.
+            // ToDo: Validate node name (must be unique and no special characters which are not allowed in an XML tag name)
+            // Problem regarding mirrors: it's impossible to ensure a unique node name before mirros are linked.
             children.Add(childNode);
             childNode.parentNode = this;
             SetNodeChanged();
@@ -222,8 +244,8 @@ namespace ROBINinspect
 
         public BaseNode FindNodeInChildren(String nodeName)
         {
-            if (children == null) return null;
-            foreach (BaseNode node in children)
+            //if (children == null) return null;
+            foreach (BaseNode node in ChildrenIterator())
             {
                 if (node.name.Equals(nodeName)) return node;
             }
@@ -318,5 +340,41 @@ namespace ROBINinspect
             }
             return null;
         }
+
+        #region Mirrors
+        List<MirrorNode> mirrors = new List<MirrorNode>();
+        public void AddMirror(MirrorNode mirror)
+        {
+            // Check if the mirror is already in the list.
+            if (mirrors.Contains(mirror))
+                return;
+            // Add mirror to list of mirrors.
+            mirrors.Add(mirror);
+        }
+
+        public void RemoveMirror(MirrorNode mirror)
+        {
+            mirrors.Remove(mirror);
+        }
+
+        private bool LinkAllMirrors()
+        {
+            bool success = true;
+            MirrorNode mirror = this as MirrorNode;
+            if (mirror != null) // Check if this node is a mirror.
+            {
+                success &= mirror.LinkMirror();
+            }
+            // Recursively try to link any mirrors.
+            foreach(BaseNode child in children)
+            {
+                success &= child.LinkAllMirrors();
+            }
+            return success;
+        }
+
+
+        #endregion
+
     }
 }
