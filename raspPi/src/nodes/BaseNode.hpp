@@ -112,6 +112,15 @@ public:
 
 private:
     BaseNode* FindNodeInternal(const char * pNodePath, bool allowPartialMatch, bool resolveMirrors);
+    BaseNode* FindChild(const char * pNodeName)
+    {   // Search in children
+        for (const auto &child : children)
+        {
+            if (child->name.compare(pNodeName) == 0) return child.get();
+        }
+        return nullptr;
+    }
+
 public:
     template<typename TNode = BaseNode>
     TNode* FindNode(const std::string& nodePath, bool allowPartialMatch = false, bool resolveMirrors = true)
@@ -123,15 +132,6 @@ public:
     TNode* FindNode(const char * pNodePath, bool allowPartialMatch = false, bool resolveMirrors = true)
     {
         return dynamic_cast<TNode*>(FindNodeInternal(pNodePath, allowPartialMatch, resolveMirrors));
-    }
-
-    BaseNode* FindChild(const char * pNodeName)
-    {   // Search in children
-        for (const auto &child : children)
-        {
-            if (child->name.compare(pNodeName) == 0) return child.get();
-        }
-        return nullptr;
     }
 
     template<typename TNode = BaseNode>

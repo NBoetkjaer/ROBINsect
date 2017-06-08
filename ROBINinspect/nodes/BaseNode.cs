@@ -22,22 +22,26 @@ namespace ROBINinspect
             get { return children.AsReadOnly(); }
         }
 
-        public IEnumerable<BaseNode> ChildrenIterator()
-        {
-            int numChilds = children.Count;
-            foreach(BaseNode ownChild in children)
-            { 
-                yield return ownChild;
-            }
-            if (this.GetType() == typeof(MirrorNode))
-            {
-                
-                foreach (BaseNode mirrorChild in (this as MirrorNode).MirrorSource.children)
-                { 
-                    yield return mirrorChild; 
-                }
-            }
-        }
+        // A Test that would allow mirrors to define its own childs ... but it seems like a bad idea :-)
+        //public IEnumerable<BaseNode> ChildrenIterator()
+        //{
+        //    int numChilds = children.Count;
+        //    foreach(BaseNode ownChild in children)
+        //    { 
+        //        yield return ownChild;
+        //    }
+        //    if (this.GetType() == typeof(MirrorNode))
+        //    {
+        //        MirrorNode mirror = this as MirrorNode;
+        //        if (mirror.IsLinked())
+        //        {
+        //            foreach (BaseNode mirrorChild in (this as MirrorNode).MirrorSource.children)
+        //            {
+        //                yield return mirrorChild;
+        //            }
+        //        }
+        //    }
+        //}
 
 
         protected BaseNode parentNode;
@@ -220,10 +224,10 @@ namespace ROBINinspect
                 {
                     parentNode.SetNodeChanged(); // Proceed to set parent as changed.
                 }
-                //for (auto mirror: mirrors)
-                //{
-                //    mirror->SetNodeChanged(); // Mark all the mirrors (if any) as changed.
-                //}
+                foreach(MirrorNode mirror in mirrors)
+                {
+                    mirror.SetNodeChanged(); // Mark all the mirrors (if any) as changed.
+                }
             }
         }
         #endregion
@@ -245,7 +249,7 @@ namespace ROBINinspect
         public BaseNode FindNodeInChildren(String nodeName)
         {
             //if (children == null) return null;
-            foreach (BaseNode node in ChildrenIterator())
+            foreach (BaseNode node in Children)
             {
                 if (node.name.Equals(nodeName)) return node;
             }
@@ -357,7 +361,7 @@ namespace ROBINinspect
             mirrors.Remove(mirror);
         }
 
-        private bool LinkAllMirrors()
+        public bool LinkAllMirrors()
         {
             bool success = true;
             MirrorNode mirror = this as MirrorNode;

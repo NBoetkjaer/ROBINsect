@@ -1,7 +1,8 @@
 <root>
 	<Hardware>
 		<Servos>
-			<s0>
+			<servo1 type="mirror" path="../s1/Calibration"/>	
+			<s0>				
 				<Calibration type="node" flags="persist">
 					<MinPWM type="uint16" flags="persist" value="165"/>
 					<MaxPWM type="uint16" flags="persist" value="580"/>

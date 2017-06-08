@@ -32,5 +32,5 @@ private:
     std::array<FloatNode*, numJoints> pNodeLinkDistance;
 
     LegKinematic kinematic;
-    Eigen::Affine3f toLegT;
+    //Eigen::Affine3f toLegT;
 };

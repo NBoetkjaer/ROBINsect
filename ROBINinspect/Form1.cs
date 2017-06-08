@@ -75,6 +75,9 @@ namespace ROBINinspect
             BaseNode rootNode = new BaseNode("root");
             NodeXmlConverter xmlConv = new NodeXmlConverter();
             xmlConv.UpdateTreeFromXml(rootNode, xmlText);
+
+            if (!rootNode.LinkAllMirrors())
+            { MessageBox.Show("Link mirrors failed!"); }
             // Serialize
             xmlText = String.Empty;
             xmlConv.ConvertToXml(rootNode, ref xmlText);
@@ -92,10 +95,19 @@ namespace ROBINinspect
             foreach (BaseNode childNode in parentNode.Children)
             {
                 TreeNode childTNode = tnode.Nodes.Add(childNode.Name);
-                childTNode.Tag = childNode;
-                if (childNode.Children.Count > 0)
+                BaseNode child = childNode;
+                if (childNode is MirrorNode)
                 {
-                    AddChildrenToNodeTree(childNode, childTNode);
+                    MirrorNode mirror = childNode as MirrorNode;
+                    if (mirror.IsLinked())
+                    {
+                        child = mirror.MirrorSource;
+                    }
+                }
+                childTNode.Tag = child;
+                if (child.Children.Count > 0)
+                {
+                        AddChildrenToNodeTree(child, childTNode);
                 }
             }
         }
