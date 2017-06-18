@@ -27,7 +27,6 @@ public:
 private:
     enum class  State {Initialize, Listning, Connected};
     State state;
-    Socket sockDiscover;
     Socket sockListen;
     Socket sockAccept;
 

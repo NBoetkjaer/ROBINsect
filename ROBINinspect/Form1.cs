@@ -28,7 +28,7 @@ namespace ROBINinspect
             rootNode.AddChild(sibling1);
             rootNode.AddChild(sibling2);
             rootNode.AddChild(sibling3);
-            BaseNode grandChild = new BaseNode("grandChild1");            
+            BaseNode grandChild = new BaseNode("grandChild1");
             child.AddChild(grandChild);
             BaseNode grandGrandChild = new BaseNode("grandGrandChild ");
             grandChild.AddChild(grandGrandChild);
@@ -136,6 +136,15 @@ namespace ROBINinspect
                     }
                 }
             }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            DataGridViewSelectedRowCollection rows = dataGridView1.SelectedRows;
+            if (rows.Count != 1) return;
+            AttributeTypes attr = (AttributeTypes)rows[0].Cells[0].Value;
+            //rows[0].Cells[1].Value;
+
         }
     }
 }

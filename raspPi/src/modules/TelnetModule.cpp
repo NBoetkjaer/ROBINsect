@@ -18,7 +18,8 @@ TelnetModule::~TelnetModule()
 void TelnetModule::CreateNodes(BaseNode& rootNode)
 {
     pCurrentNode = &rootNode;
-    BaseNode* pNode = rootNode.FindOrCreateChild<BaseNode>("TelnetSocket");
+    BaseNode* pNode = rootNode.FindOrCreateChild<BaseNode>("Network");
+    pNode = pNode->FindOrCreateChild<BaseNode>("TelnetSocket");
     pRcvNode = pNode->FindOrCreateChild<Int64Node>("BytesRecived");
     pSentNode = pNode->FindOrCreateChild<Int64Node>("BytesSent");
     pConnectedNode = pNode->FindOrCreateChild<BoolNode>("Connected");
@@ -61,7 +62,6 @@ void TelnetModule::Execute()
     switch (state)
     {
     case State::Initialize:
-        std::cout << "Discover Bind " << sockDiscover.Bind(1974, SocketType::UDP) << endl;
         std::cout << "Listen Bind " << sockListen.Bind(1973, SocketType::TCP) << endl;
         std::cout << "Listen " << sockListen.Listen() << endl;
         state = State::Listning;
@@ -89,7 +89,6 @@ void TelnetModule::Execute()
                 // Remote end is shutdown
                 std::cout << "Remote end disconnected - Shutdown (sockAccept) " << sockAccept.Shutdown() << endl;
                 std::cout << "Close socket" << sockAccept.Close() << endl;
-                sockDiscover.Close();
                 state = State::Initialize;
                 return;
             }
@@ -108,11 +107,6 @@ void TelnetModule::Execute()
         }
         pSentNode->Set(sockAccept.GetBytesSent());
         break;
-    }
-
-    if(sockDiscover.IsReadPending(0))
-    {   // Send reply to the broadcast.
-    
     }
 }
 

@@ -39,6 +39,9 @@ public:
     int Recieve(char *pData, size_t *pDataLen);
     int Send(const char *pData, size_t *pDataLen);
 
+    int RecieveFrom(char *pData, size_t *pDataLen, SOCKADDR_IN& src_addr);
+    int SendTo(const char *pData, size_t *pDataLen, const SOCKADDR_IN& src_addr);
+
     bool IsReadPending(uint32_t timeout_us) const;
     bool IsWritePending(uint32_t timeout_us) const;
 

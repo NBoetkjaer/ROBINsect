@@ -31,10 +31,19 @@ namespace ROBINinspect
                     continue;
                 }
                 xmlwr.WriteStartElement(child.Name);
-                AddNodeAttributes(xmlwr, child, onlyChanges);
-                if(child.Children.Count > 0)
+                BaseNode childNode = child;
+                if (resolveMirrors && (child.GetType() == typeof(MirrorNode)))
                 {
-                    AddChilds(xmlwr, child, flagMask, onlyChanges);
+                    MirrorNode mirror = (child as MirrorNode);
+                    if (mirror.IsLinked())
+                    {
+                        childNode = mirror.MirrorSource;
+                    }
+                }
+                AddNodeAttributes(xmlwr, childNode, onlyChanges);
+                if (childNode.Children.Count > 0)
+                {
+                    AddChilds(xmlwr, childNode, flagMask, onlyChanges);
                 }
                 xmlwr.WriteEndElement();
             }
@@ -77,6 +86,8 @@ namespace ROBINinspect
             UpdateChilds(xmlrd, root);
         }
 
+        bool resolveMirrors = true;
+
         void UpdateChilds(XmlReader xmlrd, BaseNode parentNode)
         {
             //            if (xmlrd == null || parentNode == null) return;
@@ -86,7 +97,7 @@ namespace ROBINinspect
             {
                 bool noEndElement = xmlrd.IsEmptyElement;
                 // We have a child.
-                child = parentNode.FindNodeInChildren(xmlrd.LocalName);
+                child = parentNode.FindNode(xmlrd.LocalName, false, resolveMirrors);
                 if (child == null)
                 {   // Child name not found in node tree. Create a new node.
                     // Look for type attribute
@@ -100,6 +111,14 @@ namespace ROBINinspect
                         child = new BaseNode(nodeName);
                     }
                     if (child != null) parentNode.AddChild(child);
+                    // Just an idea to accept new mirror nodes to be created dynamically.
+                    //if(resolveMirrors && child is MirrorNode)
+                    //{
+                    //    if(!(child as MirrorNode).LinkMirror())
+                    //    {
+                    //        // Error - unable to link new mirror node.
+                    //    }
+                    //}
                 }
                 if (child == null) return;
 
@@ -109,7 +128,7 @@ namespace ROBINinspect
                     xmlrd.Read(); // This child has no childs itself - continue in while loop.
                 }
                 else
-                {                   
+                {
                     UpdateChilds(xmlrd, child); // recursively update childs.
                     xmlrd.Read(); // Read the end element.
                 }

@@ -5,6 +5,7 @@
 #include <chrono>
 #include <thread>
 #include "modules/TelnetModule.hpp"
+#include "modules/DiscoveryModule.hpp"
 #include "modules/InsectModule.hpp"
 #include "modules/ServoModule.hpp"
 #include "modules/ControllerModule.hpp"
@@ -63,6 +64,7 @@ void Application::SaveConfig()
 
 void Application::RunLoop()
 {
+    modules.push_back(std::make_unique<DiscoveryModule>());
     modules.push_back(std::make_unique<TelnetModule>());
     modules.push_back(std::make_unique<InsectModule>());
     modules.push_back(std::make_unique<ServoModule>());

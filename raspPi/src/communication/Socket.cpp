@@ -165,6 +165,35 @@ int Socket::Send(const char *pData, size_t *pDataLen)
     return 0;
 }
 
+int Socket::RecieveFrom(char *pData, size_t *pDataLen, SOCKADDR_IN& src_addr)
+{
+    int iBytesRecieved;
+    int iAddrLen = sizeof(SOCKADDR_IN);
+    iBytesRecieved = recvfrom(socketID, pData, *pDataLen, 0, (SOCKADDR *) &src_addr, &iAddrLen);
+    // assert(iAddrLen <= sizeof(SOCKADDR_IN));
+    if (iBytesRecieved < 0)
+    {
+        return SocketError();
+    }
+    *pDataLen = iBytesRecieved;
+    bytesRecieved += iBytesRecieved;
+
+    return 0;
+}
+
+int Socket::SendTo(const char *pData, size_t *pDataLen, const SOCKADDR_IN& src_addr)
+{
+    int iBytesSent;
+    iBytesSent = sendto(socketID, pData, *pDataLen, 0,(SOCKADDR *) &src_addr, sizeof(SOCKADDR_IN));
+    if (iBytesSent < 0)
+    {
+        return SocketError();
+    }
+    *pDataLen = iBytesSent;
+    bytesSent += iBytesSent;
+    return 0;
+}
+
 bool Socket::IsReadPending(uint32_t timeout_us) const
 {
     fd_set rRead;
