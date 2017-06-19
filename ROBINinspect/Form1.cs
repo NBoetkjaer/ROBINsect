@@ -146,5 +146,11 @@ namespace ROBINinspect
             //rows[0].Cells[1].Value;
 
         }
+
+        private void btnDiscover_Click(object sender, EventArgs e)
+        {
+            frmDiscovery discoverForm = new frmDiscovery();
+            discoverForm.Show(this);
+        }
     }
 }

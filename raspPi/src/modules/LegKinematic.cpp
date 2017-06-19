@@ -4,12 +4,21 @@
 using namespace std;
 using namespace Eigen;
 
-LegKinematic::LegKinematic() :
+LegKinematic::LegKinematic() 
+#if _MSC_VER > 1800 
+    :
     m_jd{ 0 },
     m_ja{ 0 },
     m_ld{ 0.090f, 0.125f, 0.150f },
     m_la{ DEG2RAD(90.0f), 0.0f, 0.0f }
 {
+#else
+{
+    m_jd[0] = m_jd[1] = m_jd[2] = 0.0f;
+    m_ja[0] = m_ja[1] = m_ja[2] = 0.0f;
+    m_ld[0] = 0.090f; m_ld[1] = 0.125f; m_ld[2] = 0.150f;
+    m_la[0] = DEG2RAD(90.0f); m_la[1] = 0.0f; m_la[2] = 0.0f;
+#endif
 }
 
 LegKinematic::~LegKinematic()

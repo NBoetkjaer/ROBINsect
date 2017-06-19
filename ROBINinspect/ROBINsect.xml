@@ -3,7 +3,7 @@
 		<Servos>
 			<servo1 type="mirror" path="../s1/Calibration"/>	
 			<s0>				
-				<Calibration type="node" flags="persist">
+				<Calibration type="node" flags="persist|readonly">
 					<MinPWM type="uint16" flags="persist" value="165" range="[0,1000]"/>
 					<MaxPWM type="uint16" flags="persist" value="580" range="[0,1000]"/>
 					<MinAngle type="float" flags="persist" value="-90" unit="deg" range="[0,1000]"/>

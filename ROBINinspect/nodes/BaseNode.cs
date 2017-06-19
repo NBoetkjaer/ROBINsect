@@ -103,7 +103,7 @@ namespace ROBINinspect
                 }
                 foreach (FlagType flag in Enum.GetValues(typeof(FlagType)))
                 {
-                    if (tmp.Equals(flag.ToString()))
+                    if (tmp.Equals(Flag.Name(flag)))
                     {
                         SetFlag(flag, !removeFlag);
                     }
@@ -145,7 +145,7 @@ namespace ROBINinspect
                     {
                         strFlags += "|";
                     }
-                    strFlags += flag.ToString();
+                    strFlags += Flag.Name(flag);
                 }
             }
         }
