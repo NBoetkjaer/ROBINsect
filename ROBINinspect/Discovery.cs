@@ -109,12 +109,12 @@ namespace ROBINinspect
 
         private void BroadcastOnAllInterfaces(byte[] msg, Socket socketBroadcast, Int32 port)
         {
-
+#if false // Test through localhost
             byte[] addr = { 127, 0, 0, 1 };
             IPAddress broadcastAddress = new IPAddress(addr);
             IPEndPoint remoteEP = new IPEndPoint(broadcastAddress, port);
             socketBroadcast.SendTo(msg, remoteEP);
-/*
+#else
             IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName());
             
             foreach (IPAddress ip in host.AddressList)
@@ -124,7 +124,7 @@ namespace ROBINinspect
                 IPEndPoint remoteEP = new IPEndPoint(broadcastAddress, port);
                 socketBroadcast.SendTo(msg, remoteEP);
             }
- */
+#endif
         } 
 
         private IPAddress GetBroadcastAddress(IPAddress address)

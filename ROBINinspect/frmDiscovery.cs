@@ -56,8 +56,8 @@ namespace ROBINinspect
             Button btn = (sender as Button);
             if (btn != null)
             {
-                //Monitor monitorFrm = new Monitor(btn.Tag as DiscoveryInfo);
-                //monitorFrm.Show();
+                frmMonitor monitorFrm = new frmMonitor(btn.Tag as DiscoveryInfo);
+                monitorFrm.Show();
             }
         }
     }

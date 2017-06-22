@@ -87,6 +87,17 @@ namespace ROBINinspect
         }
 
         bool resolveMirrors = true;
+        public bool ResolveMirrors
+        {
+            get
+            {
+                return resolveMirrors;
+            }
+            set
+            {
+                resolveMirrors = value;
+            }
+        }
 
         void UpdateChilds(XmlReader xmlrd, BaseNode parentNode)
         {

@@ -4,15 +4,13 @@
 
 using namespace std;
 
-TelnetModule::TelnetModule():
-    state(State::Initialize)
+TelnetModule::TelnetModule()
 {
     SetTimeout(200);
 }
 
 TelnetModule::~TelnetModule()
 {
-
 }
 
 void TelnetModule::CreateNodes(BaseNode& rootNode)
@@ -20,10 +18,7 @@ void TelnetModule::CreateNodes(BaseNode& rootNode)
     pCurrentNode = &rootNode;
     BaseNode* pNode = rootNode.FindOrCreateChild<BaseNode>("Network");
     pNode = pNode->FindOrCreateChild<BaseNode>("TelnetSocket");
-    pRcvNode = pNode->FindOrCreateChild<Int64Node>("BytesRecived");
-    pSentNode = pNode->FindOrCreateChild<Int64Node>("BytesSent");
-    pConnectedNode = pNode->FindOrCreateChild<BoolNode>("Connected");
-
+    TcpSocketModule::CreateNodes(*pNode, 1973);
     rootNode.Subscribe(this);
 }
 
@@ -57,62 +52,25 @@ void TelnetModule::Publish()
     }
 }
 
-void TelnetModule::Execute()
+void TelnetModule::DataReceived(const char* pData, size_t dataLen)
 {
-    switch (state)
+    // remove trailing whitespaces.
+    while (dataLen > 0 && isspace((unsigned char)buffer.at(dataLen - 1)))
     {
-    case State::Initialize:
-        std::cout << "Listen Bind " << sockListen.Bind(1973, SocketType::TCP) << endl;
-        std::cout << "Listen " << sockListen.Listen() << endl;
-        state = State::Listning;
-        pConnectedNode->Set(false);
-        return;
-    case State::Listning:
-        if(sockListen.IsReadPending(0))
-        {
-            std::cout << "Accept " << sockAccept.Accept(sockListen) << endl;
-            std::cout << "Shutdown (listen) " << sockListen.Shutdown() << endl;
-            std::cout << "Close (listen)" << sockListen.Close() << endl;
-            state = State::Connected;
-            sockAccept.SetBlocking(false);
-            pConnectedNode->Set(true);
-        }
-        break;
-    case State::Connected:
-        if(sockAccept.IsReadPending(0))
-        {
-            size_t dataLen = buffer.size() - 1;
-            int retVal = sockAccept.Recieve(buffer.data(), &dataLen);
-            std::cout << "Recieve " << retVal << ": " << "Total bytes : " << sockAccept.GetBytesRecieved() << std::endl;
-            if(dataLen == 0 || retVal != 0)
-            {
-                // Remote end is shutdown
-                std::cout << "Remote end disconnected - Shutdown (sockAccept) " << sockAccept.Shutdown() << endl;
-                std::cout << "Close socket" << sockAccept.Close() << endl;
-                state = State::Initialize;
-                return;
-            }
-            // remove trailing whitespaces.
-            while (dataLen > 0 && isspace((unsigned char)buffer.at(dataLen - 1)))
-            {
-                dataLen--;
-            }
-            buffer.at(dataLen) = 0; // Terminate the string.
-
-            ProcessCmd(buffer.data());
-            updateOutput = true;
-            clearConsole = true;
-            std::cout << buffer.data() << endl;
-            pRcvNode->Set(sockAccept.GetBytesRecieved());
-        }
-        pSentNode->Set(sockAccept.GetBytesSent());
-        break;
+        dataLen--;
     }
+    buffer.at(dataLen) = 0; // Terminate the string.
+
+    ProcessCmd(buffer.data(), dataLen);
+    updateOutput = true;
+    clearConsole = true;
+    std::cout << buffer.data() << endl;
 }
 
-void TelnetModule::ProcessCmd(const char* pCmd)
+void TelnetModule::ProcessCmd(const char* pCmd, size_t dataLen)
 {    
     const char* pChar = pCmd;
+    const char* pEndChar = pCmd + dataLen; // One past the last character.
     // Command syntax:
     // NodePath [AttributeName] [=value] 
     // Set node value:
@@ -126,7 +84,7 @@ void TelnetModule::ProcessCmd(const char* pCmd)
     BaseNode* pCmdNode = nullptr;
     attribID_t attrId = INVALID_ATTRIBUTE_ID;
     // Skip leading white spaces.
-    while (*pChar != 0 && isspace((unsigned char)*pChar))
+    while (pChar != pEndChar && isspace((unsigned char)*pChar))
     {
         ++pChar;
     }
@@ -134,10 +92,10 @@ void TelnetModule::ProcessCmd(const char* pCmd)
     const char* pStartAttributeName = nullptr;
     bool assignment = false;
     // Read entire NodePath and attribute name if present.
-    while (*pChar != 0)
+    while (pChar != pEndChar)
     {
         ++pChar;
-        if (*pChar == 0 || isspace((unsigned char)(*pChar)) || *pChar == '=')
+        if (pChar == pEndChar || isspace((unsigned char)(*pChar)) || *pChar == '=')
         {
             if (pCmdNode == nullptr)
             {
@@ -152,7 +110,7 @@ void TelnetModule::ProcessCmd(const char* pCmd)
                 if (attrId == INVALID_ATTRIBUTE_ID) return; // Unknown attribte. (ToDo should we create ??)
             }
             // Skip leading white spaces.
-            while (*pChar != 0 && isspace((unsigned char)*pChar))
+            while (pChar != pEndChar && isspace((unsigned char)*pChar))
             {
                 ++pChar;
             }
