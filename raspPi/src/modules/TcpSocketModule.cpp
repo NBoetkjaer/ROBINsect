@@ -45,7 +45,7 @@ void TcpSocketModule::Execute()
     case State::Connected:
         if(sockAccept.IsReadPending(0))
         {
-            size_t dataLen = buffer.size() - 1;
+            size_t dataLen = buffer.size();
             int retVal = sockAccept.Recieve(buffer.data(), &dataLen);
             std::cout << "Recieve " << retVal << ": " << "Total bytes : " << sockAccept.GetBytesRecieved() << std::endl;
             if(dataLen == 0 || retVal != 0)
