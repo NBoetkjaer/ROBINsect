@@ -40,8 +40,20 @@ void NodeXmlConverter::AddNodeAttributes(xml_node<> *pXmlNode, const BaseNode* p
 
 xml_node<> *NodeXmlConverter::AddChilds(const BaseNode* pParentNode, FlagType flagMask, bool onlyChanges)
 {
-    const auto &children = pParentNode->GetChilds();
     xml_node<> *pXmlParent = nullptr;
+    const BaseNode* pActualParent = pParentNode;
+
+    if (resolveMirrors && (typeid(*pParentNode) == typeid(MirrorNode)))
+    {
+        const MirrorNode * pMirror = dynamic_cast<const MirrorNode*> (pParentNode);
+        if (pMirror == nullptr || !pMirror->IsLinked())
+        {
+            // ToDo: Handle error. Tried to resolve an unlinked mirror.
+            return nullptr;
+        }
+        pActualParent = pMirror->GetMirrorSource();
+    }
+    const auto &children = pActualParent->GetChilds();
     for (const auto & childNode : children)
     {
         if (onlyChanges && !childNode->AnyChanges())
@@ -59,7 +71,7 @@ xml_node<> *NodeXmlConverter::AddChilds(const BaseNode* pParentNode, FlagType fl
                     || flagMask == FlagType::none) // If mask is FlagType::none it means 'don't use mask'.
                 {
                     // Append all attributes.
-                    AddNodeAttributes(pXmlParent, pParentNode, onlyChanges);
+                    AddNodeAttributes(pXmlParent, pActualParent, onlyChanges);
                 }
             }
             // Append child node.
@@ -75,7 +87,7 @@ xml_node<> *NodeXmlConverter::AddChilds(const BaseNode* pParentNode, FlagType fl
             {   // Create the childs parent node.
                 pXmlParent = doc.allocate_node(node_element, pParentNode->GetName().c_str());
                 // Append all attributes.
-                AddNodeAttributes(pXmlParent, pParentNode, onlyChanges);
+                AddNodeAttributes(pXmlParent, pActualParent, onlyChanges);
             }
         }
     }
@@ -134,7 +146,7 @@ void NodeXmlConverter::UpdateChilds(const rapidxml::xml_node<> *pXmlParentNode, 
     while (pXmlChildNode)
     {
         // Check if current xml node exist in node tree.
-        BaseNode* pChildNode = pParentNode->FindNode(pXmlChildNode->name(), false, false);
+        BaseNode* pChildNode = pParentNode->FindNode(pXmlChildNode->name(), false, resolveMirrors);
         if (!pChildNode) // Node not found 
         {   // create new node
             // Find node type attribute.

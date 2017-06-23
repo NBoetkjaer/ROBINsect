@@ -11,7 +11,10 @@ public:
     ~NodeXmlConverter() {}
     void ConvertToXml(const BaseNode* pRoot, std::string& xml, FlagType flagMask = FlagType::none, bool onlyChanges = false);
     void UpdateTreeFromXml(BaseNode* pRoot, std::string& xml);
+    bool GetResolveMirrors(){ return resolveMirrors; }
+    void SetResolveMirrors(bool value){ resolveMirrors = value;}
 private:
+    bool resolveMirrors = false;
     rapidxml::xml_document<> doc;
     void AddNodeAttributes(rapidxml::xml_node<> *pXmlNode, const BaseNode* pNode, bool onlyChanges);
     rapidxml::xml_node<> *AddChilds(const BaseNode* pParentNode, FlagType flagMask, bool onlyChanges);
