@@ -44,10 +44,7 @@ void TelnetModule::Publish()
 {
     if (consoleOutput.size() > 0)
     {
-        // ToDo - Check dataLen and send remaining data.
-        size_t dataLen = consoleOutput.size();
-        int retVal = sockAccept.Send(consoleOutput.data(), &dataLen);
-        std::cout << "Send " << retVal << ": " << "Total bytes:" << sockAccept.GetBytesSent() << std::endl;
+        SendData(consoleOutput.data(), consoleOutput.size());
         consoleOutput.clear();
     }
 }
@@ -55,16 +52,13 @@ void TelnetModule::Publish()
 void TelnetModule::DataReceived(const char* pData, size_t dataLen)
 {
     // remove trailing whitespaces.
-    while (dataLen > 0 && isspace((unsigned char)buffer.at(dataLen - 1)))
+    while (dataLen > 0 && isspace((unsigned char)pData[dataLen - 1]))
     {
         dataLen--;
     }
-    buffer.at(dataLen) = 0; // Terminate the string.
-
-    ProcessCmd(buffer.data(), dataLen);
+    ProcessCmd(pData, dataLen);
     updateOutput = true;
     clearConsole = true;
-    std::cout << buffer.data() << endl;
 }
 
 void TelnetModule::ProcessCmd(const char* pCmd, size_t dataLen)

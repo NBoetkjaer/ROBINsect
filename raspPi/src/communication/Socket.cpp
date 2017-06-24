@@ -34,7 +34,8 @@ int Socket::SetBlocking(bool blocking)
     if(blocking){
         retVal = fcntl(socketID, F_SETFL, 0);
     }
-    else{
+    else
+    {
         retVal = fcntl(socketID, F_SETFL, O_NONBLOCK);
     }
 #endif
@@ -120,16 +121,25 @@ int Socket::Accept(const Socket &listningSocket)
 
     socklen_t addrlen = sizeof(SOCKADDR);
     newSockID = accept(listningSocket.socketID, &addr, &addrlen);
-    if (VALID_SOCKET(newSockID))
-    {
-        socketID = newSockID;
-        connected = true;
-        socketType = SocketType::TCP;
-    }
-    else
+    if (!VALID_SOCKET(newSockID))
     {
         return SocketError();
     }
+    socketID = newSockID;
+    connected = true;
+    socketType = SocketType::TCP;
+    return 0;
+}
+
+int Socket::GetPort(uint16_t *portNo)
+{
+    SOCKADDR_IN socketAddr;
+    socklen_t addrlen = sizeof(SOCKADDR_IN);
+    if (getsockname(socketID, (SOCKADDR*) &socketAddr, &addrlen) < 0)
+    {
+        return SocketError();
+    }
+    *portNo = ntohs(socketAddr.sin_port);
     return 0;
 }
 
@@ -229,9 +239,9 @@ bool Socket::IsWritePending(uint32_t timeout_us) const
     iSocketsReady = select(socketID + 1, NULL, &rWrite, NULL, &to);
     if (iSocketsReady == 1) // &&  FD_ISSET (socketID, &rWrite)   
     {
-        return true;
+        return false; // No write is pending.
     }
-    return false;
+    return true;
     //if(iSocketsReady<0)
     //  return SocketError();
 }

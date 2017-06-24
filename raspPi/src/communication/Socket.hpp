@@ -33,6 +33,7 @@ public:
     int Bind(uint16_t portNo, SocketType type);
     int Connect(const SOCKADDR_IN& sockAddr);
     int Accept(const Socket &listningSocket);
+    int GetPort(uint16_t *portNo);
     int Shutdown();
     int Close();
     

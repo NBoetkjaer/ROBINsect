@@ -9,7 +9,7 @@ Controller::Controller():
 
 void Controller::CreateNodes(BaseNode& parentNode, int controllerID)
 {
-    string nodeName = std::to_string(controllerID);
+    string nodeName ="device" + std::to_string(controllerID);
     pNodeController = parentNode.FindOrCreateChild(nodeName);
     //pNodeController->Subscribe(this);
     
@@ -19,7 +19,7 @@ void Controller::CreateNodes(BaseNode& parentNode, int controllerID)
     pNodeController->FindOrCreateChild("Channels");
     for (size_t iChan = 0; iChan < channels.size(); ++iChan)
     {
-        nodeName = to_string(iChan);
+        nodeName = "ch" + to_string(iChan);
         channels[iChan] = pNodeController->FindOrCreateChild<UInt16Node>(nodeName, 0, 150, 700);
     }
 }

@@ -66,7 +66,7 @@ namespace ROBINinspect
         protected override void GetValue(ref String strValue)
         {
             if (options.Length != 2) return;
-            strValue = val ? options[0] : options[1];
+            strValue = val ? options[1] : options[0];
         }
         protected override void SetValue(String strValue)
         {

@@ -17,7 +17,7 @@ Servo::Servo():
 
 void Servo::CreateNodes(BaseNode& parentNode, int servoNumber)
 {
-    string nodeName = std::to_string(servoNumber);
+    string nodeName = "s" + std::to_string(servoNumber);
     pServoNode = parentNode.FindOrCreateChild(nodeName);
     if (pServoNode == nullptr)
     {
@@ -31,10 +31,10 @@ void Servo::CreateNodes(BaseNode& parentNode, int servoNumber)
     const int numJoints = 3;
     int legID = servoNumber / numJoints;
     int jointID = servoNumber % numJoints;
-    string path = "/Insect/Legs/" + to_string(legID) + "/Joints/" + to_string(jointID) + "/jointAngle";
+    string path = "/Insect/Legs/l" + to_string(legID) + "/Joints/j" + to_string(jointID) + "/jointAngle";
     pServoNode->FindOrCreateChild<MirrorNode>("SetAngle", path);
     int controllerID = servoNumber / 9;
-    path = "/Hardware/PWMControllers/" + to_string(controllerID) + "/" + to_string(servoNumber % 9);
+    path = "/Hardware/PWMControllers/device" + to_string(controllerID) + "/ch" + to_string(servoNumber % 9);
     pServoNode->FindOrCreateChild<MirrorNode>("PWM", path);
 
     pCalibrationNode = pServoNode->FindOrCreateChild("Calibration");

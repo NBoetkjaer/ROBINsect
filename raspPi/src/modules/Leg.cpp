@@ -20,7 +20,7 @@ Leg::Leg()
 void Leg::CreateNodes(BaseNode& rootNode, int legNumber)
 {
     legID = legNumber;
-    string legNodeName = std::to_string(legNumber);
+    string legNodeName ="l" + std::to_string(legNumber);
     pNodeLeg = rootNode.FindOrCreateChild<BaseNode>(legNodeName);
     if (pNodeLeg == nullptr)
     {
@@ -44,7 +44,7 @@ void Leg::CreateNodes(BaseNode& rootNode, int legNumber)
     BaseNode* pJointParent = pNodeLeg->FindOrCreateChild("Joints");
     for (size_t jointIdx = 0; jointIdx < pNodeJoints.size(); ++jointIdx)
     {
-        string jointNodeName = std::to_string(jointIdx);
+        string jointNodeName = "j" + std::to_string(jointIdx);
         pNodeJoints[jointIdx] = pJointParent->FindOrCreateChild<BaseNode>(jointNodeName);
 
         pNodeJointAngles[jointIdx] = pNodeJoints[jointIdx]->FindOrCreateChild<FloatNode>("jointAngle", 0.0f, -105.0f, 105.f);

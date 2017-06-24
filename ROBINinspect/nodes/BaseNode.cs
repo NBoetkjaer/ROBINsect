@@ -89,6 +89,7 @@ namespace ROBINinspect
             string[] arrFlags = strFlags.Split(flagDelimiter);
             foreach (String strFlag in arrFlags)
             {
+                if (String.IsNullOrEmpty(strFlag)) continue;
                 // Skip leading white spaces.
                 String tmp = strFlag.Trim();
                 bool removeFlag = false;
