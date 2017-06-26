@@ -11,6 +11,7 @@ XmlViewModule::XmlViewModule(const std::string& path):
     pViewNode(nullptr)
 {
     xmlConverter.SetResolveMirrors(true);
+    xmlConverter.SetXMLIndenting(false);
 }
 
 void XmlViewModule::CreateNodes(BaseNode& rootNode)

@@ -23,12 +23,7 @@ extern Attribute infoAttrib;
 extern Attribute optionsAttrib;
 
 class MirrorNode; // Forward declare.
-
-class NodeObserver
-{
-public:
-    virtual void Notify()=0;
-};
+class NodeObserver;
 
 class BaseNode
 {

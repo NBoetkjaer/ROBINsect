@@ -19,6 +19,20 @@ void TcpSocketModule::CreateNodes(BaseNode& rootNode, uint16_t portNo)
     pRcvNode = rootNode.FindOrCreateChild<Int64Node>("BytesRecived");
     pSentNode = rootNode.FindOrCreateChild<Int64Node>("BytesSent");
     pConnectedNode = rootNode.FindOrCreateChild<BoolNode>("Connected");
+    portChanged.SetNotifyFunc([this]() {OnPortChanged(); });
+    pPortNode->Subscribe(&portChanged);
+}
+
+void TcpSocketModule::OnPortChanged()
+{
+    uint16_t port;
+    if (state == State::Listning && sockListen.GetPort(&port) == 0)
+    {
+        if (pPortNode->Get() != port)
+        {
+            Disconnect(); // Disconnect listen socket so it will use the new port number.
+        }
+    }
 }
 
 void TcpSocketModule::Execute()
@@ -57,9 +71,7 @@ void TcpSocketModule::Execute()
             if(dataLen == 0 || retVal != 0)
             {
                 // Remote end is shutdown
-                std::cout << "Remote end disconnected - Shutdown (sockAccept) " << sockAccept.Shutdown() << endl;
-                std::cout << "Close socket" << sockAccept.Close() << endl;
-                state = State::Initialize;
+                Disconnect();
                 return;
             }
             DataReceived(buffer.data(), dataLen);
@@ -68,6 +80,13 @@ void TcpSocketModule::Execute()
         pSentNode->Set(sockAccept.GetBytesSent());
         break;
     }
+}
+
+void TcpSocketModule::Disconnect()
+{
+    std::cout << "Remote end disconnected - Shutdown (sockAccept) " << sockAccept.Shutdown() << endl;
+    std::cout << "Close socket" << sockAccept.Close() << endl;
+    state = State::Initialize;
 }
 
 void TcpSocketModule::SendData(const char* pData, size_t dataLen)

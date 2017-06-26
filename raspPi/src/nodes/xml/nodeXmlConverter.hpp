@@ -13,7 +13,9 @@ public:
     void UpdateTreeFromXml(BaseNode* pRoot, std::string& xml);
     bool GetResolveMirrors(){ return resolveMirrors; }
     void SetResolveMirrors(bool value){ resolveMirrors = value;}
+    void SetXMLIndenting(bool useIndents);
 private:
+    int xmlIndentingFlag = 0; // could also be print_no_indenting
     bool resolveMirrors = false;
     rapidxml::xml_document<> doc;
     void AddNodeAttributes(rapidxml::xml_node<> *pXmlNode, const BaseNode* pNode, bool onlyChanges);

@@ -231,13 +231,7 @@ void Application::RunLoop()
         {
             pModul->Publish();
         }
-        std::string test;
-        xmlConv.ConvertToXml(&root, test, FlagType::none, true);
-        if (test.size() > 5)
-        {
-            //cout << test << endl;
-        }
-        test.clear();
+
         // Clear all changes.
         root.ClearAllChanges();
     }

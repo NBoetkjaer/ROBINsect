@@ -1,5 +1,6 @@
 #pragma once
 
+#include "NodeObserver.hpp"
 #include "BaseNode.hpp"
 #include "BaseNodeImpl.hpp"
 #include "NumericNode.hpp"

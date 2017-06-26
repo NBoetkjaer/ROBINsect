@@ -6,6 +6,11 @@
 using namespace std;
 using namespace rapidxml;
 
+void NodeXmlConverter::SetXMLIndenting(bool useIndents)
+{ 
+    xmlIndentingFlag = useIndents ? 0 : print_no_indenting;
+}
+
 void NodeXmlConverter::AddNodeAttributes(xml_node<> *pXmlNode, const BaseNode* pNode, bool onlyChanges)
 {
     string attribVal;
@@ -103,7 +108,7 @@ void NodeXmlConverter::ConvertToXml(const BaseNode* pRoot, std::string& xmlStrin
         doc.append_node(pXmlNode);
     }
     xmlString.clear();
-    print(std::back_inserter(xmlString), doc, 0);
+    print(std::back_inserter(xmlString), doc, xmlIndentingFlag);
 }
 
 

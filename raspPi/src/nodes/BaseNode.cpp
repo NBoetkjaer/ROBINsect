@@ -5,6 +5,7 @@
 #endif
 #include <sstream>
 #include <algorithm>
+#include "NodeObserver.hpp"
 
 using namespace std;
 
