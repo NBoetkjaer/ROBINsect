@@ -58,6 +58,7 @@
             this.Controls.Add(this.btnDiscover);
             this.Name = "frmDiscovery";
             this.Text = "frmDiscovery";
+            this.Load += new System.EventHandler(this.frmDiscovery_Load);
             this.ResumeLayout(false);
 
         }

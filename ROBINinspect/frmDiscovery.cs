@@ -60,5 +60,10 @@ namespace ROBINinspect
                 monitorFrm.Show();
             }
         }
+
+        private void frmDiscovery_Load(object sender, EventArgs e)
+        {
+            btnDiscover_Click(btnDiscover, EventArgs.Empty);
+        }
     }
 }

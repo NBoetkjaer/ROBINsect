@@ -12,6 +12,7 @@ private:
     Int64Node* pSentNode;
     BoolNode* pConnectedNode;
     UInt16Node* pPortNode;
+    int counter = 0;
 
     enum class  State { Initialize, Listning, Connected };
     State state;

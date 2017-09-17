@@ -129,5 +129,19 @@ namespace ROBINinspect
             }
         }
 
+        private void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            if (treeView1.SelectedNode != null)
+            {
+                BaseNode node = treeView1.SelectedNode.Tag as BaseNode;
+                BaseNode root = node.GetRoot();
+                root.ClearAllChanges();
+                if (node == null) return;
+                AttributeTypes attr = (AttributeTypes)dataGridView1.Rows[e.RowIndex].Cells[0].Value;
+                string attribValue = dataGridView1.Rows[e.RowIndex].Cells[1].Value as string;
+                node.SetAttribute(attr, attribValue);
+                robinMonitor.SendTreeUpdates();
+            }
+        }
     }
 }

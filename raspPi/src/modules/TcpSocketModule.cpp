@@ -75,10 +75,15 @@ void TcpSocketModule::Execute()
                 return;
             }
             DataReceived(buffer.data(), dataLen);
-            pRcvNode->Set(sockAccept.GetBytesRecieved());
         }
-        pSentNode->Set(sockAccept.GetBytesSent());
         break;
+    }
+    counter++;
+    if (counter > 60)
+    {
+        pRcvNode->Set(sockAccept.GetBytesRecieved());
+        pSentNode->Set(sockAccept.GetBytesSent());
+        counter = 0;
     }
 }
 

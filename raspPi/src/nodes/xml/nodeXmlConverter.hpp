@@ -6,7 +6,8 @@
 
 class NodeXmlConverter
 {
-public: 
+public:
+    const std::string Transaction = "Transaction";
     NodeXmlConverter() {}
     ~NodeXmlConverter() {}
     void ConvertToXml(const BaseNode* pRoot, std::string& xml, FlagType flagMask = FlagType::none, bool onlyChanges = false);

@@ -10,6 +10,8 @@ namespace ROBINinspect
 {
     public class NodeXmlConverter
     {
+        public const string Transaction = "Transaction";
+
         public void ConvertToXml(BaseNode root, ref String strXml, FlagType flagMask = FlagType.none, bool onlyChanges = false)
         {
             StringWriter strWriter = new StringWriter();
@@ -82,6 +84,10 @@ namespace ROBINinspect
             settings.IgnoreWhitespace = true;
             XmlReader xmlrd = XmlReader.Create(new StringReader(strXml), settings);
             xmlrd.Read();
+            if(xmlrd.Name.Equals(Transaction))
+            {
+                xmlrd.Read();
+            }
 
             UpdateChilds(xmlrd, root);
         }

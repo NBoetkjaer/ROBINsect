@@ -34,7 +34,9 @@ void Servo::CreateNodes(BaseNode& parentNode, int servoNumber)
     string path = "/Insect/Legs/l" + to_string(legID) + "/Joints/j" + to_string(jointID) + "/jointAngle";
     pServoNode->FindOrCreateChild<MirrorNode>("SetAngle", path);
     int controllerID = servoNumber / 9;
-    path = "/Hardware/PWMControllers/device" + to_string(controllerID) + "/ch" + to_string(servoNumber % 9);
+    const int channelGroupSize = 4;
+    int channelNo = (legID % 3) * channelGroupSize + jointID;
+    path = "/Hardware/PWMControllers/device" + to_string(controllerID) + "/ch" + to_string(channelNo);
     pServoNode->FindOrCreateChild<MirrorNode>("PWM", path);
 
     pCalibrationNode = pServoNode->FindOrCreateChild("Calibration");

@@ -178,7 +178,8 @@ int Socket::Send(const char *pData, size_t *pDataLen)
 int Socket::RecieveFrom(char *pData, size_t *pDataLen, SOCKADDR_IN& src_addr)
 {
     int iBytesRecieved;
-    int iAddrLen = sizeof(SOCKADDR_IN);
+    socklen_t iAddrLen = sizeof(SOCKADDR_IN);
+    
     iBytesRecieved = recvfrom(socketID, pData, *pDataLen, 0, (SOCKADDR *) &src_addr, &iAddrLen);
     // assert(iAddrLen <= sizeof(SOCKADDR_IN));
     if (iBytesRecieved < 0)

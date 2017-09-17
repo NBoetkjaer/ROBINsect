@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Collections.Generic;
+using System.Text;
 
 namespace ROBINinspect
 {
@@ -15,8 +16,8 @@ namespace ROBINinspect
         Socket socketXML;
         const Int32 portXML = 1975;
 
-        const string transferStart = "<transaction";
-        const string transferEnd = "</transaction>";
+        const string transferStart = "<" + NodeXmlConverter.Transaction;
+        const string transferEnd = "</" + NodeXmlConverter.Transaction + ">";
 
         int transactionStartPos = -1;
         string transactionReceiveBuffer;
@@ -56,7 +57,9 @@ namespace ROBINinspect
         {
             if (socketXML != null)
             {
+                socketXML.Shutdown(SocketShutdown.Both);
                 socketXML.Close();
+                socketXML = null;
             }
         }
         public void Connect()
@@ -203,6 +206,18 @@ namespace ROBINinspect
                         }
                     }
                 }
+            }
+        }
+
+        public void SendTreeUpdates()
+        {
+            if (rootNode.AnyChanges() && IsConnected)
+            {
+                String strXml = String.Empty;
+                xmlConverter.ConvertToXml(rootNode, ref strXml, FlagType.none, true);
+                strXml = transferStart+ ">" + strXml + transferEnd;
+                byte[] send_buffer = Encoding.ASCII.GetBytes(strXml);
+                socketXML.Send(send_buffer);
             }
         }
     } // class

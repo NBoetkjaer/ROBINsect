@@ -186,6 +186,7 @@ void NodeXmlConverter::UpdateTreeFromXml(BaseNode* pRoot, std::string& xmlString
     doc.clear();
     doc.parse<0>(&xmlString[0]);
     xml_node<> *pXmlNode = doc.first_node();
-
+    if (pXmlNode != nullptr && Transaction.compare(pXmlNode->name()) == 0)
+        pXmlNode = pXmlNode->first_node();
     UpdateChilds(pXmlNode, pRoot);
 }

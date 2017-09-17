@@ -27,7 +27,8 @@ namespace ROBINinspect
 
         protected override void GetValue(ref String strValue)
         {
-            String strVal = "[";
+            String strVal = String.Empty;
+            strValue = "[";
             nodeX.GetAttribute(AttributeTypes.value, ref strVal);
             strValue += strVal + optionDelimiter;
             nodeY.GetAttribute(AttributeTypes.value, ref strVal);

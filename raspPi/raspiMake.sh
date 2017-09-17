@@ -1,5 +1,5 @@
 #! /bin/sh
-ROBINhost=raspi3
+ROBINhost=raspi
 
 #scp -rp ./src/* pi@$ROBINhost:src/ROBINsect/servoTest/src/
 ssh pi@$ROBINhost 'cd ~/src/test; rm -r src/'

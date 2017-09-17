@@ -68,6 +68,24 @@ namespace ROBINinspect
             }
             return node;
         }
+        private const char pathDelimiter = '/';
+        public String GetFullPath()
+        {
+            BaseNode node = this;
+            if (node.parentNode == null) return String.Empty; // If root node.
+            String path = name;
+            // Traverse to root.
+            while (node.parentNode != null)
+            {
+                node = node.parentNode;
+                if (node.parentNode != null) // Do not add root node to the path.
+                {
+                    path = node.name + pathDelimiter + path;
+                }
+            }
+            return path;
+        }
+
 
         #region Attributes
         #region Flag attribute
@@ -236,6 +254,33 @@ namespace ROBINinspect
         public bool AnyChanges()  { return recentChanges != 0; }
         public bool AnyRecentChanges() { return (recentChanges & 1) == 1; }
         public int RecentChangeCount() { return (int)((recentChanges >> 2) + (recentChanges & 1)); }
+        public void PushChangeHistory()
+        {
+            if (AnyRecentChanges())
+            {
+                recentChanges &= ~1U; // Clear LSB. Remove indication of most recent change.
+                recentChanges += 2; // increase change count by 2 (actual count is  'recentChanges >> 2') 
+                // Also push changes for all childs.
+                foreach (BaseNode child in children)
+                {
+                    child.PushChangeHistory();
+                }
+            }
+        }
+
+        public void ClearAllChanges()
+        {
+            if (AnyChanges())
+            {
+                recentChanges = 0;      // Clear change history.
+                attributeChanges = 0;   // Clear attribute changes.
+                // Do the same for all children.
+                foreach (BaseNode child in children)
+                {
+                    child.ClearAllChanges();
+                }
+            }
+        }
 
         public void AddChild(BaseNode childNode)
         {
@@ -278,7 +323,7 @@ namespace ROBINinspect
                 }
                 return mirror.MirrorSource.FindNodeInternal(nodePath, strPos, allowPartialMatch, resolveMirrors);
             }
-            const char pathDelimiter = '/';
+
             if (nodePath == null) return null;
             // Special case for an empty string - just return this.
             if (nodePath.Length <= strPos) return this;
