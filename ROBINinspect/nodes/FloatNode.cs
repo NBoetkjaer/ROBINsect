@@ -59,6 +59,12 @@ namespace ROBINinspect
             Value = val; // This will ensure that 'value' is within the new range.
         }
 
+        public void GetRange(out float min, out float max)
+        {
+            min = minValue;
+            max = maxValue;
+        }
+
         protected override void GetRange(ref String strValue)
         {
             strValue = "[" + minValue.ToString("R", DecimalFormat.FormatInfo) + rangeDelimiter + maxValue.ToString("R", DecimalFormat.FormatInfo) + "]";
@@ -116,6 +122,11 @@ namespace ROBINinspect
         #region range attribute
         private double minValue = float.MinValue;
         private double maxValue = float.MaxValue;
+        public void GetRange(out double min, out double max)
+        {
+            min = minValue;
+            max = maxValue;
+        }
         public void SetRange(double min, double max)
         {
             if (min > max)

@@ -42,6 +42,11 @@ namespace ROBINinspect
         #region range attribute
         private UInt16 minValue = UInt16.MinValue;
         private UInt16 maxValue = UInt16.MaxValue;
+        public void GetRange(out UInt16 min, out UInt16 max)
+        {
+            min = minValue;
+            max = maxValue;
+        }
         public void SetRange(UInt16 min, UInt16 max)
         {
             if (min > max)
