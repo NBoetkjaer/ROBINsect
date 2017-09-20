@@ -1,15 +1,19 @@
 #!/bin/sh
 ROBINhost=raspi
 
-#scp -rp ./src/* pi@$ROBINhost:src/ROBINsect/servoTest/src/
-ssh pi@$ROBINhost 'cd ~/src/test; rm -r src/'
-ssh pi@$ROBINhost 'cd ~/src/test; rm -r boot/'
-ssh pi@$ROBINhost 'cd ~/src/test; rm -r build/'
-#ssh pi@$ROBINhost 'cd ~/src/test; rm -r config/'
+RELATIVEDIR="src/test/"
+BASEDIR="\$HOME/$RELATIVEDIR"
 
-scp ./*  pi@$ROBINhost:src/test/
-scp -r ./src pi@$ROBINhost:src/test/src/
-scp -r ./boot pi@$ROBINhost:src/test/boot/
+ssh pi@$ROBINhost "mkdir -p $BASEDIR"
+
+ssh pi@$ROBINhost "cd $BASEDIR; rm -r src/"
+ssh pi@$ROBINhost "cd $BASEDIR; rm -r boot/"
+ssh pi@$ROBINhost "cd $BASEDIR; rm -r build/"
+#ssh pi@$ROBINhost "cd $BASEDIR; rm -r config/'
+
+scp ./*  pi@$ROBINhost:${RELATIVEDIR}
+scp -r ./src pi@$ROBINhost:${RELATIVEDIR}src/
+scp -r ./boot pi@$ROBINhost:${RELATIVEDIR}boot/
 #scp -r ./config  pi@$ROBINhost:src/test/config/
 
-ssh pi@$ROBINhost 'cd ~/src/test; ./make_script.sh'
+ssh pi@$ROBINhost "cd $BASEDIR; ./make_script.sh"
