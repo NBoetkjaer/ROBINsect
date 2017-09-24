@@ -3,8 +3,10 @@
 
 class Module
 {
+protected:
+    static const int NoTimeOut = -1;
 public:
-    Module():timeoutPeriod_ms(-1){}
+    Module():timeoutPeriod_ms(NoTimeOut){}
     virtual ~Module() {};
     // CreateNodes is used to create all nodes which is "owened" by this module.
     // Nodes should be created with default values, in order to be able to recover the configuration file,

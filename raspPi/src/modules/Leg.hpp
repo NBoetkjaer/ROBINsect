@@ -15,10 +15,12 @@ public:
     virtual void Notify() override;
     
     void SetGoal(float x, float y, float z);
+    void EnableLeg(bool enable);
 private:
     uint16_t legID;
     static const int numJoints = 3;
     BaseNode* pNodeLeg;
+    BoolNode* pNodeEnable;
     Pos3D_32f_Node* pNodeMountPos;
     Pos3D_32f_Node* pNodeGoalPos;
     Pos3D_32f_Node* pNodeCurrentPos;
@@ -30,6 +32,7 @@ private:
     std::array<FloatNode*, numJoints> pNodeJointDistance;
     std::array<FloatNode*, numJoints> pNodeLinkAngle;
     std::array<FloatNode*, numJoints> pNodeLinkDistance;
+    std::array<BoolNode*, numJoints> pNodeJointEnabled;
 
     LegKinematic kinematic;
     //Eigen::Affine3f toLegT;

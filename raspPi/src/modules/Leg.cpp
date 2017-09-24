@@ -29,6 +29,8 @@ void Leg::CreateNodes(BaseNode& rootNode, int legNumber)
 
     pNodeLeg->Subscribe(this);
 
+    pNodeEnable = pNodeLeg->FindOrCreateChild<BoolNode>("enabled", false);
+
     pNodeMountPos = pNodeLeg->FindOrCreateChild<Pos3D_32f_Node>("mountPosition");
     pNodeMountPos->SetAttribute(unitAttrib.GetID(), "m");
 
@@ -47,6 +49,7 @@ void Leg::CreateNodes(BaseNode& rootNode, int legNumber)
         string jointNodeName = "j" + std::to_string(jointIdx);
         pNodeJoints[jointIdx] = pJointParent->FindOrCreateChild<BaseNode>(jointNodeName);
 
+        pNodeJointEnabled[jointIdx] = pNodeJoints[jointIdx]->FindOrCreateChild<BoolNode>("enabled", false);
         pNodeJointAngles[jointIdx] = pNodeJoints[jointIdx]->FindOrCreateChild<FloatNode>("jointAngle", 0.0f, -105.0f, 105.f);
         pNodeJointAngles[jointIdx]->SetAttribute(unitAttrib.GetID(), "deg");
 
@@ -90,6 +93,11 @@ void Leg::Notify()
         }
     }
 
+    if (pNodeEnable->IsValueChanged())
+    {
+        EnableLeg(pNodeEnable->Get());
+    }
+
     for (size_t jointIdx = 0; jointIdx < pNodeJoints.size(); ++jointIdx)
     {
         if (pNodeLinkDistance[jointIdx]->IsValueChanged())
@@ -111,6 +119,15 @@ void Leg::SetGoal(float x, float y, float z)
     pNodeGoalPos->SetPosition(x, y, z);
 }
 
+
+void Leg::EnableLeg(bool enable)
+{
+    pNodeEnable->Set(enable);
+    for (auto node : pNodeJointEnabled)
+    {
+        node->Set(enable);
+    }
+}
 //void Leg::Execute()
 //{
 //

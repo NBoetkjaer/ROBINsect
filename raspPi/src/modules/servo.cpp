@@ -31,8 +31,9 @@ void Servo::CreateNodes(BaseNode& parentNode, int servoNumber)
     const int numJoints = 3;
     int legID = servoNumber / numJoints;
     int jointID = servoNumber % numJoints;
-    string path = "/Insect/Legs/l" + to_string(legID) + "/Joints/j" + to_string(jointID) + "/jointAngle";
-    pServoNode->FindOrCreateChild<MirrorNode>("SetAngle", path);
+    string path = "/Insect/Legs/l" + to_string(legID) + "/Joints/j" + to_string(jointID);
+    pServoNode->FindOrCreateChild<MirrorNode>("SetAngle", path + "/jointAngle");
+    pServoNode->FindOrCreateChild<MirrorNode>("enabled", path + "/enabled");
     int controllerID = servoNumber / 9;
     const int channelGroupSize = 4;
     int channelNo = (legID % 3) * channelGroupSize + jointID;
@@ -59,6 +60,7 @@ void Servo::LookupNodes()
 {
     pNodeSetAngle = pServoNode->FindNode<FloatNode>("SetAngle");
     pNodePWM = pServoNode->FindNode<UInt16Node>("PWM");
+    pNodeEnabled = pServoNode->FindNode<BoolNode>("enabled");
 }
 
 void Servo::Notify()
@@ -81,10 +83,19 @@ void Servo::Notify()
             offset = pNodeMaxPWM->Get() - pNodeMaxAngle->Get() * slope;
         }
     }
-    if (pNodeSetAngle && pNodeSetAngle->IsValueChanged())
+
+    if (pNodeSetAngle && pNodeEnabled &&
+        (pNodeSetAngle->IsValueChanged() || pNodeEnabled->IsValueChanged()) )
     {
-        pNodePWM->Set(GetPWM(pNodeSetAngle->Get()));
-        pNodeAngle->Set(GetAngle(pNodePWM->Get()));
+        if (pNodeEnabled->Get())
+        {
+            pNodePWM->Set(GetPWM(pNodeSetAngle->Get()));
+            pNodeAngle->Set(GetAngle(pNodePWM->Get()));
+        }
+        else
+        {
+            pNodePWM->Set(0);
+        }
     }
 }
 

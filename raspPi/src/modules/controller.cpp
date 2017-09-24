@@ -20,7 +20,7 @@ void Controller::CreateNodes(BaseNode& parentNode, int controllerID)
     for (size_t iChan = 0; iChan < channels.size(); ++iChan)
     {
         nodeName = "ch" + to_string(iChan);
-        channels[iChan] = pNodeController->FindOrCreateChild<UInt16Node>(nodeName, 0, 150, 700);
+        channels[iChan] = pNodeController->FindOrCreateChild<UInt16Node>(nodeName, 0, 0, 800);
     }
 }
 

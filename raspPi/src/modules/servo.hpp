@@ -13,6 +13,7 @@ class Servo : public NodeObserver
         virtual void Notify() override;
     private:
         BaseNode *pServoNode;
+        BoolNode *pNodeEnabled;
         UInt16Node* pNodePWM;
         FloatNode* pNodeAngle;
         FloatNode* pNodeSetAngle;
