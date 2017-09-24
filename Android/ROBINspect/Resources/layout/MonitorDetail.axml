@@ -35,6 +35,10 @@
             android:id="@+id/seekBarValue"
             android:minHeight="30dp" />
     </LinearLayout>
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinnerOptions" />
     <ListView
         android:minWidth="25px"
         android:minHeight="25px"

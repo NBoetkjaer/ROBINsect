@@ -87,6 +87,9 @@ namespace ROBINspect
             SeekBar seeker = monitorAct.FindViewById<SeekBar>(Resource.Id.seekBarValue);
             seeker.Visibility = ViewStates.Invisible;
 
+            Spinner spinnerOptions = monitorAct.FindViewById<Spinner>(Resource.Id.spinnerOptions);
+            spinnerOptions.Visibility = ViewStates.Invisible;
+
             // Set the node name.
             TextView txtView = monitorAct.FindViewById<TextView>(Resource.Id.textViewNodeName);
             txtView.Text = monitorAct.currentNode.Name;
@@ -96,6 +99,11 @@ namespace ROBINspect
             // Setup for a value attribute.
             if (node is AbstractValueNode)
             {
+                string strValue = String.Empty;
+                if (!node.GetAttribute(AttributeTypes.value, ref strValue))
+                {
+                    return;
+                }
                 valueGroup.Visibility = ViewStates.Visible;
                 if (node is AbstractNumericNode)
                 {
@@ -107,11 +115,7 @@ namespace ROBINspect
                     if(GetRange(node, out min, out max))
                     {
                         float nodeValue = (max - min) / 2f;
-                        string strValue = String.Empty;
-                        if (node.GetAttribute(AttributeTypes.value, ref strValue))
-                        {
-                            nodeValue = float.Parse(strValue);
-                        }
+                        nodeValue = float.Parse(strValue);
                         if (integerNode)
                         {
                             seeker.Max = seekerMax;
@@ -129,8 +133,36 @@ namespace ROBINspect
                         seeker.ProgressChanged += Seeker_ProgressChanged;
                     }
                 }
+                String strOption = String.Empty;
+                if (node.GetAttribute(AttributeTypes.options, ref strOption))
+                {
+                    String[] options = strOption.Split(AbstractNumericNode.optionDelimiter);
+                    ArrayAdapter spinnerArrayAdapter = new ArrayAdapter(monitorAct, Android.Resource.Layout.SimpleSpinnerItem, options);
+                    spinnerOptions.Adapter = spinnerArrayAdapter;
+                    int pos = Array.IndexOf(options, strValue);
+                    if(pos >= 0)
+                        spinnerOptions.SetSelection(pos);
+                    valueGroup.Visibility = ViewStates.Visible;
+                    spinnerOptions.Visibility = ViewStates.Visible;
+                    spinnerOptions.ItemSelected += SpinnerOptions_ItemSelected;
+                }
             }
         }
+
+        private void SpinnerOptions_ItemSelected(object sender, AdapterView.ItemSelectedEventArgs e)
+        {
+            Spinner spinnerCtrl = sender as Spinner;
+            if (spinnerCtrl != null)
+            {
+                String strOption = String.Empty;
+                if (monitorAct.currentNode.GetAttribute(AttributeTypes.options, ref strOption))
+                {
+                    String[] options = strOption.Split(AbstractNumericNode.optionDelimiter);
+                    strNewValue = options[e.Position];
+                }
+            }
+        }
+
         public override void OnStart()
         {
             base.OnStart();

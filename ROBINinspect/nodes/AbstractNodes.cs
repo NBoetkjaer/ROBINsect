@@ -59,7 +59,7 @@ namespace ROBINinspect
         bool IsValueChanged() { return IsAttributeChanged(AttributeTypes.value); }
 
         #region static helper functions for options attributes
-        protected static char optionDelimiter = ',';
+        public const char optionDelimiter = ',';
         static protected void GetOptions(ref String strOptions, String[] options, char delimiter)
         {
             strOptions = String.Empty;

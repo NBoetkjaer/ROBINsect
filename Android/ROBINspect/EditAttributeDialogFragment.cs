@@ -47,7 +47,7 @@ namespace ROBINspect
                 {
                     edit.Text = strVal;
                 }
-                if(attr == AttributeTypes.value)
+                if(attr == AttributeTypes.value && (node is AbstractNumericNode))
                 {
                     edit.InputType = Android.Text.InputTypes.NumberFlagDecimal | Android.Text.InputTypes.ClassNumber;
                 }
