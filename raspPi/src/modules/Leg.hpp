@@ -16,6 +16,8 @@ public:
     
     void SetGoal(float x, float y, float z);
     void EnableLeg(bool enable);
+    const LegKinematic& GetKinematic() const { return kinematic; };
+
 private:
     uint16_t legID;
     static const int numJoints = 3;

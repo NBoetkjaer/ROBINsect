@@ -86,10 +86,15 @@ void Leg::Notify()
         float x, y, z;
         pNodeGoalPos->GetPosition(x, y, z);
         pNodeCurrentPos->SetPosition(x, y, z);
-        kinematic.setGoal(x, y, z);
-        for (size_t jointIdx = 0; jointIdx < pNodeJoints.size(); ++jointIdx)
+        Eigen::Vector3f goalPos = { x, y, z };
+        Eigen::Vector3f jointAngles_deg;
+
+        if (kinematic.getJointAngles(goalPos, jointAngles_deg)) // Is goal position reachable.
         {
-            pNodeJointAngles[jointIdx]->Set(kinematic.getJoint(jointIdx));
+            for (size_t jointIdx = 0; jointIdx < pNodeJoints.size(); ++jointIdx)
+            {
+                pNodeJointAngles[jointIdx]->Set(jointAngles_deg[jointIdx]);
+            }
         }
     }
 

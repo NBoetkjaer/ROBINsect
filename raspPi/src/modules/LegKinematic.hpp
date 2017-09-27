@@ -14,11 +14,10 @@ class LegKinematic
 public:
     LegKinematic();
     ~LegKinematic();
-    void setGoal(float goalX, float goalY, float goalZ);
-    void getGoal(float& goalX, float& goalY, float& goalZ);
-    void setJoints(float joint1Angle_deg, float joint2Angle_deg, float joint3Angle_deg);
-    float getJoint(int idx) const;
-    void getJoints(float& joint1Angle_deg, float& joint2Angle_deg, float& joint3Angle_deg) const;
+
+    bool getJointAngles(const Eigen::Vector3f& goalPos, Eigen::Vector3f& jointAngles_deg) const;
+    void getTipPosition(const Eigen::Vector3f& jointAngles_deg, Eigen::Vector3f& goalPos) const;
+
     void SetDH_LinkDist(int idx, float linkDist);
     void SetDH_LinkDist(float linkDist1, float linkDist2, float linkDist3)
     {
@@ -54,7 +53,6 @@ private:
     */
 
     float m_jd[3];
-    float m_ja[3];
     float m_ld[3];
     float m_la[3];
 };
