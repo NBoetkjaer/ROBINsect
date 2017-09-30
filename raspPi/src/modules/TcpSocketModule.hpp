@@ -29,7 +29,7 @@ protected:
     void OnPortChanged();
     void CreateNodes(BaseNode& rootNode, uint16_t portNo = 0);
     void SendData(const char* pData, size_t dataLen);
-    virtual void DataReceived(const char* pData, size_t dataLen) = 0;
+    virtual void DataReceived(char* pData, size_t dataLen) = 0;
     virtual void Connected() {};
     bool IsConnected() { return sockAccept.IsConnected(); }
 };

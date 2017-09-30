@@ -58,7 +58,7 @@ void XmlViewModule::Connected()
     update = true;
 }
 
-void XmlViewModule::DataReceived(const char* pData, size_t dataLen)
+void XmlViewModule::DataReceived(char* pData, size_t dataLen)
 {
     const std::string transferStart = "<" + xmlConverter.Transaction;
     const std::string transferEnd = "</" + xmlConverter.Transaction + ">";

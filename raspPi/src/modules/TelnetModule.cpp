@@ -49,12 +49,13 @@ void TelnetModule::Publish()
     }
 }
 
-void TelnetModule::DataReceived(const char* pData, size_t dataLen)
+void TelnetModule::DataReceived(char* pData, size_t dataLen)
 {
     // remove trailing whitespaces.
     while (dataLen > 0 && isspace((unsigned char)pData[dataLen - 1]))
     {
         dataLen--;
+        pData[dataLen] = 0;
     }
     ProcessCmd(pData, dataLen);
     updateOutput = true;

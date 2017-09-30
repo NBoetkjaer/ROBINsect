@@ -20,7 +20,7 @@ public:
     virtual void OnTimer() override;
     virtual void CreateNodes(BaseNode& rootNode) override;
 private:
-    virtual void DataReceived(const char* pData, size_t dataLen) override;
+    virtual void DataReceived(char* pData, size_t dataLen) override;
 
     void PrintNodes(bool clear);
     void ProcessCmd(const char* pCmd, size_t dataLen);

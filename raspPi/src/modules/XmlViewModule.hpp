@@ -21,7 +21,7 @@ public:
     virtual void LookupNodes() override;
 private:
     virtual void Connected() override;
-    virtual void DataReceived(const char* pData, size_t dataLen) override;
+    virtual void DataReceived(char* pData, size_t dataLen) override;
 
     std::string strTransaction;
     std::string transactionReceiveBuffer;
