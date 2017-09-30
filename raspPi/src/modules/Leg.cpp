@@ -34,7 +34,7 @@ void Leg::CreateNodes(BaseNode& rootNode, int legNumber)
     pNodeMountPos = pNodeLeg->FindOrCreateChild<Pos3D_32f_Node>("mountPosition");
     pNodeMountPos->SetAttribute(unitAttrib.GetID(), "m");
 
-    pNodeMountSide = pNodeLeg->FindOrCreateChild<BoolNode>("mountSide");
+    pNodeMountSide = pNodeLeg->FindOrCreateChild<BoolNode>("mountSide", !(legID & 0x1) ); // Even legID is located to the right.
     pNodeMountSide->SetAttribute(optionsAttrib.GetID(), "left,right");
 
     pNodeGoalPos = pNodeLeg->FindOrCreateChild<Pos3D_32f_Node>("goalPos", 0.1f, 0.0f, -0.15f);
@@ -71,11 +71,11 @@ void Leg::Notify()
     {
         if (!pNodeMountSide->Get()) // right side 
         {
-            kinematic.SetDH_LinkAngle(DEG2RAD(90), DEG2RAD(180), 0.0f);
+            kinematic.SetDH_LinkAngle(DEG2RAD(-90), DEG2RAD(180), 0.0f);
         }
         else
         { 
-            kinematic.SetDH_LinkAngle(DEG2RAD(-90), DEG2RAD(180), 0.0f);
+            kinematic.SetDH_LinkAngle(DEG2RAD(90), DEG2RAD(180), 0.0f);
         }
         // Update Body -> Leg transformation.
     }
@@ -85,12 +85,12 @@ void Leg::Notify()
         // Calculate a new trajectory.
         float x, y, z;
         pNodeGoalPos->GetPosition(x, y, z);
-        pNodeCurrentPos->SetPosition(x, y, z);
         Eigen::Vector3f goalPos = { x, y, z };
         Eigen::Vector3f jointAngles_deg;
-
         if (kinematic.getJointAngles(goalPos, jointAngles_deg)) // Is goal position reachable.
         {
+            //std::cout << "joint space: " << jointAngles_deg.transpose() << std::endl;
+            pNodeCurrentPos->SetPosition(x, y, z);
             for (size_t jointIdx = 0; jointIdx < pNodeJoints.size(); ++jointIdx)
             {
                 pNodeJointAngles[jointIdx]->Set(jointAngles_deg[jointIdx]);

@@ -19,8 +19,8 @@ void InsectModule::CreateNodes(BaseNode& rootNode)
     pNodeLegs = pNodeInsect->FindOrCreateChild<BaseNode>("Legs");
 
     pNodeEnable = pNodeInsect->FindOrCreateChild<BoolNode>("Enable", false);
-    pNodeSoftStart = pNodeInsect->FindOrCreateChild<BoolNode>("SoftStart", false);
-    pNodeShutdown = pNodeInsect->FindOrCreateChild<BoolNode>("ShutdownSystem", false);
+    pNodeSoftStart = pNodeInsect->FindOrCreateChild<BoolNode>("SoftStart", false);    
+    pNodeTestTrajectory = pNodeInsect->FindOrCreateChild<BoolNode>("TestTrajectory", false);
 
     pNodePosition = pNodeInsect->FindOrCreateChild<Pos3D_32f_Node>("BodyPosition");
     for(size_t legIdx = 0; legIdx < legs.size(); ++legIdx)
@@ -28,26 +28,15 @@ void InsectModule::CreateNodes(BaseNode& rootNode)
         legs[legIdx].CreateNodes(*pNodeLegs, legIdx);
     }
 }
+void InsectModule::LookupNodes()
+{
+    pNodeShutdown = pNodeInsect->FindNode<BoolNode>("/SystemInfo/ShutdownSystem", false);
+    if (pNodeShutdown)
+        pNodeShutdown->Subscribe(this);
+}
 
 void InsectModule::Notify()
 {
-    
-    if (pNodeShutdown->IsValueChanged())
-    {
-        std::string cmd = "sudo shutdown"; // Shutdown commmand.
-        if (!pNodeShutdown->Get())
-        {
-            cmd += " -c"; // Cancel the shutdown request.
-            std::system(cmd.c_str());
-        }
-        else
-        {
-            //cmd += " -P"; // Power of now 
-            EnableLegs(false); // Disable all motors.
-            std::system(cmd.c_str()); // Shutdown the OS
-        }
-    }
-
     if (pNodeEnable->IsValueChanged())
     {
         EnableLegs(pNodeEnable->Get());
@@ -63,12 +52,35 @@ void InsectModule::Notify()
             SoftStart();
         }
     }
+    if (pNodeShutdown->Get()) // When shutting down - disable all legs
+    {
+        EnableLegs(false);
+    }
 }
 
 void InsectModule::Execute()
 {
-    for (auto leg : legs)
+    static Eigen::Vector3f start(0.12f, -0.07f, -0.13f);
+    static Eigen::Vector3f end(0.12f, 0.07f, -0.13f);
+    static bool dir = false;
+
+    for (auto& leg : legs)
     {
+        if (pNodeTestTrajectory->Get())
+        {
+            if (!leg.UpdateTrajectory(1.0f))
+            {
+                dir = !dir;
+                if (dir)
+                {
+                    std::swap(start, end);
+                }
+
+                std::unique_ptr<TrajectorySegment> trajectory = std::make_unique<LinearTrajectorySegment>();
+                trajectory->Initialize(start, end, 480.0f);
+                leg.SetTrajectory(std::move(trajectory));
+            }
+        }
         //leg.Execute();
         //leg.SetGoal();
     }
@@ -84,7 +96,7 @@ void InsectModule::OnTimer()
 
 void InsectModule::EnableLegs(bool enable)
 {
-    for (auto leg : legs)
+    for (auto& leg : legs)
     {
         leg.EnableLeg(enable);
     }

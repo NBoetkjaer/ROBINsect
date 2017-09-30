@@ -142,9 +142,6 @@ int main(int argc, char* argv[])
 
     Application app;
     app.RunLoop();
-    app.SaveConfig();
-
-
     return 0;
 }
 

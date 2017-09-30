@@ -11,6 +11,7 @@ public:
     virtual ~InsectModule();
     virtual void Execute() override;
     virtual void CreateNodes(BaseNode& rootNode) override;
+    virtual void LookupNodes() override;
     virtual void OnTimer() override;
 private:
     static const int numLegs = 6;
@@ -30,5 +31,6 @@ private:
     BoolNode* pNodeEnable;
     BoolNode* pNodeSoftStart;
     BoolNode* pNodeShutdown;
+    BoolNode* pNodeTestTrajectory;
 
 };

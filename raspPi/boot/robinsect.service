@@ -3,7 +3,7 @@ Description=ROBINsect main service
 After=network.target
 
 [Service]
-WorkingDirectory=/home/pi/src/test/build
+WorkingDirectory=/home/pi/src/test
 ExecStart=/home/pi/src/test/build/ROBINsect
 Restart=always
 StandardOutput=null

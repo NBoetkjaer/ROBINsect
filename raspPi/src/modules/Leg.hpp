@@ -1,6 +1,7 @@
 #pragma once
 #include "Module.hpp"
-#include  "LegKinematic.hpp"
+#include "LegKinematic.hpp"
+#include "TrajectorySegment.hpp"
 #include  <Eigen/Dense>
 
 class Leg : public NodeObserver
@@ -17,7 +18,26 @@ public:
     void SetGoal(float x, float y, float z);
     void EnableLeg(bool enable);
     const LegKinematic& GetKinematic() const { return kinematic; };
-
+    void SetTrajectory(std::unique_ptr<TrajectorySegment> pNewTrajectory)
+    {
+        pTrajectory = std::move(pNewTrajectory);
+        deltaTime = 0.0f;
+    }
+    bool UpdateTrajectory(float elapsedTime)
+    {
+        if (pTrajectory != nullptr)
+        {
+            deltaTime += elapsedTime;
+            if(deltaTime < pTrajectory->GetDeltaTime())
+            {
+                Eigen::Vector3f pos;
+                pTrajectory->GetPosition(deltaTime, pos);
+                pNodeGoalPos->SetPosition(pos[0], pos[1], pos[2]);
+                return true;
+            }
+        }
+        return false;
+    }
 private:
     uint16_t legID;
     static const int numJoints = 3;
@@ -37,5 +57,9 @@ private:
     std::array<BoolNode*, numJoints> pNodeJointEnabled;
 
     LegKinematic kinematic;
+
+    // ToDo: Temporary solution - consider using a list of segments.
+    std::unique_ptr<TrajectorySegment> pTrajectory;
+    float deltaTime = 0;
     //Eigen::Affine3f toLegT;
 };

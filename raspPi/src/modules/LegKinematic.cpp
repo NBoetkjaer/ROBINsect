@@ -8,7 +8,6 @@ LegKinematic::LegKinematic()
 #if _MSC_VER > 1800 
     :
     m_jd{ 0 },
-    m_ja{ 0 },
     m_ld{ 0.090f, 0.125f, 0.150f },
     m_la{ DEG2RAD(90.0f), 0.0f, 0.0f }
 {
@@ -65,13 +64,19 @@ bool LegKinematic::getJointAngles(const Eigen::Vector3f& goalPos, Eigen::Vector3
 
 
     // Joint 2 angle is given by:
-    // x3 = x2 + h * y / dist;
-    // y3 = y2 - h * x / dist;
-    // jointAngles[1] = atan2(y3, x3);
-    // Or tbe other solution ...
-    x3 = x2 - h * y / dist;
-    y3 = y2 + h * x / dist;
-    jointAngles_deg[1] = atan2(y3, x3);
+    if (m_la[0] < 0)
+    {
+        x3 = x2 + h * y / dist;
+        y3 = y2 - h * x / dist;
+        jointAngles_deg[1] = atan2(y3, x3);
+    }
+    else
+    {
+        // Or tbe other solution ...
+        x3 = x2 - h * y / dist;
+        y3 = y2 + h * x / dist;
+        jointAngles_deg[1] = atan2(y3, x3);
+    }
     //cout << "m_joint2Angle_rad: " << RAD2DEG(m_joint2Angle_rad) << std::endl;	
 
     // Transform the goal point into the coordinate frame of link 2.
@@ -79,14 +84,7 @@ bool LegKinematic::getJointAngles(const Eigen::Vector3f& goalPos, Eigen::Vector3
     invertTransform(jointLinkT);
     goal = jointLinkT * goal;
 
-    // x = x - x3;
-    // y = y - y3;
-    // float s = sin(-jointAngles[1]);
-    // float c = cos(-jointAngles[1]);
-    // x = x*c - y*s;
-    // y = x*s + y*c;
-    
-    jointAngles_deg[2] = RAD2DEG(atan2(goal(1), goal(0)));
+    jointAngles_deg[2] = atan2(goal(1), goal(0));
 
     // Convert to degrees.
     jointAngles_deg = RAD2DEG(jointAngles_deg);
