@@ -60,7 +60,6 @@ void Application::RunLoop()
     std::cout << "Starting module loop" << std::endl;    
     auto timeStamp = ClockType::now();
     auto prevTimestamp = timeStamp;
-    auto prevUpdate = timeStamp;
     auto elapsedAccum = std::chrono::seconds::zero();
     auto desiredLoopTime = std::chrono::microseconds(long(1000000.0f / pSystemModule->GetLoopFrequency()));
     auto nextTimeStamp = timeStamp + desiredLoopTime;    

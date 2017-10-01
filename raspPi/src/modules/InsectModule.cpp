@@ -60,29 +60,38 @@ void InsectModule::Notify()
 
 void InsectModule::Execute()
 {
-    static Eigen::Vector3f start(0.12f, -0.07f, -0.13f);
-    static Eigen::Vector3f end(0.12f, 0.07f, -0.13f);
+    Eigen::Vector3f start;
+    Eigen::Vector3f end;
     static bool dir = false;
-
+    bool updateTrajectory = false;
     for (auto& leg : legs)
     {
         if (pNodeTestTrajectory->Get())
         {
-            if (!leg.UpdateTrajectory(1.0f))
+            start << 0.12f, -0.07f, -0.13f;
+            end << 0.12f, 0.07f, -0.13f;
+            if (leg.GetLegID() & 0x1) // Left side move the other way.
             {
-                dir = !dir;
+               std::swap(start, end);
+            }
+            if (!leg.UpdateTrajectory(1.0f))
+            {                
                 if (dir)
                 {
                     std::swap(start, end);
                 }
-
+                updateTrajectory = true;
                 std::unique_ptr<TrajectorySegment> trajectory = std::make_unique<LinearTrajectorySegment>();
                 trajectory->Initialize(start, end, 480.0f);
                 leg.SetTrajectory(std::move(trajectory));
             }
-        }
+        }        
         //leg.Execute();
         //leg.SetGoal();
+    }
+    if (updateTrajectory)
+    {
+        dir = !dir;
     }
 }
 

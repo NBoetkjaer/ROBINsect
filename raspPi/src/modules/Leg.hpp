@@ -9,7 +9,7 @@ class Leg : public NodeObserver
 public:
     Leg();
     virtual ~Leg() {};
-
+    uint16_t GetLegID()const { return legID;}
     void CreateNodes(BaseNode& rootNode, int legNumber);
     //void Execute();
     // Inherited via NodeObserver
@@ -46,8 +46,6 @@ private:
     Pos3D_32f_Node* pNodeMountPos;
     Pos3D_32f_Node* pNodeGoalPos;
     Pos3D_32f_Node* pNodeCurrentPos;
-    BoolNode* pNodeMountSide;
-
 
     std::array<BaseNode*, numJoints> pNodeJoints;
     std::array<FloatNode*, numJoints> pNodeJointAngles;

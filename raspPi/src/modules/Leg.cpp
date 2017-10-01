@@ -10,7 +10,6 @@ Leg::Leg()
     pNodeMountPos = nullptr;
     pNodeGoalPos = nullptr;
     pNodeCurrentPos = nullptr;
-    pNodeMountSide = nullptr;
     pNodeJoints = { nullptr };
     pNodeJointAngles = { nullptr };
     pNodeJointDistance = { nullptr };
@@ -34,9 +33,6 @@ void Leg::CreateNodes(BaseNode& rootNode, int legNumber)
     pNodeMountPos = pNodeLeg->FindOrCreateChild<Pos3D_32f_Node>("mountPosition");
     pNodeMountPos->SetAttribute(unitAttrib.GetID(), "m");
 
-    pNodeMountSide = pNodeLeg->FindOrCreateChild<BoolNode>("mountSide", !(legID & 0x1) ); // Even legID is located to the right.
-    pNodeMountSide->SetAttribute(optionsAttrib.GetID(), "left,right");
-
     pNodeGoalPos = pNodeLeg->FindOrCreateChild<Pos3D_32f_Node>("goalPos", 0.1f, 0.0f, -0.15f);
     pNodeGoalPos->SetAttribute(unitAttrib.GetID(), "m");
     
@@ -54,29 +50,32 @@ void Leg::CreateNodes(BaseNode& rootNode, int legNumber)
         pNodeJointAngles[jointIdx]->SetAttribute(unitAttrib.GetID(), "deg");
 
         float linkDist = 0.087f;
-        if(jointIdx == 0)
+        float linkAngle = 0;
+        switch(jointIdx)
         {
+        case 0:
             linkDist = 0.06f;
             pNodeJointAngles[jointIdx]->SetRange(-90.0f, 70.0f);
+            linkAngle = legID & 0x1 ? -90.0f : 90.0f;
+            break;
+        case 1:
+            linkAngle = 180;
+            break;
         }
-
         pNodeLinkDistance[jointIdx] = pNodeJoints[jointIdx]->FindOrCreateChild<FloatNode>("linkDistance", linkDist);
         pNodeLinkDistance[jointIdx]->SetAttribute(unitAttrib.GetID(), "m");
+        pNodeLinkDistance[jointIdx]->SetFlag(FlagType::persist, true, false);
+        pNodeLinkAngle[jointIdx] = pNodeJoints[jointIdx]->FindOrCreateChild<FloatNode>("linkAngle", linkAngle);
+        pNodeLinkAngle[jointIdx]->SetAttribute(unitAttrib.GetID(), "deg");
+        pNodeLinkAngle[jointIdx]->SetFlag(FlagType::persist, true, false);
     }
 }
 
 void Leg::Notify()
 {
-    if(pNodeMountPos->AnyChanges() || pNodeMountSide->IsValueChanged())
+    if(pNodeMountPos->AnyChanges())
     {
-        if (!pNodeMountSide->Get()) // right side 
-        {
-            kinematic.SetDH_LinkAngle(DEG2RAD(-90), DEG2RAD(180), 0.0f);
-        }
-        else
-        { 
-            kinematic.SetDH_LinkAngle(DEG2RAD(90), DEG2RAD(180), 0.0f);
-        }
+
         // Update Body -> Leg transformation.
     }
 
@@ -109,18 +108,15 @@ void Leg::Notify()
         {
             kinematic.SetDH_LinkDist(jointIdx, pNodeLinkDistance[jointIdx]->Get());
         }
+        if (pNodeLinkAngle[jointIdx]->IsValueChanged())
+        {
+            kinematic.SetDH_LinkAngle(jointIdx, DEG2RAD(pNodeLinkAngle[jointIdx]->Get()));
+        }
     }
 }
 
 void Leg::SetGoal(float x, float y, float z)
 {
-    // Transform to the leg coordinate system.
-    if (!pNodeMountSide->Get()) // right side 
-    {
-    }
-    else
-    {
-    }
     pNodeGoalPos->SetPosition(x, y, z);
 }
 
