@@ -20,6 +20,33 @@
 
 int main(int argc, char* argv[])
 {
+    Eigen::Vector3f start(1.0f, 1.0f, 0.0f);
+    Eigen::Vector3f target(1.0f, 1.0f, 5.0f);
+    Eigen::Vector3f normal(0.0f, 1.0f, 0.0f);
+
+    CircularTrajectorySegment test(start, target, normal, 5.0f, 30.0f);
+    Eigen::Vector3f pos;
+    test.GetPosition(0.0f, pos);
+    test.GetPosition(30.0f, pos);
+
+    float steps = 50.0f;
+    float radius = 5.0f;
+    float minAngle_rad = -0.2f;
+    float maxAngle_rad = 1.2f;
+    start <<  2.0f, radius * cos(minAngle_rad), radius * sin(minAngle_rad);
+    target << 2.0f, radius * cos(maxAngle_rad), radius * sin(maxAngle_rad);
+    normal << -1.0f, 0.0f, 0.0f;
+    CircularTrajectorySegment testTrack(start, target, normal, radius, steps);
+    Eigen::Vector3f posRef;
+    for (float time = 0.0f; time < steps; time += 1.0f)
+    {
+        float angle_rad = minAngle_rad + time * (maxAngle_rad - minAngle_rad) / steps;
+        posRef << 2.0f, radius * cos(angle_rad), radius * sin(angle_rad);
+        testTrack.GetPosition(time, pos);
+        std::cout << "diff: " << (posRef - pos).norm() << std::endl;
+    }
+
+    return 0;
     BaseNode root("root");
 
     std::cout << "Size of std::vector<NodeObserver*>: " << sizeof(std::vector<NodeObserver*>) << std::endl;

@@ -81,11 +81,10 @@ void InsectModule::Execute()
                     std::swap(start, end);
                 }
                 updateTrajectory = true;
-                std::unique_ptr<TrajectorySegment> trajectory = std::make_unique<LinearTrajectorySegment>();
-                trajectory->Initialize(start, end, 480.0f);
+                std::unique_ptr<TrajectorySegment> trajectory = std::make_unique<LinearTrajectorySegment>(start, end, 480.0f);
                 leg.SetTrajectory(std::move(trajectory));
             }
-        }        
+        }
         //leg.Execute();
         //leg.SetGoal();
     }
