@@ -31,12 +31,12 @@ int main(int argc, char* argv[])
 
     float steps = 50.0f;
     float radius = 5.0f;
-    float minAngle_rad = -0.2f;
-    float maxAngle_rad = 1.2f;
+    float minAngle_rad = 2.2f;
+    float maxAngle_rad = -2.2f;
     start <<  2.0f, radius * cos(minAngle_rad), radius * sin(minAngle_rad);
     target << 2.0f, radius * cos(maxAngle_rad), radius * sin(maxAngle_rad);
-    normal << -1.0f, 0.0f, 0.0f;
-    CircularTrajectorySegment testTrack(start, target, normal, radius, steps);
+    normal << 1.0f, 0.0f, 0.0f;
+    CircularTrajectorySegment testTrack(start, target, normal, -radius, steps);
     Eigen::Vector3f posRef;
     for (float time = 0.0f; time < steps; time += 1.0f)
     {

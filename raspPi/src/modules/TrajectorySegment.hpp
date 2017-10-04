@@ -42,7 +42,7 @@ class CircularTrajectorySegment :public TrajectorySegment
 public:
     CircularTrajectorySegment(const Eigen::Vector3f& start, const Eigen::Vector3f& target,
                               const Eigen::Vector3f& normal, float radius, float duration):
-        TrajectorySegment(duration), arcRadius(radius)
+        TrajectorySegment(duration)
     {
         // A negative radius means the circular path is followed in a clockwise rotation around the normal.
         // A positive radius is a counter clockwise path.
@@ -51,7 +51,7 @@ public:
         // and start is located in the origin.
         Eigen::Vector3f xAxis = target - start;
         float chordLength = xAxis.norm();
-        if (chordLength > 2.0f * radius) return;
+        if (chordLength > 2.0f * abs(radius) || chordLength == 0.0f) return;
         // Find y-axis so that we have a right hand coordinate system.
         Eigen::Vector3f zAxis = normal;
         xAxis.normalize();
@@ -70,10 +70,10 @@ public:
         Eigen::Vector2f target2D = (toCirclePlane * target).head<2>();
         // Find circle center.
         // A line through the midpoint and perpendicular to the line segment (start, target) will also pass through the center.
-        // since target is also located on the positive x-axis (and start is the origin) x coord of center is midway to target.
-        // y is given by pythagoras.
+        // since target is also located on the positive x-axis (and start is the origin) x coordinate of center is midway to target.
+        // y is given by Pythagoras. Actually two circles exist, Here we use the circle with a positive y center. To get the other circle invert the normal vector.
         float cntrX = chordLength / 2.0f;
-        float cntrY = copysignf(sqrt(radius*radius - cntrX *cntrX), radius); // Make cntrY take same sign as radius.
+        float cntrY = sqrt(radius*radius - cntrX *cntrX);
         Eigen::Vector3f center(cntrX, cntrY, 0);
         // Transform center back to original coordinate system.
         center = fromCirclePlane * center;
@@ -86,24 +86,16 @@ public:
         fromCirclePlane.matrix().col(0) = xAxis;
         fromCirclePlane.matrix().col(1) = yAxis;
         fromCirclePlane.matrix().col(3) = center;
-
-        arcAngle_rad = 2.0f * asin(chordLength / (2.0f * radius));
-        if (arcAngle_rad < 0) // ~ radius must be negative (== a clockwise orientation around normal)
-        {   // Take the long pat 
-            arcAngle_rad += (float)M_2_PI;
+        // Calculate the angle sweep.
+        if (radius > 0) 
+        {   // Counter clockwise orientation around normal.
+            arcAngle_rad = 2.0f * asin(chordLength / (2.0f * radius)); // arcAngle_rad is positive.
         }
-
-        toCirclePlane = fromCirclePlane;
-        invertTransform(toCirclePlane);
-        std::cout << toCirclePlane.matrix() << std::endl;
-
-        Eigen::Vector3f testVec;
-        testVec = toCirclePlane * center;
-        std::cout << "center: " << testVec.transpose() << std::endl;
-        testVec = toCirclePlane * start;
-        std::cout << "start: " << testVec.transpose() << std::endl;
-        testVec = toCirclePlane * target;
-        std::cout << "target: " << testVec.transpose() << std::endl;
+        else
+        {   // Clockwise orientation around normal ~ the longest way around in the circle.
+            arcAngle_rad = (float)(-2.0 * M_PI) - 2.0f * asin(chordLength / (2.0f * radius)); // arcAngle_rad is negative.
+        }
+        arcRadius = abs(radius);
     };
 
     virtual ~CircularTrajectorySegment() {};
