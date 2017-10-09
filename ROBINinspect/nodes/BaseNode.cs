@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ROBINinspect
 {
@@ -17,7 +13,7 @@ namespace ROBINinspect
         }
 
         protected List<BaseNode> children = new List<BaseNode>();
-        public IReadOnlyCollection<BaseNode> Children
+        public ReadOnlyCollection<BaseNode> Children
         {
             get { return children.AsReadOnly(); }
         }
