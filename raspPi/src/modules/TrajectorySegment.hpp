@@ -19,30 +19,126 @@ protected:
     float durationTime;
 };
 
-class LinearTrajectorySegment :public TrajectorySegment
+class SimpleTrajectorySegment : public TrajectorySegment
+{
+private:
+    float m0, m1;
+public:
+    SimpleTrajectorySegment(float duration) : TrajectorySegment(duration) {};
+    virtual ~SimpleTrajectorySegment() {};
+protected:
+    bool bSpline = false;
+    virtual float GetCurveLength() const = 0;
+    void UseSpline(float startVelocity, float endVelocity)
+    {
+        bSpline = true;
+        // Determine the Hermite spline coefficients.
+        //
+        // p0 = start time = 0;
+        // p1 = end time = durationTime;
+        float curveLength = GetCurveLength();
+        // Start velocity 
+        m0 = startVelocity * durationTime * durationTime / curveLength; // Normalize by segment length (assuming GetPosition() will return equidistantly spaced positions as a funtion of time)
+        // End velocity
+        m1 = endVelocity * durationTime * durationTime / curveLength;   // Normalize by segment length .
+    };
+
+    float GetSplineTime(float time) const
+    {
+        // Interpolate the time by a Hermite spline.
+        // https://en.wikipedia.org/wiki/Cubic_Hermite_spline
+        // Hermite interpolation coefficients.
+
+        // h00 = 2t^3 - 3t^2 + 1;
+        // h10 = t^3 - 2t^2 + t;
+        // h01 = -2t^3 + 3t^2;	
+        // h11 = t^3 - t^2;
+
+        // interpolated time: t = [0:1] normalized time ~ [0:durationTime].
+        // f(t) = h00 * p0 + h10 * m0 + h01 * p1 + h11 * m1. // Note: p0 is always zero and p1 equals the durationTime.
+        float time1 = time / durationTime;
+        float time2 = time1*time1;
+        float time3 = time1*time1*time1;
+        return m0 * (time3 - 2.0f * time2 + time1) + durationTime * (-2.0f * time3 + 3.0f * time2) + m1 * (time3 - time2);
+    }
+};
+
+class LinearTrajectorySegment :public SimpleTrajectorySegment
 {
 public:
     LinearTrajectorySegment(const Eigen::Vector3f& start, const Eigen::Vector3f& target, float duration):
-        TrajectorySegment(duration), startPos(start)
+        SimpleTrajectorySegment(duration), startPos(start)
     {
         slope = (target - startPos) / durationTime;
     };
+
+    LinearTrajectorySegment(const Eigen::Vector3f& start, const Eigen::Vector3f& target, float duration, float startVelocity, float endVelocity) :
+        SimpleTrajectorySegment(duration), startPos(start)
+    {
+        slope = (target - startPos) / durationTime;
+        UseSpline(startVelocity, endVelocity);
+    };
+
     virtual ~LinearTrajectorySegment() {};
     virtual void GetPosition(float time, Eigen::Vector3f& position) const override
     {
+        if (bSpline)
+        {
+            time = GetSplineTime(time);
+        }
         position = startPos + slope * time;
-    }
+    };
 protected:
+    virtual float GetCurveLength() const override
+    {
+        return (slope*durationTime).norm();
+    };
     Eigen::Vector3f startPos;
     Eigen::Vector3f slope;
 };
 
-class CircularTrajectorySegment :public TrajectorySegment
+class CircularTrajectorySegment :public SimpleTrajectorySegment
 {
 public:
     CircularTrajectorySegment(const Eigen::Vector3f& start, const Eigen::Vector3f& target,
-                              const Eigen::Vector3f& normal, float radius, float duration):
-        TrajectorySegment(duration)
+        const Eigen::Vector3f& normal, float radius, float duration)
+        :SimpleTrajectorySegment(duration)
+    {
+        Initialize(start, target, normal, radius);
+    }
+
+    CircularTrajectorySegment(const Eigen::Vector3f& start, const Eigen::Vector3f& target,
+        const Eigen::Vector3f& normal, float radius, float duration, float startVelocity, float endVelocity)
+        : SimpleTrajectorySegment(duration)
+    {
+        Initialize(start, target, normal, radius);
+        UseSpline(startVelocity, endVelocity);
+    }
+
+    virtual ~CircularTrajectorySegment() {};
+    virtual void GetPosition(float time, Eigen::Vector3f& position) const override
+    {
+        if (bSpline)
+        {
+            time = GetSplineTime(time);
+        }
+
+        // Calculate position along the arc.
+        float angle_rad = arcAngle_rad * time / durationTime;
+        Eigen::Vector3f pos(arcRadius * cos(angle_rad), arcRadius * sin(angle_rad), 0.0f);
+        position = fromCirclePlane * pos;
+    }
+protected:
+    virtual float GetCurveLength() const override
+    {
+        return abs(arcAngle_rad * arcRadius);
+    };
+    Eigen::AffineCompact3f fromCirclePlane;
+    float arcAngle_rad;
+    float arcRadius;
+private:
+    void Initialize(const Eigen::Vector3f& start, const Eigen::Vector3f& target,
+        const Eigen::Vector3f& normal, float radius)
     {
         // A negative radius means the circular path is followed in a clockwise rotation around the normal.
         // A positive radius is a counter clockwise path.
@@ -87,7 +183,7 @@ public:
         fromCirclePlane.matrix().col(1) = yAxis;
         fromCirclePlane.matrix().col(3) = center;
         // Calculate the angle sweep.
-        if (radius > 0) 
+        if (radius > 0)
         {   // Counter clockwise orientation around normal.
             arcAngle_rad = 2.0f * asin(chordLength / (2.0f * radius)); // arcAngle_rad is positive.
         }
@@ -98,22 +194,9 @@ public:
         arcRadius = abs(radius);
     };
 
-    virtual ~CircularTrajectorySegment() {};
-    virtual void GetPosition(float time, Eigen::Vector3f& position) const override
-    {
-        // Calculate position along the arc.
-        float angle_rad = arcAngle_rad * time / durationTime;
-        Eigen::Vector3f pos(arcRadius * cos(angle_rad), arcRadius * sin(angle_rad), 0.0f);
-        position = fromCirclePlane * pos;
-   }
-protected:
-    Eigen::AffineCompact3f fromCirclePlane;
-    float arcAngle_rad;
-    float arcRadius;
-private:
     void invertTransform(Eigen::AffineCompact3f &transform) const
     {
-        // Invert a pure rotat and translate matrix.
+        // Invert a pure rotate and translate matrix.
         transform.matrix().topLeftCorner<3, 3>().transposeInPlace();
         transform.matrix().topRightCorner<3, 1>() = -1.0f * transform.matrix().topLeftCorner<3, 3>()
                                                     * transform.matrix().topRightCorner<3, 1>();

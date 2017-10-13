@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
     Eigen::Vector3f target(1.0f, 1.0f, 5.0f);
     Eigen::Vector3f normal(0.0f, 1.0f, 0.0f);
 
-    CircularTrajectorySegment test(start, target, normal, 5.0f, 30.0f);
+    CircularTrajectorySegment test(start, target, normal, 5.0f, 30.0f, 0.0f, 0.0f);
     Eigen::Vector3f pos;
     test.GetPosition(0.0f, pos);
     test.GetPosition(30.0f, pos);
@@ -36,7 +36,8 @@ int main(int argc, char* argv[])
     start <<  2.0f, radius * cos(minAngle_rad), radius * sin(minAngle_rad);
     target << 2.0f, radius * cos(maxAngle_rad), radius * sin(maxAngle_rad);
     normal << 1.0f, 0.0f, 0.0f;
-    CircularTrajectorySegment testTrack(start, target, normal, -radius, steps);
+    //CircularTrajectorySegment testTrack(start, target, normal, -radius, steps, 0.0f, 0.0f);
+    CircularTrajectorySegment testTrack(start, target, normal, -radius, steps, radius * abs(maxAngle_rad - minAngle_rad)/steps, radius * abs(maxAngle_rad - minAngle_rad)/steps);
     Eigen::Vector3f posRef;
     for (float time = 0.0f; time < steps; time += 1.0f)
     {
