@@ -49,17 +49,21 @@ void Leg::CreateNodes(BaseNode& rootNode, int legNumber)
         pNodeJointAngles[jointIdx] = pNodeJoints[jointIdx]->FindOrCreateChild<FloatNode>("jointAngle", 0.0f, -105.0f, 105.f);
         pNodeJointAngles[jointIdx]->SetAttribute(unitAttrib.GetID(), "deg");
 
-        float linkDist = 0.087f;
+        float linkDist = 0.086f;
         float linkAngle = 0;
         switch(jointIdx)
         {
         case 0:
-            linkDist = 0.06f;
+            linkDist = 0.0597f;
             pNodeJointAngles[jointIdx]->SetRange(-90.0f, 70.0f);
             linkAngle = legID & 0x1 ? -90.0f : 90.0f;
             break;
         case 1:
+            linkDist = 0.08603f;
             linkAngle = 180;
+            break;
+        case 2:
+            linkDist = 0.09025f;
             break;
         }
         pNodeLinkDistance[jointIdx] = pNodeJoints[jointIdx]->FindOrCreateChild<FloatNode>("linkDistance", linkDist);

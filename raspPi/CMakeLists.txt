@@ -6,6 +6,7 @@ file(GLOB SOURCES_top "src/*.cpp")
 file(GLOB SOURCES_comm "src/communication/*.*pp")
 file(GLOB SOURCES_modules "src/modules/*.*pp")
 file(GLOB SOURCES_modules_hw "src/modules/hardware/*.*pp")
+file(GLOB SOURCES_modules_trajectory "src/modules/trajectory/*.*pp")
 file(GLOB SOURCES_modules_hw_stub "src/modules/hardware/stub/*.*pp")
 file(GLOB SOURCES_nodes "src/nodes/*.*pp")
 file(GLOB SOURCES_xml "src/nodes/xml/*.*pp")
@@ -22,6 +23,7 @@ file(GLOB SOURCES_test "src/test/*.cpp")
 		${SOURCES_comm}
 		${SOURCES_modules}
 		${SOURCES_modules_hw}
+		${SOURCES_modules_trajectory}
 		${SOURCES_nodes}
 		${SOURCES_xml}
 		${SOURCES_test}
@@ -40,6 +42,7 @@ ELSE (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 		${SOURCES_modules}
 		${SOURCES_modules_hw}
 		${SOURCES_modules_hw_stub}
+		${SOURCES_modules_trajectory}		
 		${SOURCES_nodes}
 		${SOURCES_xml}
 		${SOURCES_test}
@@ -55,6 +58,7 @@ add_executable(ROBINsect ${SOURCES} )
 				
 source_group("Modules"				FILES ${SOURCES_modules})
 source_group("Modules\\hardware"	FILES ${SOURCES_modules_hw} ${SOURCES_modules_hw_stub})
+source_group("Modules\\trajectory"	FILES ${SOURCES_modules_trajectory})
 source_group("Nodes"				FILES ${SOURCES_nodes})
 source_group("Nodes\\xml"			FILES ${SOURCES_xml})
 source_group("Communication"		FILES ${SOURCES_comm})

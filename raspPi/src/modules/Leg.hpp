@@ -1,7 +1,8 @@
 #pragma once
+#include <memory>
 #include "Module.hpp"
 #include "LegKinematic.hpp"
-#include "TrajectorySegment.hpp"
+#include "trajectory/TrajectorySegment.hpp"
 #include  <Eigen/Dense>
 
 class Leg : public NodeObserver
@@ -18,6 +19,8 @@ public:
     void SetGoal(float x, float y, float z);
     void EnableLeg(bool enable);
     const LegKinematic& GetKinematic() const { return kinematic; };
+    void RestartTrajectory(float initialTime = 0.0f) { deltaTime = initialTime;}
+    const TrajectorySegment* GetTrajectory() { return pTrajectory.get();}
     void SetTrajectory(std::unique_ptr<TrajectorySegment> pNewTrajectory)
     {
         pTrajectory = std::move(pNewTrajectory);
@@ -28,7 +31,7 @@ public:
         if (pTrajectory != nullptr)
         {
             deltaTime += elapsedTime;
-            if(deltaTime < pTrajectory->GetDeltaTime())
+            if(deltaTime < pTrajectory->GetDuration())
             {
                 Eigen::Vector3f pos;
                 pTrajectory->GetPosition(deltaTime, pos);

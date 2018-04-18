@@ -17,6 +17,7 @@
 
 #include "../modules/TelnetModule.hpp"
 #include "../modules/InsectModule.hpp"
+#include "../modules/trajectory/CircularTrajectorySegment.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -47,7 +48,7 @@ int main(int argc, char* argv[])
         std::cout << "diff: " << (posRef - pos).norm() << std::endl;
     }
 
-    return 0;
+    //return 0;
     BaseNode root("root");
 
     std::cout << "Size of std::vector<NodeObserver*>: " << sizeof(std::vector<NodeObserver*>) << std::endl;

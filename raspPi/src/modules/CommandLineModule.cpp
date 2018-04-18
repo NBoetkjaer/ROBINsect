@@ -1,5 +1,3 @@
-#pragma once
-
 #include "CommandLineModule.hpp"
 //#include "../cmd.h"
 
