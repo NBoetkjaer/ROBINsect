@@ -1,0 +1,288 @@
+fileFormatVersion: 2
+guid: 63b858af7e041394d85ca1d2e61c0b1d
+timeCreated: 1507382250
+licenseType: Free
+ModelImporter:
+  serializedVersion: 21
+  fileIDToRecycleName:
+    100000: ID101
+    100002: ID101 1
+    100004: ID107
+    100006: ID107 1
+    100008: ID113
+    100010: ID113 1
+    100012: ID119
+    100014: ID119 1
+    100016: ID125
+    100018: ID125 1
+    100020: ID13
+    100022: ID13 1
+    100024: ID131
+    100026: ID131 1
+    100028: ID19
+    100030: ID19 1
+    100032: ID25
+    100034: ID25 1
+    100036: ID31
+    100038: ID31 1
+    100040: ID37
+    100042: ID37 1
+    100044: ID43
+    100046: ID43 1
+    100048: ID49
+    100050: ID49 1
+    100052: ID79
+    100054: ID79 1
+    100056: ID87
+    100058: ID87 1
+    100060: instance_0
+    100062: instance_1
+    100064: instance_2
+    100066: instance_2 1
+    100068: instance_3
+    100070: instance_3 1
+    100072: instance_4
+    100074: instance_5
+    100076: //RootNode
+    100078: Servo
+    100080: Servo 1
+    100082: Servo_MG_996R
+    100084: Servo_MG_996R 1
+    100086: Servo_mount
+    100088: Servo_mount 1
+    100090: ServoAxis
+    100092: ServoAxis 1
+    100094: ServoAxis 2
+    100096: ServoAxis 3
+    100098: ServoHorn1
+    100100: ServoHorn1 1
+    100102: ServoHouse
+    100104: ServoHouse 1
+    100106: ServoHouse 2
+    100108: ServoHouse 3
+    400000: ID101
+    400002: ID101 1
+    400004: ID107
+    400006: ID107 1
+    400008: ID113
+    400010: ID113 1
+    400012: ID119
+    400014: ID119 1
+    400016: ID125
+    400018: ID125 1
+    400020: ID13
+    400022: ID13 1
+    400024: ID131
+    400026: ID131 1
+    400028: ID19
+    400030: ID19 1
+    400032: ID25
+    400034: ID25 1
+    400036: ID31
+    400038: ID31 1
+    400040: ID37
+    400042: ID37 1
+    400044: ID43
+    400046: ID43 1
+    400048: ID49
+    400050: ID49 1
+    400052: ID79
+    400054: ID79 1
+    400056: ID87
+    400058: ID87 1
+    400060: instance_0
+    400062: instance_1
+    400064: instance_2
+    400066: instance_2 1
+    400068: instance_3
+    400070: instance_3 1
+    400072: instance_4
+    400074: instance_5
+    400076: //RootNode
+    400078: Servo
+    400080: Servo 1
+    400082: Servo_MG_996R
+    400084: Servo_MG_996R 1
+    400086: Servo_mount
+    400088: Servo_mount 1
+    400090: ServoAxis
+    400092: ServoAxis 1
+    400094: ServoAxis 2
+    400096: ServoAxis 3
+    400098: ServoHorn1
+    400100: ServoHorn1 1
+    400102: ServoHouse
+    400104: ServoHouse 1
+    400106: ServoHouse 2
+    400108: ServoHouse 3
+    2300000: ID101
+    2300002: ID101 1
+    2300004: ID107
+    2300006: ID107 1
+    2300008: ID113
+    2300010: ID113 1
+    2300012: ID119
+    2300014: ID119 1
+    2300016: ID125
+    2300018: ID125 1
+    2300020: ID13
+    2300022: ID13 1
+    2300024: ID131
+    2300026: ID131 1
+    2300028: ID19
+    2300030: ID19 1
+    2300032: ID25
+    2300034: ID25 1
+    2300036: ID31
+    2300038: ID31 1
+    2300040: ID37
+    2300042: ID37 1
+    2300044: ID43
+    2300046: ID43 1
+    2300048: ID49
+    2300050: ID49 1
+    2300052: ID79
+    2300054: ID79 1
+    2300056: ID87
+    2300058: ID87 1
+    2300060: Servo_mount
+    2300062: Servo_mount 1
+    2300064: ServoAxis 2
+    2300066: ServoAxis 3
+    2300068: ServoHorn1
+    2300070: ServoHorn1 1
+    2300072: ServoHouse 2
+    2300074: ServoHouse 3
+    3300000: ID101
+    3300002: ID101 1
+    3300004: ID107
+    3300006: ID107 1
+    3300008: ID113
+    3300010: ID113 1
+    3300012: ID119
+    3300014: ID119 1
+    3300016: ID125
+    3300018: ID125 1
+    3300020: ID13
+    3300022: ID13 1
+    3300024: ID131
+    3300026: ID131 1
+    3300028: ID19
+    3300030: ID19 1
+    3300032: ID25
+    3300034: ID25 1
+    3300036: ID31
+    3300038: ID31 1
+    3300040: ID37
+    3300042: ID37 1
+    3300044: ID43
+    3300046: ID43 1
+    3300048: ID49
+    3300050: ID49 1
+    3300052: ID79
+    3300054: ID79 1
+    3300056: ID87
+    3300058: ID87 1
+    3300060: Servo_mount
+    3300062: Servo_mount 1
+    3300064: ServoAxis 2
+    3300066: ServoAxis 3
+    3300068: ServoHorn1
+    3300070: ServoHorn1 1
+    3300072: ServoHouse 2
+    3300074: ServoHouse 3
+    4300000: Servo_mount
+    4300002: ID13
+    4300004: ID19
+    4300006: ID25
+    4300008: ID31
+    4300010: ID37
+    4300012: ID43
+    4300014: ID49
+    4300016: ServoHouse
+    4300018: ServoAxis
+    4300020: ID79
+    4300022: ID87
+    4300024: ServoHorn1
+    4300026: ID101
+    4300028: ID107
+    4300030: ID113
+    4300032: ID119
+    4300034: ID125
+    4300036: ID131
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 2.54
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
