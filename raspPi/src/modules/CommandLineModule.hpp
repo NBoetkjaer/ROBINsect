@@ -7,7 +7,8 @@
 class CommandLineModule : public Module, public NodeObserver
 {
 private:
-    BaseNode* pCommandsNode;
+    StringNode* pNodeCommand;
+    StringNode* pNodeOutput;
 public:
     CommandLineModule(){};
     virtual ~CommandLineModule(){};
@@ -15,7 +16,7 @@ public:
     virtual void CreateNodes(BaseNode& rootNode) override;
 private:
 //    virtual void DataReceived(char* pData, size_t dataLen) override;
-    void ProcessCmd(const char* pCmd, size_t dataLen);
+    void ProcessCmd(const char* pCmd);
 
     // Inherited via NodeObserver
     virtual void Notify() override;

@@ -9,6 +9,7 @@
 #include "modules/InsectModule.hpp"
 #include "modules/ServoModule.hpp"
 #include "modules/ControllerModule.hpp"
+#include "modules/CommandLineModule.hpp"
 
 using namespace std;
 
@@ -37,7 +38,8 @@ void Application::RunLoop()
     modules.push_back(std::make_unique<XmlViewModule>("/"));
     modules.push_back(std::make_unique<InsectModule>());
     modules.push_back(std::make_unique<ServoModule>());
-    modules.push_back(std::make_unique<ControllerModule>());  
+    modules.push_back(std::make_unique<ControllerModule>());
+    modules.push_back(std::make_unique<CommandLineModule>());
     
     std::cout << std::endl << "************************" << std::endl;
     std::cout << "Initialize all modules" << std::endl;

@@ -51,7 +51,7 @@ public:
         value = newValue;
         SetAttributeChanged(valueAttrib.GetID());
     }
-    T Get() const { return value; }
+    const T& Get() const { return value; }
 protected:
     T value;
 };

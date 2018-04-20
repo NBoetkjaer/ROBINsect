@@ -284,7 +284,7 @@ bool BaseNode::GetFlag(FlagType flag) const
 void BaseNode::SetInfo(const char* pValue)
 {
     info = pValue;
-    SetAttributeChanged(flagsAttrib.GetID()); // Mark the change.
+    SetAttributeChanged(infoAttrib.GetID()); // Mark the change.
 }
 
 // SetAttribute
