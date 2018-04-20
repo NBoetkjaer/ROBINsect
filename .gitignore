@@ -1,6 +1,9 @@
 # directories
 libraries/
 
+# Visual Studio cache directory
+.vs/
+
 build/
 debug/
 release/
@@ -13,3 +16,4 @@ obj/
 *.opensdf
 *.user
 *.ncb
+*.bak
