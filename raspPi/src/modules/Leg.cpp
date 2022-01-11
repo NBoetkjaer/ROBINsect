@@ -32,6 +32,11 @@ void Leg::CreateNodes(BaseNode& rootNode, int legNumber)
 
     pNodeMountPos = pNodeLeg->FindOrCreateChild<Pos3D_32f_Node>("mountPosition");
     pNodeMountPos->SetAttribute(unitAttrib.GetID(), "m");
+    pNodeMountPos->SetFlag(FlagType::persist, true, false);
+
+    pNodeMountAngle_deg = pNodeLeg->FindOrCreateChild<Pos3D_32f_Node>("mountAngle");
+    pNodeMountAngle_deg->SetAttribute(unitAttrib.GetID(), "deg");
+    pNodeMountAngle_deg->SetFlag(FlagType::persist, true, false);
 
     pNodeGoalPos = pNodeLeg->FindOrCreateChild<Pos3D_32f_Node>("goalPos", 0.1f, 0.0f, -0.15f);
     pNodeGoalPos->SetAttribute(unitAttrib.GetID(), "m");
@@ -57,6 +62,8 @@ void Leg::CreateNodes(BaseNode& rootNode, int legNumber)
             linkDist = 0.0597f;
             pNodeJointAngles[jointIdx]->SetRange(-90.0f, 70.0f);
             linkAngle = legID & 0x1 ? -90.0f : 90.0f;
+            if (legID == 4) linkAngle = -90;
+            if (legID == 5) linkAngle = 90;
             break;
         case 1:
             linkDist = 0.08603f;

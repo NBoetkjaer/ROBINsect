@@ -72,13 +72,17 @@ namespace ROBINinspect
             if (treeView1.SelectedNode != null)
             {
                 string path = treeView1.SelectedNode.FullPath;
+                path = path.Replace('\\', '/');
+                path = path.Replace("root", "");
                 BaseNode selectedNode = robinMonitor.rootNode.FindNode(path);
                 if (selectedNode == null || selectedNode.Children == null) return;
                 // Update grid view.
-                dataGridView1.Rows.Clear();
-                dataGridView1.ColumnCount = 2;
+                if (selectedNode.AnyChanges())
+                {
+                    treeView1_AfterSelect(null, null);
+                }
             }
-            Console.WriteLine("New Transaction ...");
+            //Console.WriteLine("New Transaction ...");
         }
 
         private void AddChildrenToNodeTree(BaseNode parentNode, TreeNode tnode)

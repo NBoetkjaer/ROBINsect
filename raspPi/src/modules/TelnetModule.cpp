@@ -19,6 +19,7 @@ void TelnetModule::CreateNodes(BaseNode& rootNode)
     BaseNode* pNode = rootNode.FindOrCreateChild<BaseNode>("Network");
     pNode = pNode->FindOrCreateChild<BaseNode>("TelnetSocket");
     TcpSocketModule::CreateNodes(*pNode, 1973);
+    pShowAll = pNode->FindOrCreateChild<BoolNode>("ShowAll");
     rootNode.Subscribe(this);
 }
 
@@ -162,7 +163,7 @@ void TelnetModule::PrintNodes(bool clear)
     consoleOutput += "Current node: " + tmpStr + NEWLINE;
     consoleOutput += FOREGROUND(DEFAULT_COLOR);
 
-    bool bShowAll = true;
+    bool bShowAll = pShowAll->Get();
     for (const auto &child : pCurrentNode->GetChilds())
     {
         bool hiddenChild = child->GetFlag(FlagType::hide);

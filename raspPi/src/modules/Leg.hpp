@@ -47,6 +47,7 @@ private:
     BaseNode* pNodeLeg;
     BoolNode* pNodeEnable;
     Pos3D_32f_Node* pNodeMountPos;
+    Pos3D_32f_Node* pNodeMountAngle_deg;
     Pos3D_32f_Node* pNodeGoalPos;
     Pos3D_32f_Node* pNodeCurrentPos;
 
@@ -59,8 +60,8 @@ private:
 
     LegKinematic kinematic;
 
-    // ToDo: Temporary solution - consider using a list of segments.
+
     std::unique_ptr<TrajectorySegment> pTrajectory;
     float deltaTime = 0;
-    //Eigen::Affine3f toLegT;
+    std::unique_ptr<Eigen::AffineCompact3f> toLegT = std::make_unique<Eigen::AffineCompact3f>();
 };

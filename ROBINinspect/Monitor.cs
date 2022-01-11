@@ -137,7 +137,8 @@ namespace ROBINinspect
                 xmlConverter.ResolveMirrors = true;
             }
             xmlConverter.UpdateTreeFromXml(rootNode, xmlStr);
-            OnTransactionRecieved(); 
+            OnTransactionRecieved();
+            rootNode.ClearAllChanges();
         }
 
         void ReceiveXML()

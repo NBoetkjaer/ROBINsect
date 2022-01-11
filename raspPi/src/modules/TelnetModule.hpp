@@ -10,6 +10,7 @@ class TelnetModule : public TcpSocketModule, public NodeObserver
 {
 private:
     BaseNode* pCurrentNode;
+    BoolNode* pShowAll;
     std::string consoleOutput;
     bool updateOutput;
     bool clearConsole;
