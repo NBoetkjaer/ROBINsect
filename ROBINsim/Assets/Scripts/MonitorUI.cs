@@ -69,9 +69,8 @@ public class MonitorUI : MonoBehaviour
     {
         testTrajectoryNode = null;
         legJointAngles = null;
-        connected = false;
-        monitor.Close();
-        app.ShowDiscovery();
+        connected = false;        
+        monitor.Close();       
     }
 
     // Update is called once per frame
@@ -81,10 +80,7 @@ public class MonitorUI : MonoBehaviour
         if (!monitor.IsConnected)
         {
             legJointAngles = null;
-            if(connected)
-            {
-                Disconnect();
-            }
+            app.ShowDiscovery();
         }
         else if (legJointAngles == null && monitor.rootNode != null)
         {
@@ -101,7 +97,7 @@ public class MonitorUI : MonoBehaviour
             if (!ok)
             {
                 // Error ?
-                Disconnect();
+                app.ShowDiscovery();
             }
         }
     }

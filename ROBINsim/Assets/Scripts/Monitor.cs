@@ -56,8 +56,14 @@ namespace ROBINinspect
         {
             if (socketXML != null)
             {
-                socketXML.Shutdown(SocketShutdown.Both);
-                socketXML.Close();
+                try
+                {
+                    socketXML.Shutdown(SocketShutdown.Both);
+                    socketXML.Close();
+                }
+                catch (Exception)
+                {
+                }
                 socketXML = null;
             }
         }

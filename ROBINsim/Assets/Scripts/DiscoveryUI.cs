@@ -10,11 +10,16 @@ public class DiscoveryUI : MonoBehaviour {
     private Discovery robinDiscovery = new Discovery();
     // Use this for initialization
     void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
+        
+    }
+
+    void OnEnable()
+    {
+        robinDiscovery.StartDiscovery();        
+    }
+
+    // Update is called once per frame
+    void Update () {
         robinDiscovery.Update();
         FillScrollView();
     }
