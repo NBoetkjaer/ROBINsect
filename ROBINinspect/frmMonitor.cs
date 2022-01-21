@@ -85,7 +85,7 @@ namespace ROBINinspect
             //Console.WriteLine("New Transaction ...");
         }
 
-        private void AddChildrenToNodeTree(BaseNode parentNode, TreeNode tnode)
+        static private void AddChildrenToNodeTree(BaseNode parentNode, TreeNode tnode)
         {
             foreach (BaseNode childNode in parentNode.Children)
             {
@@ -146,6 +146,12 @@ namespace ROBINinspect
                 node.SetAttribute(attr, attribValue);
                 robinMonitor.SendTreeUpdates();
             }
+        }
+
+        private void btnLogger_Click(object sender, EventArgs e)
+        {
+            frmLogger frm = new frmLogger(robinMonitor);
+            frm.Show();
         }
     }
 }

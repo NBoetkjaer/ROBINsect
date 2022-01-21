@@ -142,6 +142,28 @@ namespace ROBINinspect
             }
             return true;
         }
+
+        public double ValueAsDouble()
+        {
+            switch (this)
+            {
+                case DoubleNode nodeF64:
+                    return nodeF64.Value;
+                case FloatNode nodeF32:
+                    return nodeF32.Value;
+                case Int64Node nodeI64:
+                    return nodeI64.Value;
+                case Int32Node nodeI32:
+                    return nodeI32.Value;
+                case UInt32Node nodeU32:
+                    return nodeU32.Value;
+                case UInt16Node nodeU16:
+                    return nodeU16.Value;
+                default:
+                    return double.NaN;
+            }            
+        }
+
         protected abstract void GetRange(ref String strValue);
         protected abstract void SetRange(String strValue);
     }

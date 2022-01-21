@@ -32,6 +32,7 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.btnLogger = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
@@ -87,11 +88,23 @@
             this.dataGridView1.TabIndex = 1;
             this.dataGridView1.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellEndEdit);
             // 
+            // btnLogger
+            // 
+            this.btnLogger.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnLogger.Location = new System.Drawing.Point(592, 12);
+            this.btnLogger.Name = "btnLogger";
+            this.btnLogger.Size = new System.Drawing.Size(91, 27);
+            this.btnLogger.TabIndex = 4;
+            this.btnLogger.Text = "Data logger ...";
+            this.btnLogger.UseVisualStyleBackColor = true;
+            this.btnLogger.Click += new System.EventHandler(this.btnLogger_Click);
+            // 
             // frmMonitor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(698, 451);
+            this.Controls.Add(this.btnLogger);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.btnConnect);
             this.Name = "frmMonitor";
@@ -108,5 +121,6 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.TreeView treeView1;
         private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.Button btnLogger;
     }
 }
