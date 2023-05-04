@@ -6,14 +6,14 @@ class StringNode : public AbstractValueNode<std::string>
 {
 public:
     StringNode(const std::string &nodeName, std::string val = "") : AbstractValueNode<std::string>(nodeName, val){}
-    virtual ~StringNode(){}
+    ~StringNode() override {}
     
-    virtual void GetValue(std::string &strValue) const
+    void GetValue(std::string &strValue) const override
     {
         strValue = value;
     }
 
-    virtual void SetValue(const char* pValues)
+    void SetValue(const char* pValues) override
     {
         value = pValues;
         SetAttributeChanged(valueAttrib.GetID());

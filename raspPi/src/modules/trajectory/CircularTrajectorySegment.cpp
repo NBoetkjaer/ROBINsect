@@ -10,7 +10,10 @@ void CircularTrajectorySegment::Initialize(const Eigen::Vector3f& start, const E
     // and start is located in the origin.
     Eigen::Vector3f xAxis = target - start;
     float chordLength = xAxis.norm();
-    if (chordLength > 2.0f * abs(radius) || chordLength == 0.0f) return;
+    if (chordLength > abs(2.0f * radius))
+        chordLength = abs(2.0f * radius);
+    if(chordLength == 0.0f) return;
+
     // Find y-axis so that we have a right hand coordinate system.
     Eigen::Vector3f zAxis = normal;
     xAxis.normalize();
@@ -31,7 +34,7 @@ void CircularTrajectorySegment::Initialize(const Eigen::Vector3f& start, const E
     // since target is also located on the positive x-axis (and start is the origin) x coordinate of center is midway to target.
     // y is given by Pythagoras. Actually two circles exist, Here we use the circle with a positive y center. To get the other circle invert the normal vector.
     float cntrX = chordLength / 2.0f;
-    float cntrY = sqrt(radius*radius - cntrX *cntrX);
+    float cntrY = cntrX < radius ? sqrt(radius * radius - cntrX * cntrX) : 0.0f;
     Eigen::Vector3f center(cntrX, cntrY, 0);
     // Transform center back to original coordinate system.
     center = fromCirclePlane * center;
@@ -47,24 +50,24 @@ void CircularTrajectorySegment::Initialize(const Eigen::Vector3f& start, const E
     // Calculate the angle sweep.
     if (radius > 0)
     {   // Counter clockwise orientation around normal.
-        arcAngle_rad = 2.0f * asin(chordLength / (2.0f * radius)); // arcAngle_rad is positive.
+        m_arcAngle_rad = 2.0f * asin(chordLength / (2.0f * radius)); // m_arcAngle_rad is positive.
     }
     else
     {   // Clockwise orientation around normal ~ the longest way around in the circle.
-        arcAngle_rad = (float)(-2.0 * M_PI) - 2.0f * asin(chordLength / (2.0f * radius)); // arcAngle_rad is negative.
+        m_arcAngle_rad = (float)(-2.0 * M_PI) - 2.0f * asin(chordLength / (2.0f * radius)); // m_arcAngle_rad is negative.
     }
-    arcRadius = abs(radius);
+    m_arcRadius = abs(radius);
 }
 
 void CircularTrajectorySegment::GetPosition(float time, Eigen::Vector3f& position) const
 {
-    if (bSpline)
+    if (m_bSpline)
     {
         time = GetSplineTime(time);
     }
 
     // Calculate position along the arc.
-    float angle_rad = arcAngle_rad * time / durationTime;
-    Eigen::Vector3f pos(arcRadius * cos(angle_rad), arcRadius * sin(angle_rad), 0.0f);
+    float angle_rad = m_arcAngle_rad * time / m_duration_s;
+    Eigen::Vector3f pos(m_arcRadius * cos(angle_rad), m_arcRadius * sin(angle_rad), 0.0f);
     position = fromCirclePlane * pos;
 }

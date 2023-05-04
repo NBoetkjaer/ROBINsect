@@ -8,6 +8,7 @@ file(GLOB SOURCES_modules "src/modules/*.*pp")
 file(GLOB SOURCES_modules_hw "src/modules/hardware/*.*pp")
 file(GLOB SOURCES_modules_trajectory "src/modules/trajectory/*.*pp")
 file(GLOB SOURCES_modules_gait "src/modules/gait/*.*pp")
+file(GLOB SOURCES_modules_geometry "src/modules/geometry/*.*pp")
 file(GLOB SOURCES_modules_hw_stub "src/modules/hardware/stub/*.*pp")
 file(GLOB SOURCES_nodes "src/nodes/*.*pp")
 file(GLOB SOURCES_xml "src/nodes/xml/*.*pp")
@@ -26,14 +27,16 @@ file(GLOB SOURCES_test "src/test/*.cpp")
         ${SOURCES_modules_hw}
         ${SOURCES_modules_trajectory}
         ${SOURCES_modules_gait}
+        ${SOURCES_modules_geometry}
         ${SOURCES_nodes}
         ${SOURCES_xml}
         ${SOURCES_test}
     )
-    ADD_DEFINITIONS(
-        -std=c++17 # Or -std=c++0x
-        # Other flags
-    )
+#    ADD_DEFINITIONS(
+#        -std=c++17 # Or -std=c++0x
+#        # Other flags
+#    )
+
 
 ELSE (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     
@@ -46,6 +49,7 @@ ELSE (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         ${SOURCES_modules_hw_stub}
         ${SOURCES_modules_trajectory}
         ${SOURCES_modules_gait}
+        ${SOURCES_modules_geometry}
         ${SOURCES_nodes}
         ${SOURCES_xml}
         ${SOURCES_test}
@@ -59,10 +63,14 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 add_executable(ROBINsect ${SOURCES} )
                 
+set(CXX_STANDARD_REQUIRED ON)
+set_property(TARGET ROBINsect PROPERTY CXX_STANDARD 17)
+
 source_group("Modules"              FILES ${SOURCES_modules})
 source_group("Modules\\hardware"    FILES ${SOURCES_modules_hw} ${SOURCES_modules_hw_stub})
 source_group("Modules\\trajectory"  FILES ${SOURCES_modules_trajectory})
 source_group("Modules\\gait"        FILES ${SOURCES_modules_gait})
+source_group("Modules\\geomerty"    FILES ${SOURCES_modules_geometry})
 source_group("Nodes"                FILES ${SOURCES_nodes})
 source_group("Nodes\\xml"           FILES ${SOURCES_xml})
 source_group("Communication"        FILES ${SOURCES_comm})

@@ -25,11 +25,13 @@ protected:
 
     virtual float GetCurveLength() const override
     {
-        return abs(arcAngle_rad * arcRadius);
+        return abs(m_arcAngle_rad * m_arcRadius);
     };
+
     Eigen::AffineCompact3f fromCirclePlane;
-    float arcAngle_rad;
-    float arcRadius;
+    float m_arcAngle_rad;
+    float m_arcRadius;
+
 private:
     void Initialize(const Eigen::Vector3f& start, const Eigen::Vector3f& target,
         const Eigen::Vector3f& normal, float radius);

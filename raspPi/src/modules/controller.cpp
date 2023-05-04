@@ -44,7 +44,7 @@ void Controller::Publish()
             // Offset is used to spread out the servo pulses, in order to balance the load on the power supply.
             // Servo PWM value is using less than 10 bit, since we have 12 bit available we distribute the pulses 
             // in full 12 bit range.
-            uint16_t channelOffset = iChan * (0xFFF - 0x3FF)/16; 
+            uint16_t channelOffset = static_cast<uint16_t>(iChan * (0xFFF - 0x3FF)/16); 
             changes = true;
             controller.setPWM((__u8)iChan, channelOffset , channels[iChan]->Get() + channelOffset);
         }

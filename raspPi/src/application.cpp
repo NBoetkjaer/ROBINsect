@@ -116,13 +116,6 @@ void Application::RunLoop()
         nextTimeStamp +=  desiredLoopTime;
         prevTimestamp = timeStamp;
 
-        // Execute all modules.
-        for (auto &pModule : modules)
-        {
-            pModule->SetElapsedUs(elapsed_us);
-            pModule->Execute();
-        }
-
         // Continue to notify all nodes until the tree is stabilized.
         const int maxIterations = 8 * sizeof(size_t) - 1;
         int iterations = 0;
@@ -137,12 +130,19 @@ void Application::RunLoop()
         }
 
         // Publish all modules.
-        for (auto &pModule : modules)
+        for (auto& pModule : modules)
         {
             pModule->Publish();
         }
 
         // Clear all changes.
         root.ClearAllChanges();
+
+        // Execute all modules.
+        for (auto &pModule : modules)
+        {
+            pModule->SetElapsedUs(elapsed_us);
+            pModule->Execute();
+        }
     }
 }

@@ -5,32 +5,32 @@ class LinearTrajectorySegment :public SimpleTrajectorySegment
 {
 public:
     LinearTrajectorySegment(const Eigen::Vector3f& start, const Eigen::Vector3f& target, float duration):
-        SimpleTrajectorySegment(duration), startPos(start)
+        SimpleTrajectorySegment(duration), m_startPos(start)
     {
-        slope = (target - startPos) / durationTime;
+        m_slope = (target - m_startPos) / m_duration_s;
     };
 
     LinearTrajectorySegment(const Eigen::Vector3f& start, const Eigen::Vector3f& target, float duration, float startVelocity, float endVelocity) :
-        SimpleTrajectorySegment(duration), startPos(start)
+        SimpleTrajectorySegment(duration), m_startPos(start)
     {
-        slope = (target - startPos) / durationTime;
+        m_slope = (target - m_startPos) / m_duration_s;
         UseSpline(startVelocity, endVelocity);
     };
 
     virtual ~LinearTrajectorySegment() {};
     virtual void GetPosition(float time, Eigen::Vector3f& position) const override
     {
-        if (bSpline)
+        if (m_bSpline)
         {
             time = GetSplineTime(time);
         }
-        position = startPos + slope * time;
+        position = m_startPos + m_slope * time;
     };
 protected:
     virtual float GetCurveLength() const override
     {
-        return (slope*durationTime).norm();
+        return (m_slope*m_duration_s).norm();
     };
-    Eigen::Vector3f startPos;
-    Eigen::Vector3f slope;
+    Eigen::Vector3f m_startPos;
+    Eigen::Vector3f m_slope;
 };

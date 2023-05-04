@@ -49,14 +49,14 @@ bool LegKinematic::getJointAngles(const Eigen::Vector3f& goalPos, Eigen::Vector3
     float dist = hypot(x, y);
     if (dist > (m_ld[1] + m_ld[2]) || dist < fabs(m_ld[1] - m_ld[2]) || dist == 0.0f)
     {
-        cout << "Goal un-reachable.";
+        cout << "Goal un-reachable." << endl;
         return false;
     }
 
     float a = ((m_ld[1] * m_ld[1]) - (m_ld[2] * m_ld[2]) + (dist*dist)) / (2.0f*dist);
     if (m_ld[1] == a)
     {
-        cout << "Goal has only one solution.";
+        cout << "Goal has only one solution." << endl;;
     }
     float h = sqrtf(m_ld[1] * m_ld[1] - a*a);
     x2 = x * a / dist;

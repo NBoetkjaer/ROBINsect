@@ -17,24 +17,26 @@ public:
     virtual void Notify() override;
     
     void SetGoal(float x, float y, float z);
+    void GetCurrentPos(float &x, float &y, float &z) const;
+
     void EnableLeg(bool enable);
     const LegKinematic& GetKinematic() const { return kinematic; };
-    void RestartTrajectory(float initialTime = 0.0f) { deltaTime = initialTime;}
+    void RestartTrajectory(float initialTime_s = 0.0f) { deltaTime_s = initialTime_s;}
     const TrajectorySegment* GetTrajectory() { return pTrajectory.get();}
     void SetTrajectory(std::unique_ptr<TrajectorySegment> pNewTrajectory)
     {
         pTrajectory = std::move(pNewTrajectory);
-        deltaTime = 0.0f;
+        deltaTime_s = 0.0f;
     }
-    bool UpdateTrajectory(float elapsedTime)
+    bool UpdateTrajectory(float elapsedTime_s)
     {
         if (pTrajectory != nullptr)
         {
-            deltaTime += elapsedTime;
-            if(deltaTime < pTrajectory->GetDuration())
+            deltaTime_s += elapsedTime_s;
+            if(deltaTime_s < pTrajectory->GetDuration())
             {
                 Eigen::Vector3f pos;
-                pTrajectory->GetPosition(deltaTime, pos);
+                pTrajectory->GetPosition(deltaTime_s, pos);
                 pNodeGoalPos->SetPosition(pos[0], pos[1], pos[2]);
                 return true;
             }
@@ -42,6 +44,7 @@ public:
         return false;
     }
 private:
+    void setDefaultValues();
     uint16_t legID;
     static const int numJoints = 3;
     BaseNode* pNodeLeg;
@@ -62,6 +65,6 @@ private:
 
 
     std::unique_ptr<TrajectorySegment> pTrajectory;
-    float deltaTime = 0;
+    float deltaTime_s = 0;
     std::unique_ptr<Eigen::AffineCompact3f> toLegT = std::make_unique<Eigen::AffineCompact3f>();
 };

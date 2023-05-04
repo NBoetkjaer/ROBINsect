@@ -1,8 +1,10 @@
 #pragma once
 #include "Module.hpp"
+#include  "Leg.hpp"
+#include "gait/gait.hpp"
 
 #include <array>
-#include  "Leg.hpp"
+#include <memory>
 
 class InsectModule : public Module, public NodeObserver
 {
@@ -14,23 +16,32 @@ public:
     virtual void LookupNodes() override;
     virtual void OnTimer() override;
 private:
-    static const int numLegs = 6;
     // Inherited via NodeObserver
     virtual void Notify() override;
     
     void EnableLegs(bool enable);
     void SoftStart();
+    void InitializeGait();
     bool isSoftStarting = false;
-    int initLeg;
+    int initLeg = 0;
 
+    std::unique_ptr<Gait> gait;
+    
     // Nodes
-    BaseNode* pNodeInsect;
-    BaseNode* pNodeLegs;
-    std::array<Leg, numLegs> legs;
-    Pos3D_32f_Node* pNodePosition;
-    BoolNode* pNodeEnable;
-    BoolNode* pNodeSoftStart;
-    BoolNode* pNodeShutdown;
-    BoolNode* pNodeTestTrajectory;
+    BaseNode* pNodeInsect = nullptr;
+    BaseNode* pNodeLegs = nullptr;
+    std::array<Leg, NUM_LEGS> legs;
+    
+    BoolNode* pNodeEnable = nullptr;
+    BoolNode* pNodeSoftStart = nullptr;
+    BoolNode* pNodeShutdown = nullptr;
+    BoolNode* pNodeTestTrajectory = nullptr;
+    
+    FloatNode* pNodeBodyPosZ = nullptr;
+    //Pos3D_32f_Node* pNodeBodyAttitude = nullptr;
+    FloatNode* pNodeStepLength = nullptr;
+    FloatNode* pNodeOrientation = nullptr;
+    FloatNode* pNodeVelocity = nullptr;
+    FloatNode* pNodeAngularVelocity = nullptr;
 
 };

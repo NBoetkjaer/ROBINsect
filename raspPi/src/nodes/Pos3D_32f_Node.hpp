@@ -15,7 +15,7 @@ public:
     }
     virtual ~Pos3D_32f_Node(){}
     
-    virtual void GetValue(std::string &strValue) const
+    void GetValue(std::string &strValue) const override 
     {
         std::string strVal;
         strValue = "[";
@@ -39,9 +39,13 @@ public:
         pNodeX->Set(x);
         pNodeY->Set(y);
         pNodeZ->Set(z);
+        if (pNodeX->IsValueChanged() || pNodeY->IsValueChanged() || pNodeZ->IsValueChanged())
+        {
+            SetAttributeChanged(valueAttrib.GetID());
+        }
     }
 
-    virtual void SetValue(const char* pValues)
+    void SetValue(const char* pValues) override
     {
         static const char *pFormat = "[%g,%g,%g]";
         float values[3];
@@ -52,7 +56,6 @@ public:
         if (numSuccess == 3)
         { 
             SetPosition(values[0], values[1], values[2]);
-            SetAttributeChanged(valueAttrib.GetID());
             value = pValues;
         }
         else
