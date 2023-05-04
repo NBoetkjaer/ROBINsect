@@ -61,6 +61,12 @@ namespace ROBINinspect
             nodeX.Value = x;
             nodeY.Value = y;
             nodeZ.Value = z;
+            if (nodeZ.IsAttributeChanged(AttributeTypes.value) ||
+                nodeZ.IsAttributeChanged(AttributeTypes.value)||
+                nodeZ.IsAttributeChanged(AttributeTypes.value))
+            {
+                SetAttributeChanged(AttributeTypes.value);
+            }
         }
     }
 }

@@ -25,7 +25,7 @@ namespace ROBINinspect
         void Start () {
         
         }
-        
+
         // Update is called once per frame
         public void Update () {
             ReceiveXML();
@@ -40,7 +40,7 @@ namespace ROBINinspect
                 TransactionRecieved(this, EventArgs.Empty);
             }
         }
-        
+
         public bool IsConnected
         { 
             get
@@ -54,10 +54,17 @@ namespace ROBINinspect
         }
         public void Close()
         {
-            if (socketXML != null)
+            if (socketXML == null)
+            {
+                return;
+            }
+            try
             {
                 socketXML.Shutdown(SocketShutdown.Both);
                 socketXML.Close();
+            }
+            finally
+            {
                 socketXML = null;
             }
         }
@@ -84,7 +91,7 @@ namespace ROBINinspect
         }
 
         static int ReadFromSocket(Socket sock, Byte[] byteArray, ref int offset)
-        {            
+        {
             sock.ReceiveTimeout = 10;
             try
             {

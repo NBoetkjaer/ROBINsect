@@ -29,9 +29,9 @@ namespace ROBINinspect
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.txtFindNode = new System.Windows.Forms.TextBox();
             this.lblNode = new System.Windows.Forms.Label();
             this.btnAdd = new System.Windows.Forms.Button();
@@ -43,6 +43,7 @@ namespace ROBINinspect
             this.nudLegNumber = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.chkAutoScroll = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.grbPredefinedCollections.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudLegNumber)).BeginInit();
@@ -86,16 +87,16 @@ namespace ROBINinspect
             this.chart1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            chartArea3.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea3);
-            legend3.Name = "Legend1";
-            this.chart1.Legends.Add(legend3);
+            chartArea2.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea2);
+            legend2.Name = "Legend1";
+            this.chart1.Legends.Add(legend2);
             this.chart1.Location = new System.Drawing.Point(2, 93);
             this.chart1.Name = "chart1";
-            series3.ChartArea = "ChartArea1";
-            series3.Legend = "Legend1";
-            series3.Name = "Series1";
-            this.chart1.Series.Add(series3);
+            series2.ChartArea = "ChartArea1";
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            this.chart1.Series.Add(series2);
             this.chart1.Size = new System.Drawing.Size(898, 488);
             this.chart1.TabIndex = 3;
             this.chart1.Text = "chart1";
@@ -180,11 +181,25 @@ namespace ROBINinspect
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Find node";
             // 
+            // chkAutoScroll
+            // 
+            this.chkAutoScroll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.chkAutoScroll.AutoSize = true;
+            this.chkAutoScroll.Checked = true;
+            this.chkAutoScroll.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkAutoScroll.Location = new System.Drawing.Point(772, 70);
+            this.chkAutoScroll.Name = "chkAutoScroll";
+            this.chkAutoScroll.Size = new System.Drawing.Size(98, 17);
+            this.chkAutoScroll.TabIndex = 8;
+            this.chkAutoScroll.Text = "Auto Scroll Plot";
+            this.chkAutoScroll.UseVisualStyleBackColor = true;
+            // 
             // frmLogger
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(912, 593);
+            this.Controls.Add(this.chkAutoScroll);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.grbPredefinedCollections);
             this.Controls.Add(this.chkLogging);
@@ -199,6 +214,7 @@ namespace ROBINinspect
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -215,5 +231,6 @@ namespace ROBINinspect
         private System.Windows.Forms.NumericUpDown nudLegNumber;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.CheckBox chkAutoScroll;
     }
 }

@@ -153,5 +153,11 @@ namespace ROBINinspect
             frmLogger frm = new frmLogger(robinMonitor);
             frm.Show();
         }
+
+        private void frmMonitor_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            robinMonitor.Close();
+            robinMonitor.TransactionRecieved -= robinMonitor_TransactionRecieved;
+        }
     }
 }

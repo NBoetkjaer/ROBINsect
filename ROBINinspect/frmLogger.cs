@@ -15,6 +15,7 @@ namespace ROBINinspect
     {
         Monitor robinMonitor;
         int transactionCount = 0;
+        const int maximumDataPoints = 20000;
 
         public frmLogger(Monitor monitor)
         {
@@ -62,6 +63,10 @@ namespace ROBINinspect
                     robinMonitor.TransactionRecieved += RobinMonitor_TransactionRecieved;
                 }
                 chkLogging.Text = "Stop logging";
+                foreach (Series myserie in chart1.Series)
+                {
+                    myserie.Points.Clear();
+                }
             }
             else
             {
@@ -79,7 +84,7 @@ namespace ROBINinspect
             transactionCount++;
             foreach (Series myserie in chart1.Series)
             {
-                if (myserie.Points.Count > 10000) continue;
+                if (myserie.Points.Count > maximumDataPoints) continue;
                 AbstractNumericNode node = myserie.Tag as AbstractNumericNode;
                 if (node != null && node.IsAttributeChanged(AttributeTypes.value) )
                 {
@@ -87,6 +92,17 @@ namespace ROBINinspect
                     myserie.Points.AddXY(transactionCount, newValue);
                 }
                 i++;
+            }
+            if (chkAutoScroll.Checked)
+            {
+                ChartArea ca = chart1.ChartAreas[0];
+                ca.AxisX.Minimum = double.NaN;
+                ca.AxisX.Maximum = double.NaN;
+                double viewSize = 600;
+                double minX = Math.Max(0, transactionCount - viewSize);
+                double maxX = minX + viewSize;
+                ca.AxisX.ScaleView.Zoom(minX, maxX);
+                ca.RecalculateAxesScale();
             }
         }
 
